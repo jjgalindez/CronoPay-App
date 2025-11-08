@@ -30,8 +30,8 @@ export default function LoginPage() {
 
       if (error) throw error
 
-  // Si todo va bien, navega al sistema de pestañas protegido
-  router.replace("/(tabs)/inicio")
+      // Si todo va bien, navega al sistema de pestañas protegido
+      router.replace("/(tabs)/inicio")
     } catch (err: any) {
       setError(err.message ?? "Ocurrió un error")
     } finally {
