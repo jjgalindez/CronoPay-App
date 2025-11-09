@@ -49,8 +49,6 @@
 
 import { Slot } from "expo-router"
 export default function Layout() {
-<<<<<<< HEAD
-=======
   // const [isLoading, setIsLoading] = useState(true)
 
   // useEffect(() => {
@@ -68,6 +66,5 @@ export default function Layout() {
 
   // if (isLoading) return <ActivityIndicator />
 
->>>>>>> 049b7b9 (Sin inicio de sesion)
   return <Slot />
 }
