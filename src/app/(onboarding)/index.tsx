@@ -4,7 +4,7 @@ import { Link, router } from "expo-router"
 import { Alert, Image, Pressable, Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
-import { supabase } from "@/supabase"
+import { supabase } from "../../../lib/supabase"
 
 export default function Page() {
   function onLogout() {

@@ -1,26 +1,30 @@
 import "@/global.css"
-import * as Linking from "expo-linking"
-import { router, Slot } from "expo-router"
+import { useFonts } from "expo-font"
+import { Slot } from "expo-router"
+import * as SplashScreen from "expo-splash-screen"
 import React, { useEffect } from "react"
 
-import { createSessionFromUrl } from "@/app/(onboarding)/_layout"
+import AuthProvider from "../../providers/AuthProvider"
+
+SplashScreen.preventAutoHideAsync()
 
 export default function Layout() {
+  const [loaded] = useFonts({
+    Roboto: require("@/assets/fonts/Roboto-Medium.ttf"),
+    RobotoBold: require("@/assets/fonts/Roboto-Bold.ttf"),
+  })
+
   useEffect(() => {
-    const { remove } = Linking.addEventListener(
-      "url",
-      async (res: { url: string }) => {
-        if (res.url) {
-          const session = await createSessionFromUrl(res.url)
-          if (session) {
-            router.replace("/")
-          }
-        }
-      },
-    )
+    if (loaded) {
+      SplashScreen.hideAsync()
+    }
+  }, [loaded])
 
-    return () => remove()
-  }, [])
+  if (!loaded) return null
 
-  return <Slot />
+  return (
+    <AuthProvider>
+      <Slot />
+    </AuthProvider>
+  )
 }

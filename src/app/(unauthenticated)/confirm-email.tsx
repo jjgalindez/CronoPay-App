@@ -42,7 +42,21 @@ export default function Page() {
                 "mb-4 h-12 w-full items-center justify-center rounded-xl bg-[#E8F569]",
               )}
               // TODO: Replace with universal solution. https://github.com/includable/react-native-email-link
-              onPress={() => Linking.openURL("googlegmail://")}
+              onPress={async () => {
+                const gmailUrl = "googlegmail://"
+                const fallbackUrl = "mailto:"
+
+                try {
+                  const supported = await Linking.canOpenURL(gmailUrl)
+                  if (supported) {
+                    await Linking.openURL(gmailUrl)
+                  } else {
+                    await Linking.openURL(fallbackUrl)
+                  }
+                } catch (err) {
+                  console.warn("No se pudo abrir la app de correo:", err)
+                }
+              }}
             >
               <Text className={cn("text-[16px] font-bold text-[#134555]")}>
                 Open email app

@@ -10,7 +10,7 @@ import {
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
-import { supabase } from "@/supabase" // tu cliente inicializado
+import { supabase } from "../../../lib/supabase" // tu cliente inicializado
 
 export default function SignUpPage() {
   const [name, setName] = useState("")
@@ -43,7 +43,7 @@ export default function SignUpPage() {
       if (error) throw error
 
       // Navegar a pantalla de éxito
-      router.push("/sign-up-success")
+      router.push("/(unauthenticated)/confirm-email?email=" + email)
     } catch (err: any) {
       setError(err.message ?? "Ocurrió un error")
     } finally {

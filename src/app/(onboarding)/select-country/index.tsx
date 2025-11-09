@@ -70,6 +70,7 @@ export default function Page() {
             onPress={() =>
               router.push({
                 pathname: "/enter-phone-number",
+                params: { country: selectedCountry },
               })
             }
           >

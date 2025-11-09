@@ -20,14 +20,14 @@ export default function Page() {
           />
         </View>
         <View>
-          <Link href="/sign-up" asChild>
+          <Link href="/(unauthenticated)/sign-up" asChild>
             <Pressable className="h-12 w-full items-center justify-center rounded-xl bg-primary-500">
               <Text className="text-[16px] font-semibold text-white">
                 Sign up
               </Text>
             </Pressable>
           </Link>
-          <Link href="/login" asChild>
+          <Link href="/(unauthenticated)/login" asChild>
             <Pressable className="mt-4 h-12 w-full items-center justify-center rounded-xl bg-neutral-200">
               <Text className="text-[16px] font-semibold text-primary-500">
                 Log in

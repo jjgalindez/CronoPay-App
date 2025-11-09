@@ -10,7 +10,7 @@ import {
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
-import { supabase } from "@/supabase" // tu cliente inicializado
+import { supabase } from "../../../lib/supabase" // tu cliente inicializado
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -31,7 +31,7 @@ export default function LoginPage() {
       if (error) throw error
 
       // Si todo va bien, navega al Home o ruta protegida
-      router.replace("/home")
+      router.replace("/(onboarding)")
     } catch (err: any) {
       setError(err.message ?? "Ocurrió un error")
     } finally {
