@@ -1,30 +1,31 @@
-import "@/global.css"
-import { useFonts } from "expo-font"
-import { Slot } from "expo-router"
-import * as SplashScreen from "expo-splash-screen"
-import React, { useEffect } from "react"
+// app/(onboarding)/perfil/_layout.tsx
+import { Stack } from "expo-router"
 
-import AuthProvider from "../../providers/AuthProvider"
-
-SplashScreen.preventAutoHideAsync()
-
-export default function Layout() {
-  const [loaded] = useFonts({
-    Roboto: require("@/assets/fonts/Roboto-Medium.ttf"),
-    RobotoBold: require("@/assets/fonts/Roboto-Bold.ttf"),
-  })
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync()
-    }
-  }, [loaded])
-
-  if (!loaded) return null
-
+export default function PerfilLayout() {
   return (
-    <AuthProvider>
-      <Slot />
-    </AuthProvider>
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "Perfil y Configuración",
+          headerShadowVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+          },
+          headerTintColor: '#1B3D48',
+        }}
+      />
+      <Stack.Screen
+        name="editar"
+        options={{
+          title: "Editar Perfil",
+          headerShadowVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+          },
+          headerTintColor: '#1B3D48',
+        }}
+      />
+    </Stack>
   )
 }

@@ -1,66 +1,58 @@
-import { Link, useRouter } from "expo-router"
-import { useEffect } from "react"
-import { ActivityIndicator, Image, Pressable, Text, View } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+// src/components/profile/ProfileHeader.tsx
+import React from "react"
+import { View, Text, TouchableOpacity, Image } from "react-native"
+import Ionicons from "@expo/vector-icons/Ionicons"
 
-import { useAuth } from "../../providers/AuthProvider"
+interface ProfileHeaderProps {
+  name: string
+  email: string
+  avatarUrl?: string | null  // <- Nueva prop opcional
+  onEditProfile: () => void
+}
 
-export default function Page() {
-  const { loading, session } = useAuth()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (loading) return
-    if (session) {
-      router.replace("/(tabs)/inicio")
-    }
-  }, [loading, session, router])
-
-  if (loading) {
-    return (
-      <SafeAreaView style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator />
-      </SafeAreaView>
-    )
-  }
-
-  if (session) {
-    return null
+export function ProfileHeader({ name, email, avatarUrl, onEditProfile }: ProfileHeaderProps) {
+  const getInitials = (fullName: string) => {
+    return fullName
+      .split(" ")
+      .map(n => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View className="flex-1 px-4 py-7">
-        <View className="flex-1">
-          <Text className="text-[13px] font-medium text-neutral-600">
-            Bienvenido a CronoPay
-          </Text>
-          <Text className="mt-1.5 text-[34px] font-bold text-[#0C212C]">
-            Gestionar tu dinero nunca ha sido tan fácil
-          </Text>
+    <View className="items-center mt-6">
+      <View className="relative">
+        {avatarUrl ? (
+          // Si hay avatarUrl, mostrar la imagen
           <Image
-            source={require("@/assets/making-your-money.png")}
-            className="mt-10 w-full flex-1"
-            resizeMode="contain"
+            source={{ uri: avatarUrl }}
+            className="w-28 h-28 rounded-full border-4 border-green-400"
           />
-        </View>
-        <View>
-          <Link href="/(unauthenticated)/sign-up" asChild>
-            <Pressable className="h-12 w-full items-center justify-center rounded-xl bg-primary-500">
-              <Text className="text-[16px] font-semibold text-white">
-                Registrase
-              </Text>
-            </Pressable>
-          </Link>
-          <Link href="/(unauthenticated)/login" asChild>
-            <Pressable className="mt-4 h-12 w-full items-center justify-center rounded-xl bg-neutral-200">
-              <Text className="text-[16px] font-semibold text-primary-500">
-                Iniciar Sesion
-              </Text>
-            </Pressable>
-          </Link>
+        ) : (
+          // Si no hay avatarUrl, mostrar las iniciales
+          <View className="w-28 h-28 rounded-full bg-green-500 items-center justify-center border-4 border-green-400">
+            <Text className="text-white text-2xl font-bold">
+              {getInitials(name)}
+            </Text>
+          </View>
+        )}
+        <View className="absolute bottom-1 right-1 bg-green-500 p-2 rounded-full">
+          <Ionicons name="lock-closed" size={16} color="white" />
         </View>
       </View>
-    </SafeAreaView>
+
+      <Text className="mt-3 text-lg font-semibold text-neutral-900">
+        {name}
+      </Text>
+      <Text className="text-neutral-500">{email}</Text>
+
+      <TouchableOpacity 
+        className="mt-4 bg-green-500 px-6 py-2 rounded-md"
+        onPress={onEditProfile}
+      >
+        <Text className="text-white font-semibold">Editar perfil</Text>
+      </TouchableOpacity>
+    </View>
   )
 }
