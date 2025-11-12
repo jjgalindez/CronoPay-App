@@ -49,5 +49,22 @@
 
 import { Slot } from "expo-router"
 export default function Layout() {
+  // const [isLoading, setIsLoading] = useState(true)
+
+  // useEffect(() => {
+  //   const redirectIfUnauthenticated = async () => {
+  //     const { data, error } = await supabase.auth.getSession()
+  //     if (!error && data.session) {
+  //       setIsLoading(false)
+  //       return
+  //     }
+
+  //     router.replace("/welcome")
+  //   }
+  //   redirectIfUnauthenticated()
+  // }, [])
+
+  // if (isLoading) return <ActivityIndicator />
+
   return <Slot />
 }
