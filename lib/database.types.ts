@@ -121,7 +121,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "usuarios_perfil"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       recordatorio: {
@@ -153,7 +153,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "pago"
             referencedColumns: ["id_pago"]
-          }
+          },
         ]
       }
       informe: {
@@ -188,13 +188,13 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "usuarios_perfil"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
-    Views: {}
-    Functions: {}
-    Enums: {}
-    CompositeTypes: {}
+    Views: object
+    Functions: object
+    Enums: object
+    CompositeTypes: object
   }
 }

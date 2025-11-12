@@ -1,10 +1,8 @@
-import { supabase } from "../supabase"
 import { Database } from "../database.types"
+import { supabase } from "../supabase"
 
-export type CategoriaRow =
-  Database["public"]["Tables"]["categoria"]["Row"]
-export type MetodoPagoRow =
-  Database["public"]["Tables"]["metodo_pago"]["Row"]
+export type CategoriaRow = Database["public"]["Tables"]["categoria"]["Row"]
+export type MetodoPagoRow = Database["public"]["Tables"]["metodo_pago"]["Row"]
 
 export async function fetchCategorias(): Promise<CategoriaRow[]> {
   const { data, error } = await supabase

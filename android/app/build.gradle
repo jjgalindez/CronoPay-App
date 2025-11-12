@@ -89,7 +89,7 @@ android {
 
     namespace 'com.cronopay.app'
     defaultConfig {
-        applicationId 'ccom.cronopay.app'
+        applicationId 'com.cronopay.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -1,3 +1,4 @@
+//providers/AuthProvider.tsx
 import { Session } from "@supabase/supabase-js"
 import { router } from "expo-router"
 import React, { createContext, useState, useEffect, useContext } from "react"
