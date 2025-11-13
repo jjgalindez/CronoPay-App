@@ -1,8 +1,10 @@
-package com.edrickleong.smartbank
+package com.cronopay.app
 
 import android.app.Application
 import android.content.res.Configuration
 
+import android.app.Application
+import android.content.res.Configuration
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
@@ -12,9 +14,9 @@ import com.facebook.react.ReactHost
 import com.facebook.react.common.ReleaseLevel
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint
 import com.facebook.react.defaults.DefaultReactNativeHost
-
 import expo.modules.ApplicationLifecycleDispatcher
 import expo.modules.ReactNativeHostWrapper
+import com.cronopay.app.BuildConfig
 
 class MainApplication : Application(), ReactApplication {
 

@@ -1,10 +1,14 @@
+//src/app/_layout.tsx
 import "@/global.css"
 import { useFonts } from "expo-font"
 import { Slot } from "expo-router"
 import * as SplashScreen from "expo-splash-screen"
+import * as WebBrowser from "expo-web-browser"
 import React, { useEffect } from "react"
 
 import AuthProvider from "../../providers/AuthProvider"
+
+WebBrowser.maybeCompleteAuthSession()
 
 SplashScreen.preventAutoHideAsync()
 

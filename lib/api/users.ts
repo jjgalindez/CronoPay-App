@@ -1,5 +1,5 @@
-import { supabase } from "../supabase"
 import { Database } from "../database.types"
+import { supabase } from "../supabase"
 
 export type UsuarioPerfilRow =
   Database["public"]["Tables"]["usuarios_perfil"]["Row"]

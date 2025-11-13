@@ -1,3 +1,4 @@
+//providers/AuthProvider.tsx
 import { Session } from "@supabase/supabase-js"
 import { router } from "expo-router"
 import React, { createContext, useState, useEffect, useContext } from "react"
@@ -20,11 +21,12 @@ interface Props {
   children: React.ReactNode
 }
 
-export default function AuthProvider(props: Props) {
-  const [loading, setLoading] = useState<boolean>(true)
+export default function AuthProvider({ children }: Props) {
+  const [loading, setLoading] = useState(true)
   const [session, setSession] = useState<Session | null>(null)
 
   useEffect(() => {
+    //  Obtener sesión inicial
     const fetchSession = async () => {
       try {
         const { data, error } = await supabase.auth.getSession()
@@ -40,9 +42,18 @@ export default function AuthProvider(props: Props) {
 
     fetchSession()
 
+    //  Escuchar cambios de sesión en tiempo real
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, authSession) => {
+      (event, authSession) => {
         setSession(authSession)
+
+        //  Redirección automática según estado
+        if (event === "SIGNED_IN" && authSession) {
+          router.replace("/(tabs)/inicio")
+        }
+        if (event === "SIGNED_OUT") {
+          router.replace("/(unauthenticated)/login")
+        }
       },
     )
 
@@ -51,6 +62,7 @@ export default function AuthProvider(props: Props) {
     }
   }, [])
 
+  //  Cerrar sesión
   const signOut = async () => {
     try {
       await supabase.auth.signOut()
@@ -58,13 +70,13 @@ export default function AuthProvider(props: Props) {
       console.error("Error signing out", error)
     } finally {
       setSession(null)
-      router.replace("/")
+      router.replace("/(unauthenticated)/login")
     }
   }
 
   return (
     <AuthContext.Provider value={{ loading, session, signOut }}>
-      {props.children}
+      {children}
     </AuthContext.Provider>
   )
 }

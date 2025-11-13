@@ -1,5 +1,7 @@
 {
   "expo": {
+    "name": "CronoPay",
+    "slug": "cronopay-app",
     "scheme": "com.cronopay.app",
     "userInterfaceStyle": "light",
     "icon": "./src/assets/CronoPayLogo.svg",
