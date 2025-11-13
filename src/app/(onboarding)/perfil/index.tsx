@@ -7,6 +7,7 @@ import { ProfileHeader } from "../../../components/profile/ProfileHeader"
 import { ConfigurationList } from "../../../components/profile/ConfigurationList"
 import { LogoutButton } from "../../../components/profile/LogoutButton"
 import { VersionInfo } from "../../../components/profile/VersionInfo"
+import { router } from "expo-router"
 
 
 export default function PerfilScreen() {
@@ -26,7 +27,7 @@ export default function PerfilScreen() {
 
   const handleEditProfile = () => {
     // Navegar a la pantalla de edición (la crearemos después)
-    Alert.alert("Editar Perfil", "Esta funcionalidad estará disponible pronto")
+    router.push("/(onboarding)/perfil/editar")
   }
 
   // Obtener el nombre para mostrar usando solo propiedades existentes
