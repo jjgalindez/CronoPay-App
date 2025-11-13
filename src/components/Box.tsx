@@ -21,6 +21,17 @@ type BoxProps = {
     onPress?: () => void
     backgroundColor?: string
     style?: StyleProp<ViewStyle>
+    // Progress bar props
+    showProgress?: boolean
+    currentAmount?: number
+    totalAmount?: number
+    progressColor?: string
+    progressBackgroundColor?: string
+    // Comparison props
+    showComparison?: boolean
+    comparisonText?: string
+    comparisonPercentage?: number
+    comparisonColor?: string
 }
 
 const DEFAULT_VALUE_COLOR = "#1B3D48"
@@ -40,6 +51,15 @@ export default function Box({
     onPress,
     backgroundColor = DEFAULT_CARD_BG,
     style,
+    showProgress = false,
+    currentAmount = 0,
+    totalAmount = 100,
+    progressColor = "#12C48B",
+    progressBackgroundColor = "#E5E7EB",
+    showComparison = false,
+    comparisonText,
+    comparisonPercentage,
+    comparisonColor = "#12C48B",
 }: BoxProps) {
     const containerStyles = [
         styles.container,
@@ -62,6 +82,9 @@ export default function Box({
             />
         )
 
+    const progressPercentage = totalAmount > 0 ? (currentAmount / totalAmount) * 100 : 0
+    const clampedProgress = Math.min(Math.max(progressPercentage, 0), 100)
+
     const body = (
         <View style={containerStyles}>
             <View style={iconWrapperStyles}>
@@ -79,6 +102,41 @@ export default function Box({
                 >
                     {value}
                 </Text>
+
+                {showProgress && (
+                    <View style={styles.progressBarContainer}>
+                        <View
+                            style={[
+                                styles.progressBarBackground,
+                                { backgroundColor: progressBackgroundColor },
+                            ]}
+                        >
+                            <View
+                                style={[
+                                    styles.progressBarFill,
+                                    {
+                                        width: `${clampedProgress}%`,
+                                        backgroundColor: progressColor,
+                                    },
+                                ]}
+                            />
+                        </View>
+                    </View>
+                )}
+
+                {showComparison && comparisonText && (
+                    <View style={styles.comparisonContainer}>
+                        <Text
+                            style={[
+                                styles.comparisonText,
+                                { color: comparisonColor },
+                            ]}
+                        >
+                            {comparisonPercentage !== undefined && comparisonPercentage >= 0 ? '+' : ''}
+                            {comparisonPercentage !== undefined ? `${comparisonPercentage}%` : ''} {comparisonText}
+                        </Text>
+                    </View>
+                )}
             </View>
         </View>
     )
@@ -162,5 +220,25 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "700",
         color: DEFAULT_VALUE_COLOR,
+    },
+    progressBarContainer: {
+        marginTop: 8,
+        width: "100%",
+    },
+    progressBarBackground: {
+        height: 6,
+        borderRadius: 3,
+        overflow: "hidden",
+    },
+    progressBarFill: {
+        height: "100%",
+        borderRadius: 3,
+    },
+    comparisonContainer: {
+        marginTop: 6,
+    },
+    comparisonText: {
+        fontSize: 11,
+        fontWeight: "600",
     },
 })

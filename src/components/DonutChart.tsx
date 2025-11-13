@@ -1,11 +1,13 @@
 import React, { useMemo } from "react"
-import { View, Text, StyleSheet, Dimensions } from "react-native"
+import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native"
 import Svg, { G, Circle, Text as SvgText } from "react-native-svg"
+import Ionicons from "@expo/vector-icons/Ionicons"
 
 export type DonutSlice = {
   label: string
   value: number
   color?: string
+  month?: number // optional: 0-11 (Jan-Dec)
 }
 
 export type DonutChartProps = {
@@ -13,6 +15,7 @@ export type DonutChartProps = {
   size?: number // diameter in px
   thickness?: number // ring thickness
   showPercent?: boolean
+  filterMonth?: number // optional: filter by month (0-11)
 }
 
 const DEFAULT_COLORS = ["#0F5B5C", "#12C48B", "#FFB020", "#7C4DFF", "#FF6B6B", "#3AA9FF"]
@@ -43,25 +46,37 @@ export default function DonutChart({
   size = 160,
   thickness = 20,
   showPercent = true,
+  filterMonth,
 }: DonutChartProps) {
+  // filter data by month if specified
+  const filteredData = useMemo(() => {
+    if (filterMonth === undefined) {
+      return data
+    }
+    return data.filter((item) => item.month === undefined || item.month === filterMonth)
+  }, [data, filterMonth])
+
   // make size responsive to screen width so donut doesn't overflow on small devices
   const windowWidth = Dimensions.get('window').width
-  const legendWidth = 120
-  const horizontalPadding = 48 // approximate surrounding paddings in layouts
-  const maxAvailable = Math.max(80, windowWidth - horizontalPadding - legendWidth - 24)
-  const finalSize = Math.min(size, maxAvailable)
-  const total = useMemo(() => data.reduce((s, i) => s + Math.max(0, i.value), 0), [data])
+  const legendWidth = 150
+  const finalSize = 180 // Fixed larger size to ensure scroll
+  const total = useMemo(() => filteredData.reduce((s, i) => s + Math.max(0, i.value), 0), [filteredData])
 
   const cx = finalSize / 2
   const cy = finalSize / 2
   const radius = Math.max(8, finalSize / 2 - thickness / 2 - 8)
   const circumference = 2 * Math.PI * radius
 
+  // Calculate total width needed for content
+  const contentWidth = finalSize + legendWidth + 40 // donut + legend + margins = 370px
+  const containerWidth = windowWidth - 80 // TRIGGER VALUE: scroll when content exceeds screen - 80px
+  const needsScroll = contentWidth > containerWidth
+
   // prepare slices with percent and angle
   const slices = useMemo(() => {
     const palette = DEFAULT_COLORS
     let acc = 0
-    return data.map((d, idx) => {
+    return filteredData.map((d, idx) => {
       const value = Math.max(0, d.value)
       const percent = total > 0 ? (value / total) * 100 : 0
       const length = circumference * (percent / 100)
@@ -76,91 +91,121 @@ export default function DonutChart({
       acc += length
       return slice
     })
-  }, [data, total, circumference])
+  }, [filteredData, total, circumference])
 
   // legend width reserved to the right
   
 
   return (
-    <View style={[styles.container, { width: finalSize + legendWidth, height: finalSize }]}> 
-      <Svg width={finalSize} height={finalSize}>
-        <G rotation={0} originX={cx} originY={cy}>
-          {/* background ring */}
-          <Circle cx={cx} cy={cy} r={radius} stroke="#F3F6F7" strokeWidth={thickness} fill="none" />
+    <View style={[styles.wrapper, { height: finalSize }]}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        scrollEnabled={needsScroll}
+        contentContainerStyle={{ alignItems: 'center', minWidth: contentWidth }}
+        style={{ height: finalSize }}
+      >
+        <View style={[styles.container, { height: finalSize, width: contentWidth }]}> 
+          <Svg width={finalSize} height={finalSize}>
+            <G rotation={0} originX={cx} originY={cy}>
+              {/* background ring */}
+              <Circle cx={cx} cy={cy} r={radius} stroke="#F3F6F7" strokeWidth={thickness} fill="none" />
 
-          {/* slices drawn as stroked circles using strokeDasharray */}
-          {slices.map((s, i) => {
-            const dashArray = `${s.length} ${Math.max(0, circumference - s.length)}`
-            // strokeDashoffset moves the dash; negative offset advances clockwise
-            const dashOffset = -s.offset
-            return (
-              <Circle
-                key={`slice-${i}`}
-                cx={cx}
-                cy={cy}
-                r={radius}
-                stroke={s.color}
-                strokeWidth={thickness}
-                strokeLinecap="butt"
-                fill="none"
-                strokeDasharray={dashArray}
-                strokeDashoffset={dashOffset}
-                transform={`rotate(-90 ${cx} ${cy})`}
-              />
-            )
-          })}
+              {/* slices drawn as stroked circles using strokeDasharray */}
+              {slices.map((s, i) => {
+                const dashArray = `${s.length} ${Math.max(0, circumference - s.length)}`
+                // strokeDashoffset moves the dash; negative offset advances clockwise
+                const dashOffset = -s.offset
+                return (
+                  <Circle
+                    key={`slice-${i}`}
+                    cx={cx}
+                    cy={cy}
+                    r={radius}
+                    stroke={s.color}
+                    strokeWidth={thickness}
+                    strokeLinecap="butt"
+                    fill="none"
+                    strokeDasharray={dashArray}
+                    strokeDashoffset={dashOffset}
+                    transform={`rotate(-90 ${cx} ${cy})`}
+                  />
+                )
+              })}
 
-          {/* inner percentage labels (one per slice) */}
-          {slices.map((s, i) => {
-            const midOffset = s.offset + s.length / 2
-            const midAngle = (midOffset / circumference) * 360
-            const innerLabelR = radius // center of the ring
-            const innerLabelPos = polarToCartesian(cx, cy, innerLabelR, midAngle)
-            const percentText = `${s.percent.toFixed(0)}%`
-            const percentFill = isDarkColor(s.color) ? '#FFFFFF' : '#12343A'
+              {/* inner percentage labels (one per slice) */}
+              {slices.map((s, i) => {
+                const midOffset = s.offset + s.length / 2
+                const midAngle = (midOffset / circumference) * 360
+                const innerLabelR = radius // center of the ring
+                const innerLabelPos = polarToCartesian(cx, cy, innerLabelR, midAngle)
+                const percentText = `${s.percent.toFixed(0)}%`
+                const percentFill = isDarkColor(s.color) ? '#FFFFFF' : '#12343A'
 
-            return (
-              <SvgText
-                key={`inner-${i}`}
-                x={innerLabelPos.x}
-                y={innerLabelPos.y + 4}
-                fontSize={12}
-                fill={percentFill}
-                fontWeight="700"
-                textAnchor="middle"
-              >
-                {percentText}
-              </SvgText>
-            )
-          })}
-        </G>
-      </Svg>
+                return (
+                  <SvgText
+                    key={`inner-${i}`}
+                    x={innerLabelPos.x}
+                    y={innerLabelPos.y + 4}
+                    fontSize={12}
+                    fill={percentFill}
+                    fontWeight="700"
+                    textAnchor="middle"
+                  >
+                    {percentText}
+                  </SvgText>
+                )
+              })}
+            </G>
+          </Svg>
 
-      {/* legend to the right for better readability */}
-      <View style={styles.legend}>
-        {slices.map((s, i) => (
-          <View key={`legend-${i}`} style={styles.legendRow}>
-            <View style={[styles.swatch, { backgroundColor: s.color }]} />
-            <View style={styles.legendTextWrap}>
-              <Text style={styles.legendLabel}>{s.label}</Text>
-              <Text style={styles.legendPercent}>{s.percent.toFixed(1)}%</Text>
-            </View>
+          {/* legend to the right for better readability */}
+          <View style={styles.legend}>
+            {slices.map((s, i) => (
+              <View key={`legend-${i}`} style={styles.legendRow}>
+                <View style={[styles.swatch, { backgroundColor: s.color }]} />
+                <View style={styles.legendTextWrap}>
+                  <Text style={styles.legendLabel}>{s.label}</Text>
+                  <Text style={styles.legendPercent}>{s.percent.toFixed(1)}%</Text>
+                </View>
+              </View>
+            ))}
           </View>
-        ))}
-      </View>
+        </View>
+      </ScrollView>
+      
+      {needsScroll && (
+        <View pointerEvents="none" style={styles.scrollIndicator}>
+          <Ionicons name="chevron-forward" size={20} color="rgba(27,61,72,0.6)" />
+        </View>
+      )}
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    position: 'relative',
+    width: '100%',
+  },
+  scrollIndicator: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center'
+    paddingHorizontal: 8,
   },
   legend: {
     marginLeft: 12,
-    width: 120,
+    width: 150,
     justifyContent: 'center'
   },
   legendRow: {

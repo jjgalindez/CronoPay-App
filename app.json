@@ -1,15 +1,22 @@
 {
   "expo": {
-    "scheme": "com.edrickleong.smartbank",
+    "scheme": "com.cronopay.app",
     "userInterfaceStyle": "light",
+    "icon": "./src/assets/CronoPayLogo.svg",
     "ios": {
-      "bundleIdentifier": "com.edrickleong.smartbank"
+      "bundleIdentifier": "com.cronopay.app"
     },
     "plugins": [
       "expo-router"
     ],
     "android": {
-      "package": "com.edrickleong.smartbank"
+      "package": "com.cronopay.app"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c506a387-7497-438c-89ea-2f690fe3fb44"
+      }
     }
   }
 }

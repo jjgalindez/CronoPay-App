@@ -18,7 +18,7 @@ const TAB_CONFIG: Record<string, { title: string; icon: IconName }> = {
   calendario: { title: "Calendario", icon: "calendar-outline" },
   inicio: { title: "Inicio", icon: "home-outline" },
   estadisticas: { title: "Panel de Estadísticas", icon: "stats-chart-outline" },
-  reportes: { title: "Reportes", icon: "document-text-outline" },
+  reportes: { title: "Reportes Mensuales", icon: "document-text-outline" },
 }
 
 function TabLabel({ focused, label }: { focused: boolean; label: string }) {
