@@ -1,4 +1,4 @@
-package com.edrickleong.smartbank
+package com.cronopay.app
 
 import android.app.Application
 import android.content.res.Configuration

@@ -1,15 +1,21 @@
 {
   "expo": {
-    "scheme": "com.edrickleong.smartbank",
+    "name": "CronoPay",
+    "slug": "cronopay-app",
+    "scheme": "com.cronopay.app",
     "userInterfaceStyle": "light",
     "ios": {
-      "bundleIdentifier": "com.edrickleong.smartbank"
+      "bundleIdentifier": "com.cronopay.app"
+    },
+    "android": {
+      "package": "com.cronopay.app"
     },
     "plugins": [
+      "@react-native-google-signin/google-signin",
       "expo-router"
     ],
-    "android": {
-      "package": "com.edrickleong.smartbank"
+    "extra": {
+      "router": {}
     }
   }
 }
