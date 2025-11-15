@@ -1,11 +1,18 @@
 {
   "expo": {
-    "scheme": "com.edrickleong.smartbank",
+    "name": "CronoPay",
+    "slug": "cronopay-app",
+    "scheme": "com.cronopay.app",
     "userInterfaceStyle": "light",
+    "icon": "./src/assets/CronoPayLogo.png",
     "ios": {
-      "bundleIdentifier": "com.edrickleong.smartbank"
+      "bundleIdentifier": "com.cronopay.app"
+    },
+    "android": {
+      "package": "com.cronopay.app"
     },
     "plugins": [
+      "@react-native-google-signin/google-signin",
       "expo-router",
       [
         "expo-image-picker",
@@ -15,8 +22,11 @@
         }
       ]
     ],
-    "android": {
-      "package": "com.edrickleong.smartbank"
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1184059c-9ccd-4681-bca9-49b9e2328614"
+      }
     }
   }
 }

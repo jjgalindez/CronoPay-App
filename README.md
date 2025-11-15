@@ -1,21 +1,18 @@
 <p align="center">
   <a href="https://github.com/edrickleong/smartbank">
-    <img src="docs/images/smartbank-logo.svg" alt="Logo" width="120" height="120">
+    <img src="src/assets/CronoPayLogo.svg" alt="Logo" width="120" height="120">
   </a>
 
-<h3 align="center">SmartBank</h3>
+<h3 align="center">CronoPay</h3>
 
 <p align="center">
     A demo banking app made with React Native and Supabase. 
     <br />
-    Designed by <a href="https://twitter.com/uiuxadrian">Adrian Kuleszo</a>
+    Designed by <a href="#">CronoUXTeam</a>
     <br />
-    Demo app created by <a href="https://twitter.com/edrickleong_">Edrick Leong</a>
+    Demo app created by <a href="#">CronoTeam</a>
     <br />
     <br />
-    <a href="https://github.com/edrickleong/smartbank/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/edrickleong/smartbank/issues">Request Feature</a>
 </p>
 
 ![Mockup](docs/images/mockup.png)
@@ -47,15 +44,17 @@ the phone verifications screens have been created but do not integrate with a ph
 - [ ] Selfie
 - [ ] Create a card
 - [ ] Top up account
-- [ ] Home screen
+- [x] Home screen
 - [ ] Transfer money
 - [ ] Exchange money
-- [ ] Profile settings
-- [ ] Upload avatar
+- [x] Profile settings
+- [x] Upload avatar
 
 ## ✨ Features
 
 - [x] 🔒 Sign Up / Log In
+- [x] Bar Navigation
+- [ ] Payments CRUD
 - [ ] 📞 Phone Verification
 - [ ] 🔐 Setup PIN + Face ID
 - [ ] 📷 Photo Verification
@@ -75,11 +74,20 @@ the phone verifications screens have been created but do not integrate with a ph
 ```shell
 brew install bun
 ```
+with NPM:
 
-2Clone the repo
+```shell
+npm install -g bun
+```
+or Powershell:
+
+```shell
+powershell -c "irm bun.sh/install.ps1|iex"
+```
+1. Clone the repo
 
 ```sh
-git clone https://github.com/edrickleong/smartbank
+git clone https://github.com/jjgalindez/cronopay-app
 ```
 
 3. Install NPM packages
@@ -89,17 +97,14 @@ bun install
 ```
 
 4. Copy the `.env.example` file as a `.env` file and add the missing environment variables.
+   
    You will need to sign up for a [Supabase account](https://supabase.com/) and create a project.
    You will need to update your Site URL under Authentication > URL Configuration > Site URL to
-   `com.edrickleong.smartbank`.
+   `com.cronopay.app`.
 
-```shell
+
 5. Run the development server
 
-```
-
+```shell
 bun start
-
-```
-
 ```
