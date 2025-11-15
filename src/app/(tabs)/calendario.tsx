@@ -1,13 +1,24 @@
 import { PaymentCalendar } from "@/components/PaymentCalendar"
-import { Text, View } from "react-native"
+import { PaymentReminders } from "@/components/PaymentReminders"
+import { ScrollView, View, Text } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 export default function CalendarioScreen() {
+  
+  
   return (
-    <SafeAreaView className="flex-1 bg-neutral-50">
-      <View style={{ flex: 1 }}>
-      <PaymentCalendar />
-    </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      >
+        
+        {/* Calendario visual del mes */}
+        <PaymentCalendar />
+        
+        {/* Lista de recordatorios detallados */}
+        <PaymentReminders />
+      </ScrollView>
     </SafeAreaView>
   )
 }
