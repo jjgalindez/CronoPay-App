@@ -4,7 +4,8 @@ import { View, Text } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { EmailPasswordForm } from "../../components/auth/EmailPasswordForm"
-import { GoogleButton } from "../../components/auth/GoogleButton"
+
+import GoogleSign from "@/components/auth/GoogleSign"
 
 export default function LoginPage() {
   return (
@@ -15,7 +16,7 @@ export default function LoginPage() {
         </Text>
         <EmailPasswordForm />
         <View style={{ height: 12 }} />
-        <GoogleButton />
+        <GoogleSign />
         <Text style={{ marginTop: 16, textAlign: "center" }}>
           ¿No tienes cuenta?{" "}
           <Text
