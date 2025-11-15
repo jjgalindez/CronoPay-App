@@ -26,14 +26,14 @@ export function useSignUp() {
         email,
         password,
         options: {
-          emailRedirectTo: "com.edrickleong.smartbank://auth/callback",
+          emailRedirectTo: "com.cronopay.app://auth/callback",
           data: { full_name: name },
         },
       })
 
       if (error) throw error
 
-      router.push("/(unauthenticated)/confirm-email?email=" + email)
+      router.push("/(unauthenticated)/login?signUpSuccess=true")
     } catch (err: any) {
       setError(err.message ?? "Ocurrió un error")
     } finally {
