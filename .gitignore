@@ -68,3 +68,12 @@ web-build/
 # iOS
 ios.expo/
 .expo/
+
+# Ignorar proyecto nativo Android
+/android/
+android/
+android
+
+package-lock.json
+yarn.lock
+bun.lockb
