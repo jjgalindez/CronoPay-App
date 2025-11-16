@@ -31,11 +31,15 @@ Se enfoca en flujos de onboarding limpios, UI modular y estructura de proyecto m
 
 ## 📱 Flujos implementados
 
-- [x] Walkthrough / Carrusel de onboarding
 - [x] Login with google and supabase auth
 - [x] Configuración de cuenta
-- [x] Pantalla principal
-- [ ] Configuración de perfil
+- [x] Pantalla principal con reportes
+- [x] Configuración de perfil
+- [x] Pagos
+- [x] Calendario
+- [x] Estadísticas
+- [x] Reportes
+
 
 👉 Funcionalidades como **notificaciones notificaciones** aún no están implementadas.
 
@@ -45,7 +49,8 @@ Se enfoca en flujos de onboarding limpios, UI modular y estructura de proyecto m
 
 - [x] 🔒 Registro / Login (auth con Supabase y Google)
 - [x] 🎨 Carrusel de onboarding con imágene
-- [x] 💸 HOME dentro de la app con los reportes (pendiente)
+- [x] 🏠 HOME dentro de la app con los reportes
+- [x] 💸 Funcionalidad de Gastos implementada
 
 ---
 
