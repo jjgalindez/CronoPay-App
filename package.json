@@ -4,8 +4,8 @@
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
-    "start": "expo start --go",
-    "local": "expo start --go --tunnel",
+    "start": "expo start",
+    "local": "expo start --tunnel",
     "start:login": "expo login && expo start --go",
     "android": "expo run:android",
     "ios": "expo run:ios"
