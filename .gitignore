@@ -79,3 +79,5 @@ android
 package-lock.json
 yarn.lock
 bun.lockb
+
+README.md

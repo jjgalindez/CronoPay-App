@@ -11,34 +11,10 @@ import MonthYearSelector, {
 } from "../../components/MonthYearSelector"
 import PaymentsList, { type PaymentItem } from "../../components/PaymentsList"
 import { useMemo, useState } from "react"
-
-// Colores para las categorías
-const CATEGORY_COLORS = ["#0F5B5C", "#12C48B", "#FFB020", "#7C4DFF", "#FF6B6B", "#3AA9FF"]
-
-// Mapeo de iconos por categoría
-function getCategoryIcon(categoria: string): string {
-  const iconMap: Record<string, string> = {
-    "Suscripción": "tv-outline",
-    "Suscripciones": "tv-outline",
-    "Servicios": "flash-outline",
-    "Deudores": "people-outline",
-    "Transporte": "car-outline",
-    "Comida": "fast-food-outline",
-    "Vivienda": "home-outline",
-    "Salud": "medical-outline",
-    "Educación": "school-outline",
-    "Entretenimiento": "game-controller-outline",
-    "Otros": "ellipsis-horizontal-outline",
-  }
-  return iconMap[categoria] || "wallet-outline"
-}
-
-// Mapeo de colores por estado
-const STATUS_COLOR_MAP: Record<string, { iconColor: string; iconBg: string }> = {
-  "Pagado": { iconColor: "#12C48B", iconBg: "#E8F9F1" },
-  "Pendiente": { iconColor: "#FFB020", iconBg: "#FFF7E6" },
-  "Vencido": { iconColor: "#FF3B30", iconBg: "#FFEBEB" },
-}
+import { formatCurrency } from "../../utils/formatters"
+import { getCategoryIcon, CATEGORY_COLORS } from "../../utils/categoryHelpers"
+import { getStatusColors } from "../../utils/statusHelpers"
+import { MONTH_NAMES, filterByMonth, getPreviousMonth } from "../../utils/dateHelpers"
 
 export default function ReportesScreen() {
   const { session } = useAuth()
@@ -53,20 +29,9 @@ export default function ReportesScreen() {
     year: now.getFullYear(),
   })
 
-  const monthNames = [
-    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-  ]
-
   // Filtrar pagos por mes/año seleccionado
   const filteredPayments = useMemo(() => {
-    return pagos.filter((pago) => {
-      const paymentDate = new Date(pago.fecha_vencimiento)
-      return (
-        paymentDate.getMonth() === selectedPeriod.month &&
-        paymentDate.getFullYear() === selectedPeriod.year
-      )
-    })
+    return filterByMonth(pagos, selectedPeriod.month, selectedPeriod.year)
   }, [pagos, selectedPeriod])
 
   // Calcular estadísticas dinámicas
@@ -77,17 +42,12 @@ export default function ReportesScreen() {
     const totalAmount = filteredPayments.reduce((sum, p) => sum + Number(p.monto), 0)
 
     // Calcular comparación con mes anterior
-    const prevMonth = selectedPeriod.month === 0 ? 11 : selectedPeriod.month - 1
-    const prevYear = selectedPeriod.month === 0 ? selectedPeriod.year - 1 : selectedPeriod.year
+    const { month: prevMonth, year: prevYear } = getPreviousMonth(
+      selectedPeriod.month,
+      selectedPeriod.year
+    )
     
-    const prevMonthPayments = pagos.filter((pago) => {
-      const paymentDate = new Date(pago.fecha_vencimiento)
-      return (
-        paymentDate.getMonth() === prevMonth &&
-        paymentDate.getFullYear() === prevYear
-      )
-    })
-    
+    const prevMonthPayments = filterByMonth(pagos, prevMonth, prevYear)
     const prevMonthAmount = prevMonthPayments.reduce((sum, p) => sum + Number(p.monto), 0)
     const comparisonPercentage = prevMonthAmount > 0 
       ? Math.round(((totalAmount - prevMonthAmount) / prevMonthAmount) * 100)
@@ -135,7 +95,7 @@ export default function ReportesScreen() {
     return filteredPayments
       .sort((a, b) => new Date(b.fecha_vencimiento).getTime() - new Date(a.fecha_vencimiento).getTime())
       .map((pago) => {
-        const statusColors = STATUS_COLOR_MAP[pago.estado || "Pendiente"] || STATUS_COLOR_MAP["Pendiente"]
+        const statusColors = getStatusColors((pago.estado || "Pendiente") as any)
         return {
           id: String(pago.id_pago),
           title: pago.titulo,
@@ -196,7 +156,7 @@ export default function ReportesScreen() {
     {
       id: "total",
       title: "Monto Total",
-      value: `$${new Intl.NumberFormat("es-CL", { maximumFractionDigits: 0 }).format(stats.totalAmount)}`,
+      value: `$${formatCurrency(stats.totalAmount)}`,
       iconName: "cash-outline" as const,
       iconBackgroundColor: "#EEE8FF",
       iconColor: "#1B3D48",
@@ -263,7 +223,7 @@ export default function ReportesScreen() {
 
         <View style={styles.chartSection}>
           <Text style={styles.sectionTitle}>
-            Distribución por Categoría - {monthNames[selectedPeriod.month]}
+            Distribución por Categoría - {MONTH_NAMES[selectedPeriod.month]}
           </Text>
           {donutData.length > 0 ? (
             <View style={styles.donutCard}>
@@ -288,7 +248,7 @@ export default function ReportesScreen() {
           <PaymentsList
             items={paymentsListData}
             filterMonth={selectedPeriod.month}
-            title={`Detalle de Pagos - ${monthNames[selectedPeriod.month]}`}
+            title={`Detalle de Pagos - ${MONTH_NAMES[selectedPeriod.month]}`}
           />
         </View>
 

@@ -11,24 +11,10 @@ import LineStatsGraph, {
 } from "../../components/LineStatsGraph"
 import DonutChart, { type DonutSlice } from "../../components/DonutChart"
 import RecentPayments, { type PaymentItem } from "../../components/RecentPayments"
-import type { PagoWithRelations } from "../../../lib/api"
-
-// Colores para las categorías
-const CATEGORY_COLORS = ["#0F5B5C", "#12C48B", "#FFB020", "#7C4DFF", "#FF6B6B", "#3AA9FF"]
-
-// Mapeo de iconos por estado
-const ICON_MAP: Record<string, any> = {
-  "Pagado": "checkmark-circle-outline",
-  "Pendiente": "time-outline",
-  "Vencido": "alert-circle-outline",
-}
-
-// Mapeo de colores por estado
-const STATUS_COLOR_MAP: Record<string, string> = {
-  "Pagado": "#1AAE6F",
-  "Pendiente": "#FF6B00",
-  "Vencido": "#FF3B30",
-}
+import { formatCurrency } from "../../utils/formatters"
+import { getCategoryIcon, CATEGORY_COLORS } from "../../utils/categoryHelpers"
+import { getStatusColor, getStatusBackground } from "../../utils/statusHelpers"
+import { getMonthName } from "../../utils/dateHelpers"
 
 export default function EstadisticasScreen() {
   const { session } = useAuth()
@@ -96,7 +82,6 @@ export default function EstadisticasScreen() {
   // Preparar datos para el gráfico de líneas (últimos 6 meses)
   const lineGraphData = useMemo((): LineStatsPoint[] => {
     const hoy = new Date()
-    const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
     const datos: LineStatsPoint[] = []
 
     for (let i = 5; i >= 0; i--) {
@@ -112,7 +97,7 @@ export default function EstadisticasScreen() {
       const totalMes = pagosMes.reduce((sum, p) => sum + Number(p.monto), 0)
 
       datos.push({
-        label: meses[mes],
+        label: getMonthName(mes, true),
         value: totalMes,
       })
     }
@@ -132,8 +117,8 @@ export default function EstadisticasScreen() {
         amount: Number(pago.monto),
         status: pago.estado || "Pendiente",
         iconName: pago.categoria?.nombre ? getCategoryIcon(pago.categoria.nombre) : "wallet-outline",
-        iconColor: STATUS_COLOR_MAP[pago.estado || "Pendiente"] || "#12343A",
-        iconBackgroundColor: getIconBackground(pago.estado || "Pendiente"),
+        iconColor: getStatusColor((pago.estado || "Pendiente") as any),
+        iconBackgroundColor: getStatusBackground((pago.estado || "Pendiente") as any),
       }))
   }, [pagos])
 
@@ -251,41 +236,6 @@ export default function EstadisticasScreen() {
       </ScrollView>
     </SafeAreaView>
   )
-}
-
-// Función auxiliar para formatear moneda
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("es-CO", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
-
-// Función auxiliar para obtener icono según categoría
-function getCategoryIcon(categoria: string): string {
-  const iconMap: Record<string, string> = {
-    "Suscripción": "tv-outline",
-    "Servicios": "flash-outline",
-    "Deudores": "people-outline",
-    "Transporte": "car-outline",
-    "Comida": "fast-food-outline",
-    "Vivienda": "home-outline",
-    "Salud": "medical-outline",
-    "Educación": "school-outline",
-    "Entretenimiento": "game-controller-outline",
-    "Otros": "ellipsis-horizontal-outline",
-  }
-  return iconMap[categoria] || "wallet-outline"
-}
-
-// Función auxiliar para obtener color de fondo del icono
-function getIconBackground(estado: string): string {
-  const bgMap: Record<string, string> = {
-    "Pagado": "#E8F9F1",
-    "Pendiente": "#FFF1E3",
-    "Vencido": "#FFEBEB",
-  }
-  return bgMap[estado] || "#E8F1FF"
 }
 
 const styles = StyleSheet.create({
