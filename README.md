@@ -15,6 +15,7 @@
     <br />
 </p>
 
+
 <p align="center">
   <img src="docs/images/mockupCronoPay.png" alt="Demo CronoPay" width="360" />
 </p>
