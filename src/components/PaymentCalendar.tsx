@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { 
   View, 
   Text, 
@@ -6,30 +6,40 @@ import {
   TouchableOpacity, 
   ScrollView, 
   ActivityIndicator,
-  useColorScheme 
+  useColorScheme,
+  Alert 
 } from 'react-native';
 import { usePagos } from '../hooks/usePagos';
-import { useUsuarioPerfil } from '../hooks/useUsuarioPerfil';
+import { useAuth } from 'providers/AuthProvider';
 import { PagoWithRelations } from 'lib/api/pagos';
 
 export function PaymentCalendar() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  
-  // Obtener usuario actual (usa el hook sin parámetros; ajusta según tu lógica de auth si tu hook requiere un id)
-  const { data: usuario } = useUsuarioPerfil(null);
-  const { data: pagos, isLoading, error } = usePagos(usuario?.id);
+
+  // Obtener usuario del contexto de autenticación
+  const { session } = useAuth();
+  const userId = session?.user?.id ?? null;
+
+  // Obtener pagos del usuario
+  const { data: pagos, isLoading, error } = usePagos(userId);
   
   // Datos del mes actual
-  const currentDate = new Date();
+  const currentDate = useMemo(() => new Date(), []);
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   
   // Obtener el primer día del mes y cuántos días tiene
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const daysInMonth = lastDay.getDate();
-  const startDayOfWeek = firstDay.getDay();
+  const { firstDay, lastDay, daysInMonth, startDayOfWeek } = useMemo(() => {
+    const first = new Date(year, month, 1);
+    const last = new Date(year, month + 1, 0);
+    return {
+      firstDay: first,
+      lastDay: last,
+      daysInMonth: last.getDate(),
+      startDayOfWeek: first.getDay(),
+    };
+  }, [year, month]);
   
   // Nombres de los días y mes
   const monthNames = [
@@ -39,87 +49,86 @@ export function PaymentCalendar() {
   const dayNames = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
   
   // Procesar pagos del mes actual
-  const getPaymentsForCurrentMonth = () => {
+  const paymentsThisMonth = useMemo(() => {
     if (!pagos || isLoading) return [];
     
     return pagos.filter(pago => {
       const pagoDate = new Date(pago.fecha_vencimiento);
       return pagoDate.getFullYear() === year && pagoDate.getMonth() === month;
     });
-  };
+  }, [pagos, isLoading, year, month]);
   
   // Obtener días con pagos
-  const paymentsThisMonth = getPaymentsForCurrentMonth();
-  const paymentDaysByDate = paymentsThisMonth.reduce((acc, pago) => {
-    const day = new Date(pago.fecha_vencimiento).getDate();
-    if (!acc[day]) {
-      acc[day] = [];
-    }
-    acc[day].push(pago);
-    return acc;
-  }, {} as Record<number, PagoWithRelations[]>);
+  const paymentDaysByDate = useMemo(() => {
+    return paymentsThisMonth.reduce((acc, pago) => {
+      const day = new Date(pago.fecha_vencimiento).getDate();
+      if (!acc[day]) {
+        acc[day] = [];
+      }
+      acc[day].push(pago);
+      return acc;
+    }, {} as Record<number, PagoWithRelations[]>);
+  }, [paymentsThisMonth]);
   
   const today = currentDate.getDate();
   
   // Generar array de días del calendario
-  const calendarDays: (number | null)[] = [];
-  
-  // Días vacíos del mes anterior
-  for (let i = 0; i < startDayOfWeek; i++) {
-    calendarDays.push(null);
-  }
-  
-  // Días del mes actual
-  for (let day = 1; day <= daysInMonth; day++) {
-    calendarDays.push(day);
-  }
+  const calendarDays = useMemo(() => {
+    const days: (number | null)[] = [];
+    
+    // Días vacíos del mes anterior
+    for (let i = 0; i < startDayOfWeek; i++) {
+      days.push(null);
+    }
+    
+    // Días del mes actual
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(day);
+    }
+    
+    return days;
+  }, [startDayOfWeek, daysInMonth]);
 
   // Estilos dinámicos basados en tema
   const dynamicStyles = {
-    card: [
-      styles.card,
-      isDark && styles.cardDark
-    ],
-    title: [
-      styles.title,
-      isDark && styles.titleDark
-    ],
-    subtitle: [
-      styles.subtitle,
-      isDark && styles.subtitleDark
-    ],
-    monthText: [
-      styles.monthText,
-      isDark && styles.monthTextDark
-    ],
-    weekDayText: [
-      styles.weekDayText,
-      isDark && styles.weekDayTextDark
-    ],
-    dayText: [
-      styles.dayText,
-      isDark && styles.dayTextDark
-    ],
-    legendText: [
-      styles.legendText,
-      isDark && styles.legendTextDark
-    ],
-    summaryTitle: [
-      styles.summaryTitle,
-      isDark && styles.summaryTitleDark
-    ],
-    summaryLabel: [
-      styles.summaryLabel,
-      isDark && styles.summaryLabelDark
-    ],
+    container: [styles.container, isDark && styles.containerDark],
+    card: [styles.card, isDark && styles.cardDark],
+    title: [styles.title, isDark && styles.titleDark],
+    subtitle: [styles.subtitle, isDark && styles.subtitleDark],
+    monthText: [styles.monthText, isDark && styles.monthTextDark],
+    weekDayText: [styles.weekDayText, isDark && styles.weekDayTextDark],
+    dayText: [styles.dayText, isDark && styles.dayTextDark],
+    legendText: [styles.legendText, isDark && styles.legendTextDark],
+    summaryTitle: [styles.summaryTitle, isDark && styles.summaryTitleDark],
+    summaryLabel: [styles.summaryLabel, isDark && styles.summaryLabelDark],
+    summaryValue: [styles.summaryValue, isDark && styles.summaryValueDark],
+    loadingText: [styles.loadingText, isDark && styles.loadingTextDark],
   };
+
+  // Si no hay sesión
+  if (!session && !isLoading) {
+    return (
+      <View style={dynamicStyles.container}>
+        <View style={dynamicStyles.card}>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorIcon}>🔒</Text>
+            <Text style={styles.errorText}>No autenticado</Text>
+            <Text style={styles.errorSubtext}>
+              Debes iniciar sesión para ver tus pagos
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   // Manejo de errores
   if (error) {
     return (
-      <View style={[styles.container, isDark && styles.containerDark]}>
+      <View style={dynamicStyles.container}>
         <View style={dynamicStyles.card}>
           <View style={styles.errorContainer}>
+            <Text style={styles.errorIcon}>⚠️</Text>
             <Text style={styles.errorText}>Error al cargar los pagos</Text>
             <Text style={styles.errorSubtext}>{error.message}</Text>
           </View>
@@ -143,7 +152,11 @@ export function PaymentCalendar() {
     const paidPayments = dayPayments.filter(p => p.estado === 'Pagado');
     
     // Determinar color basado en estado y si es vencido
-    const isPastDue = new Date(year, month, day) < new Date() && pendingPayments.length > 0;
+    const dayDate = new Date(year, month, day);
+    dayDate.setHours(0, 0, 0, 0);
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+    const isPastDue = dayDate < todayDate && pendingPayments.length > 0;
     
     let dayStyle: any = styles.dayCell;
     let textStyle: any = dynamicStyles.dayText;
@@ -172,8 +185,15 @@ export function PaymentCalendar() {
         activeOpacity={0.7}
         onPress={() => {
           if (hasPayments) {
-            // Aquí puedes navegar a detalle o mostrar modal
-            console.log(`Pagos del día ${day}:`, dayPayments.map(p => p.id_pago));
+            const pagosList = dayPayments
+              .map(p => `• ${p.categoria?.nombre || 'sin categoria'}: $${(p.monto || 0).toLocaleString('es-CO')}`)
+              .join('\n');
+            
+            Alert.alert(
+              `Pagos del ${day} de ${monthNames[month]}`,
+              pagosList,
+              [{ text: 'Cerrar', style: 'cancel' }]
+            );
           }
         }}
       >
@@ -193,8 +213,9 @@ export function PaymentCalendar() {
   };
 
   return (
-    <ScrollView style={[styles.container, isDark && styles.containerDark]}>
+    <ScrollView style={dynamicStyles.container}>
       <View style={dynamicStyles.card}>
+        {/* Header */}
         <View style={styles.header}>
           <Text style={dynamicStyles.title}>Calendario de Pagos</Text>
           {paymentsThisMonth.length > 0 && (
@@ -263,8 +284,8 @@ export function PaymentCalendar() {
                 <Text style={dynamicStyles.summaryLabel}>Pagados</Text>
               </View>
               <View style={styles.summaryItem}>
-                <Text style={[styles.summaryValue, isDark && styles.summaryValueDark]}>
-                  ${paymentsThisMonth.reduce((sum, p) => sum + Number(p.monto ?? 0), 0).toLocaleString()}
+                <Text style={dynamicStyles.summaryValue}>
+                  ${paymentsThisMonth.reduce((sum, p) => sum + Number(p.monto ?? 0), 0).toLocaleString('es-CO')}
                 </Text>
                 <Text style={dynamicStyles.summaryLabel}>Total</Text>
               </View>
@@ -276,9 +297,15 @@ export function PaymentCalendar() {
         {isLoading && (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="small" color="#3b82f6" />
-            <Text style={[styles.loadingText, isDark && styles.loadingTextDark]}>
-              Cargando pagos...
-            </Text>
+            <Text style={dynamicStyles.loadingText}>Cargando pagos...</Text>
+          </View>
+        )}
+
+        {/* Empty state */}
+        {!isLoading && paymentsThisMonth.length === 0 && (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyIcon}>📅</Text>
+            <Text style={dynamicStyles.legendText}>No hay pagos este mes</Text>
           </View>
         )}
       </View>
@@ -582,10 +609,25 @@ const styles = StyleSheet.create({
     color: '#a3a3a3',
   },
   
+  // Empty State
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 32,
+  },
+  emptyIcon: {
+    fontSize: 48,
+    marginBottom: 12,
+    opacity: 0.5,
+  },
+  
   // Error
   errorContainer: {
     padding: 20,
     alignItems: 'center',
+  },
+  errorIcon: {
+    fontSize: 48,
+    marginBottom: 12,
   },
   errorText: {
     fontSize: 16,
