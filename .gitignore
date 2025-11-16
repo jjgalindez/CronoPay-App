@@ -24,6 +24,8 @@ project.xcworkspace
 
 # Android/IntelliJ
 #
+# Android/IntelliJ
+android/
 build/
 .idea
 .gradle
@@ -68,3 +70,14 @@ web-build/
 # iOS
 ios.expo/
 .expo/
+
+# Ignorar proyecto nativo Android
+/android/
+android/
+android
+
+package-lock.json
+yarn.lock
+bun.lockb
+
+README.md
