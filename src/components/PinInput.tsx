@@ -54,15 +54,16 @@ const PinInput = ({ code, setCode }: PinInputProps) => {
   return (
     <View className="w-full">
       <Pressable
-        className="flex flex-row justify-center gap-x-6 px-4"
+        className="flex flex-row justify-center px-4"
+        style={{ columnGap: 24 }}
         onPress={handleOnPress}
       >
-        <View className="flex-row justify-between gap-x-2">
+        <View className="flex-row justify-between" style={{ columnGap: 8 }}>
           {renderBoxDigit(0)}
           {renderBoxDigit(1)}
           {renderBoxDigit(2)}
         </View>
-        <View className="flex-row justify-between gap-x-2">
+        <View className="flex-row justify-between" style={{ columnGap: 8 }}>
           {renderBoxDigit(3)}
           {renderBoxDigit(4)}
           {renderBoxDigit(5)}

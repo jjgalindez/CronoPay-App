@@ -38,15 +38,16 @@ export default function PinInput({ maxLength = 6, onComplete }: Props) {
   return (
     <View className="w-full">
       <Pressable
-        className="flex flex-row justify-center gap-x-6 px-4"
+        className="flex flex-row justify-center px-4"
+        style={{ columnGap: 24 }}
         onPress={onPress}
       >
-        <View className="flex-row justify-between gap-x-2">
+        <View className="flex-row justify-between" style={{ columnGap: 8 }}>
           {Array.from({ length: Math.ceil(maxLength / 2) }, (_, i) =>
             renderBoxDigit(i),
           )}
         </View>
-        <View className="flex-row justify-between gap-x-2">
+        <View className="flex-row justify-between" style={{ columnGap: 8 }}>
           {Array.from({ length: Math.floor(maxLength / 2) }, (_, i) =>
             renderBoxDigit(i + Math.ceil(maxLength / 2)),
           )}

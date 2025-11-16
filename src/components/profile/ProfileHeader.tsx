@@ -1,6 +1,7 @@
 // src/components/profile/ProfileHeader.tsx
 import React from "react"
-import { View, Text, TouchableOpacity, Image } from "react-native"
+import { View, Text, Pressable, Image, useWindowDimensions } from "react-native"
+import { Ionicons } from "@expo/vector-icons"
 
 interface ProfileHeaderProps {
   name: string
@@ -9,7 +10,12 @@ interface ProfileHeaderProps {
   onEditProfile: () => void
 }
 
-export function ProfileHeader({ name, email, avatarUrl, onEditProfile }: ProfileHeaderProps) {
+export const ProfileHeader = React.memo(({ name, email, avatarUrl, onEditProfile }: ProfileHeaderProps) => {
+  const { width } = useWindowDimensions()
+  const isSmallScreen = width < 375
+  
+  const avatarSize = isSmallScreen ? 56 : 64
+  const titleSize = isSmallScreen ? 18 : 24
   
   const getIniciales = (nombreCompleto: string) => {
     return nombreCompleto
@@ -21,36 +27,60 @@ export function ProfileHeader({ name, email, avatarUrl, onEditProfile }: Profile
   }
 
   return (
-    <View className="px-6 py-6 border-b border-gray-200">
-      <View className="flex-row items-center mb-4">
-        {avatarUrl ? (
-          <View className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 mr-4">
-            <Image
-              source={{ uri: avatarUrl }}
-              className="w-full h-full"
-              resizeMode="cover"
-            />
+    <View className="border-b border-gray-200" style={{ paddingHorizontal: Math.max(16, width * 0.05), paddingVertical: isSmallScreen ? 16 : 24 }}>
+      <View className="mb-4 flex-row items-center" style={{ columnGap: isSmallScreen ? 12 : 16 }}>
+        <View className="relative">
+          {avatarUrl ? (
+            <View 
+              className="overflow-hidden rounded-full border-2 border-gray-200"
+              style={{ height: avatarSize, width: avatarSize }}
+            >
+              <Image
+                source={{ uri: avatarUrl }}
+                style={{ height: avatarSize, width: avatarSize }}
+                resizeMode="cover"
+              />
+            </View>
+          ) : (
+            <View 
+              className="items-center justify-center rounded-full border-2 border-gray-200 bg-green-500"
+              style={{ height: avatarSize, width: avatarSize }}
+            >
+              <Text className="font-bold text-white" style={{ fontSize: avatarSize * 0.3 }}>
+                {getIniciales(name || "U")}
+              </Text>
+            </View>
+          )}
+          <View className="absolute -bottom-1 -right-1 h-5 w-5 items-center justify-center rounded-full bg-gray-100 border border-white">
+            <Ionicons name="person" size={12} color="#6B7280" />
           </View>
-        ) : (
-          <View className="w-16 h-16 rounded-full bg-green-500 items-center justify-center border-2 border-gray-200 mr-4">
-            <Text className="text-white text-lg font-bold">
-              {getIniciales(name || "U")}
-            </Text>
-          </View>
-        )}
+        </View>
         
         <View className="flex-1">
-          <Text className="text-2xl font-bold text-gray-900 mb-1">{name}</Text>
-          <Text className="text-gray-600 text-base">{email}</Text>
+          <Text className="mb-1 font-bold text-gray-900" style={{ fontSize: titleSize }} numberOfLines={1}>{name}</Text>
+          <View className="flex-row items-center" style={{ columnGap: 4 }}>
+            <Ionicons name="mail-outline" size={14} color="#6B7280" />
+            <Text className="flex-1 text-sm text-gray-600" numberOfLines={1}>{email}</Text>
+          </View>
         </View>
       </View>
       
-      <TouchableOpacity 
+      <Pressable 
         onPress={onEditProfile}
-        className="bg-gray-100 py-3 px-4 rounded-lg border border-gray-300 self-start"
+        className="self-start rounded-lg border border-gray-300 bg-gray-100 px-4 py-3"
+        style={({ pressed }) => [
+          { opacity: pressed ? 0.7 : 1 }
+        ]}
       >
-        <Text className="text-gray-800 font-medium text-base">Editar perfil</Text>
-      </TouchableOpacity>
+        {({ pressed }) => (
+          <View className="flex-row items-center" style={{ columnGap: 6 }}>
+            <Ionicons name="pencil-outline" size={16} color="#374151" />
+            <Text className="text-base font-medium text-gray-800">Editar perfil</Text>
+          </View>
+        )}
+      </Pressable>
     </View>
   )
-}
+})
+
+ProfileHeader.displayName = "ProfileHeader"

@@ -1,7 +1,7 @@
 // src/components/profile/ConfigurationItem.tsx
 import React from "react"
-import { View, Text, TouchableOpacity, Switch } from "react-native"
-import Ionicons from "@expo/vector-icons/Ionicons"
+import { View, Text, Pressable, Switch, Platform } from "react-native"
+import { Ionicons } from "@expo/vector-icons"
 
 interface ConfigurationItemProps {
   title: string
@@ -13,7 +13,7 @@ interface ConfigurationItemProps {
   isLast?: boolean
 }
 
-export function ConfigurationItem({
+export const ConfigurationItem = React.memo(({
   title,
   subtitle,
   onPress,
@@ -21,7 +21,7 @@ export function ConfigurationItem({
   switchValue = false,
   onSwitchChange,
   isLast = false,
-}: ConfigurationItemProps) {
+}: ConfigurationItemProps) => {
 
   // Función para obtener el ícono según el título
   const getIcono = () => {
@@ -59,37 +59,61 @@ export function ConfigurationItem({
     }
   }
 
-  return (
-    <TouchableOpacity
-      className={`flex-row justify-between items-center px-6 py-4 ${
-        !isLast ? "border-b border-gray-100" : ""
-      }`}
-      onPress={onPress}
-      disabled={hasSwitch}
-    >
-      <View className="flex-row items-center flex-1">
+  const content = (
+    <View className="flex-1 flex-row items-center" style={{ columnGap: 12 }}>
+      <View className="items-center justify-center">
         <Ionicons 
           name={getIcono() as any} 
           size={22} 
           color={getColorIcono()} 
-          style={{ marginRight: 12 }}
         />
-        <View className="flex-1">
-          <Text className="text-gray-900 font-medium text-base">{title}</Text>
-          <Text className="text-gray-500 text-sm mt-1">{subtitle}</Text>
-        </View>
       </View>
-      
+      <View className="flex-1">
+        <Text className="text-base font-medium text-gray-900" numberOfLines={1}>{title}</Text>
+        <Text className="mt-0.5 text-sm text-gray-500" numberOfLines={2}>{subtitle}</Text>
+      </View>
       {hasSwitch ? (
         <Switch
           value={switchValue}
           onValueChange={onSwitchChange}
           thumbColor={switchValue ? "#10B981" : "#f4f3f4"}
           trackColor={{ true: "#A7F3D0", false: "#E5E7EB" }}
+          ios_backgroundColor="#E5E7EB"
         />
       ) : (
         <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
       )}
-    </TouchableOpacity>
+    </View>
   )
-}
+
+  if (hasSwitch) {
+    return (
+      <View
+        className={`px-6 py-4 ${
+          !isLast ? "border-b border-gray-100" : ""
+        }`}
+      >
+        {content}
+      </View>
+    )
+  }
+
+  return (
+    <Pressable
+      className={`px-6 py-4 ${
+        !isLast ? "border-b border-gray-100" : ""
+      }`}
+      onPress={onPress}
+      style={({ pressed }) => [
+        {
+          backgroundColor: pressed ? (Platform.OS === 'ios' ? '#F3F4F6' : '#F9FAFB') : 'transparent',
+        }
+      ]}
+      android_ripple={{ color: '#F3F4F6' }}
+    >
+      {content}
+    </Pressable>
+  )
+})
+
+ConfigurationItem.displayName = "ConfigurationItem"

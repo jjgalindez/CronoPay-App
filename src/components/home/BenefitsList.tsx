@@ -1,4 +1,5 @@
 // src/components/home/BenefitsList.tsx
+import React from "react"
 import { View, Text } from "react-native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 
@@ -15,19 +16,29 @@ const benefits = [
     icon: "bar-chart",
     text: "Reportes mensuales: Analiza tus patrones de gasto",
   },
-]
+] as const
 
-export default function BenefitsList() {
+const BenefitItem = React.memo<{ icon: string; text: string }>(({ icon, text }) => (
+  <View className="flex-row items-start" style={{ columnGap: 12 }}>
+    <View className="mt-0.5 w-6 items-center">
+      <Icon name={icon} size={22} color="#3b82f6" />
+    </View>
+    <Text className="flex-1 text-[14px] leading-relaxed text-neutral-700">{text}</Text>
+  </View>
+))
+
+BenefitItem.displayName = "BenefitItem"
+
+const BenefitsList = React.memo(() => {
   return (
-    <View className="mt-8 space-y-4">
+    <View className="my-4" style={{ rowGap: 16 }}>
       {benefits.map(({ icon, text }, index) => (
-        <View key={index} className="flex-row items-center gap-x-3 space-x-2">
-          <View className="w-6 items-center">
-            <Icon name={icon} size={24} color="#3b82f6" />
-          </View>
-          <Text className="flex-1 text-[15px] text-neutral-700">{text}</Text>
-        </View>
+        <BenefitItem key={index} icon={icon} text={text} />
       ))}
     </View>
   )
-}
+})
+
+BenefitsList.displayName = "BenefitsList"
+
+export default BenefitsList
