@@ -1,6 +1,14 @@
+// src/hooks/useUsuarioPerfil.ts
 import { useCallback, useEffect, useState } from "react"
+import { supabase } from "../../lib/supabase"
 
-import { fetchUsuarioPerfil, UsuarioPerfilRow } from "../../lib/api/users"
+// Definir el tipo basado en tu tabla usuarios_perfil
+export type UsuarioPerfilRow = {
+  id: string
+  nombre: string | null
+  avatar_url: string | null
+  creado_en: string | null
+}
 
 type Options = {
   enabled?: boolean
@@ -18,6 +26,25 @@ const DEFAULT_STATE: UseUsuarioPerfilState = {
   isLoading: false,
   error: null,
   refetch: async () => {},
+}
+
+// Función para obtener el perfil desde usuarios_perfil
+export const fetchUsuarioPerfil = async (userId: string): Promise<UsuarioPerfilRow> => {
+  const { data, error } = await supabase
+    .from('usuarios_perfil')
+    .select('*')
+    .eq('id', userId)
+    .single()
+
+  if (error) {
+    throw new Error(`Error al obtener perfil: ${error.message}`)
+  }
+
+  if (!data) {
+    throw new Error('Perfil no encontrado')
+  }
+
+  return data
 }
 
 export function useUsuarioPerfil(

@@ -13,7 +13,14 @@
     },
     "plugins": [
       "@react-native-google-signin/google-signin",
-      "expo-router"
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "La app necesita acceso a tus fotos para cambiar tu foto de perfil.",
+          "cameraPermission": "La app necesita acceso a tu cámara para tomar fotos de perfil."
+        }
+      ]
     ],
     "extra": {
       "router": {},
