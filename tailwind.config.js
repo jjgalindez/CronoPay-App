@@ -32,4 +32,8 @@ module.exports = {
       },
     },
   },
+  corePlugins: {
+    // Deshabilitar propiedades no compatibles con React Native
+    gap: false,
+  },
 }

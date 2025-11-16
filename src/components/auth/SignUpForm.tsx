@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native"
 
+import GoogleSign from "./GoogleSign"
 import { useSignUp } from "../../hooks/useSignUp"
 
 export function SignUpForm() {
@@ -26,94 +27,100 @@ export function SignUpForm() {
   } = useSignUp()
 
   return (
-    <View style={{ flex: 1, justifyContent: "center" }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 16 }}>
-        Crear cuenta
-      </Text>
-
-      <TextInput
-        placeholder="Nombre completo"
-        value={name}
-        onChangeText={setName}
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          padding: 12,
-          marginBottom: 12,
-          borderRadius: 8,
-        }}
-      />
-
-      <TextInput
-        placeholder="Correo electrónico"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          padding: 12,
-          marginBottom: 12,
-          borderRadius: 8,
-        }}
-      />
-
-      <TextInput
-        placeholder="Contraseña"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          padding: 12,
-          marginBottom: 12,
-          borderRadius: 8,
-        }}
-      />
-
-      <TextInput
-        placeholder="Repite tu contraseña"
-        secureTextEntry
-        value={repeatPassword}
-        onChangeText={setRepeatPassword}
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          padding: 12,
-          marginBottom: 12,
-          borderRadius: 8,
-        }}
-      />
-
-      {error && <Text style={{ color: "red", marginBottom: 12 }}>{error}</Text>}
-
-      <Pressable
-        onPress={handleSignUp}
-        disabled={isLoading}
-        style={{
-          backgroundColor: isLoading ? "#ccc" : "#2791B5",
-          padding: 16,
-          borderRadius: 8,
-          alignItems: "center",
-        }}
-      >
-        {isLoading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={{ color: "#fff", fontWeight: "bold" }}>Registrarse</Text>
-        )}
-      </Pressable>
-
-      <Text style={{ marginTop: 16, textAlign: "center" }}>
-        ¿Ya tienes cuenta?{" "}
-        <Text
-          style={{ color: "#2791B5" }}
-          onPress={() => router.push("/(unauthenticated)/login")}
-        >
-          Inicia sesión
+    <View className="flex-col space-y-8">
+      {/* Encabezado */}
+      <View className="space-y-1">
+        <Text className="text-2xl font-bold text-neutral-900">
+          Crear cuenta
         </Text>
-      </Text>
+        <Text className="mb-3 text-[15px] text-neutral-600">
+          Regístrate con tu correo para comenzar.
+        </Text>
+      </View>
+
+      {/* Tarjeta del formulario */}
+      <View className=" space-y-5 rounded-2xl border border-neutral-200 bg-white p-5 py-3">
+        <TextInput
+          placeholder="Nombre completo"
+          placeholderTextColor="#6b7280"
+          value={name}
+          onChangeText={setName}
+          className="rounded-xl border border-neutral-300 px-4  py-3 text-[15px] text-neutral-800"
+        />
+
+        <TextInput
+          placeholder="Correo electrónico"
+          placeholderTextColor="#6b7280"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+          className="rounded-xl border border-neutral-300 px-4 py-3 text-[15px] text-neutral-800"
+        />
+
+        <TextInput
+          placeholder="Contraseña"
+          placeholderTextColor="#6b7280"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+          className="rounded-xl border border-neutral-300 px-4 py-3 text-[15px] text-neutral-800"
+        />
+
+        <TextInput
+          placeholder="Repite tu contraseña"
+          placeholderTextColor="#6b7280"
+          secureTextEntry
+          value={repeatPassword}
+          onChangeText={setRepeatPassword}
+          className="rounded-xl border border-neutral-300 px-4 py-3 text-[15px] text-neutral-800"
+        />
+
+        {error && (
+          <Text className="text-center text-[14px] text-red-500">{error}</Text>
+        )}
+
+        {/* Botón de registro */}
+        <Pressable
+          onPress={handleSignUp}
+          disabled={isLoading}
+          className={`items-center rounded-xl py-3 ${
+            isLoading ? "bg-neutral-300" : "bg-teal-600"
+          } active:opacity-80`}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text className="text-[15px] font-semibold text-white">
+              Registrarse
+            </Text>
+          )}
+        </Pressable>
+
+        <View className="my-1 flex-row items-center">
+          <View className="h-px flex-1 bg-neutral-200" />
+          <Text className="mx-3 text-[13px] text-neutral-500">
+            o continúa con
+          </Text>
+          <View className="h-px flex-1 bg-neutral-200" />
+        </View>
+
+        {/* Botón Google */}
+        <GoogleSign />
+      </View>
+
+      {/* Enlace a login */}
+      <View className="items-center pt-2">
+        <Text className="text-[15px] text-neutral-600">
+          ¿Ya tienes cuenta?{" "}
+          <Text
+            onPress={() => router.push("/(unauthenticated)/login")}
+            className="font-semibold"
+            style={{ color: "#2b9fc4" }}
+          >
+            Inicia sesión
+          </Text>
+        </Text>
+      </View>
     </View>
   )
 }

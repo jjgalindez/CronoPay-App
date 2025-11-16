@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 
-import { fetchPagos, PagoWithRelations } from "../../lib/api"
+import { 
+  fetchPagos, 
+  createPago,
+  updatePago,
+  deletePago,
+  setPagoEstado,
+  type PagoWithRelations,
+  type PagoInsert,
+  type PagoUpdate
+} from "../../lib/api"
 
 type Options = {
   enabled?: boolean
@@ -11,9 +20,13 @@ type PagosState = {
   isLoading: boolean
   error: Error | null
   refetch: () => Promise<void>
+  create: (payload: PagoInsert) => Promise<PagoWithRelations>
+  update: (pagoId: number, values: PagoUpdate) => Promise<PagoWithRelations>
+  remove: (pagoId: number) => Promise<void>
+  setEstado: (pagoId: number, estado: "Pendiente" | "Pagado") => Promise<PagoWithRelations>
 }
 
-const DEFAULT_STATE: PagosState = {
+const DEFAULT_STATE: Omit<PagosState, 'create' | 'update' | 'remove' | 'setEstado'> = {
   data: [],
   isLoading: false,
   error: null,
@@ -40,10 +53,78 @@ export function usePagos(
       setData(result)
     } catch (err) {
       setError(err as Error)
+      console.error('Error fetching pagos:', err)
     } finally {
       setIsLoading(false)
     }
   }, [userId, enabled])
+
+  const handleCreate = useCallback(async (payload: PagoInsert): Promise<PagoWithRelations> => {
+    if (!userId) {
+      throw new Error('No user ID provided')
+    }
+
+    try {
+      setIsLoading(true)
+      setError(null)
+      const result = await createPago({ ...payload, id_usuario: userId })
+      await handleFetch() // Refrescar la lista
+      return result
+    } catch (err) {
+      setError(err as Error)
+      console.error('Error creating pago:', err)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }, [userId, handleFetch])
+
+  const handleUpdate = useCallback(async (pagoId: number, values: PagoUpdate): Promise<PagoWithRelations> => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const result = await updatePago(pagoId, values)
+      await handleFetch() // Refrescar la lista
+      return result
+    } catch (err) {
+      setError(err as Error)
+      console.error('Error updating pago:', err)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }, [handleFetch])
+
+  const handleRemove = useCallback(async (pagoId: number): Promise<void> => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      await deletePago(pagoId)
+      await handleFetch() // Refrescar la lista
+    } catch (err) {
+      setError(err as Error)
+      console.error('Error deleting pago:', err)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }, [handleFetch])
+
+  const handleSetEstado = useCallback(async (pagoId: number, estado: "Pendiente" | "Pagado"): Promise<PagoWithRelations> => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const result = await setPagoEstado(pagoId, estado)
+      await handleFetch() // Refrescar la lista
+      return result
+    } catch (err) {
+      setError(err as Error)
+      console.error('Error setting pago estado:', err)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }, [handleFetch])
 
   useEffect(() => {
     handleFetch()
@@ -53,6 +134,10 @@ export function usePagos(
     return {
       ...DEFAULT_STATE,
       refetch: handleFetch,
+      create: handleCreate,
+      update: handleUpdate,
+      remove: handleRemove,
+      setEstado: handleSetEstado,
     }
   }
 
@@ -61,5 +146,12 @@ export function usePagos(
     isLoading,
     error,
     refetch: handleFetch,
+    create: handleCreate,
+    update: handleUpdate,
+    remove: handleRemove,
+    setEstado: handleSetEstado,
   }
 }
+
+// Re-exportar tipos para facilitar el uso
+export type { PagoWithRelations, PagoInsert, PagoUpdate }
