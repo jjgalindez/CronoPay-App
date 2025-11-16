@@ -1,0 +1,16 @@
+// src/components/home/HeroSection.tsx
+import { Text, View } from "react-native"
+
+export default function HeroSection() {
+  return (
+    <View className="mb-6">
+      <Text className="text-[13px] font-medium text-neutral-600">CronoPay</Text>
+      <Text className="my-2 py-2 text-[24px] font-bold leading-7 text-[#0C212C]">
+        Organiza tus pagos fácilmente
+      </Text>
+      <Text className="mt-2 text-[16px] text-neutral-600">
+        Controla todas tus suscripciones y pagos recurrentes desde una sola app
+      </Text>
+    </View>
+  )
+}

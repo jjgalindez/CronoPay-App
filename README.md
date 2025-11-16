@@ -15,17 +15,14 @@
     <br />
 </p>
 
-![Mockup](docs/images/mockup.png)
+![Mockup](docs/images/mockupCronoPay.png)
 
-This project uses designs from Adrian Kuleszo's
-book [The UI Professional's Design Manual](https://uiadrian.gumroad.com/l/design-manual). Support him by purchasing a
-copy of his book on [Gumroad](https://uiadrian.gumroad.com/l/design-manual).
+CronoPay es una aplicación de finanzas moderna construida con Expo, NativeWind y Supabase.  
+Se enfoca en flujos de onboarding limpios, UI modular y estructura de proyecto mantenible.
 
-## Demo
+---
 
-<p align="center">
-  <img src="docs/demo.gif" alt="demo" width="360" />
-</p>
+## 📱 Flujos implementados
 
 ## 📱 Flujos implementados
 
@@ -55,9 +52,16 @@ copy of his book on [Gumroad](https://uiadrian.gumroad.com/l/design-manual).
 - [Bun](https://bun.sh/) – Runtime y gestor de paquetes rápido
 ## 🚀 Local Development
 
-1. Install Bun
+---
 
-```shell
+## 🚀 Desarrollo local
+
+### 1. Instalar Bun Windows
+```sh
+powershell -c "irm bun.sh/install.ps1|iex"
+
+#### macOS
+```sh
 brew install bun
 ```
 with NPM:
