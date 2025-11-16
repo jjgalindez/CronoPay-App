@@ -6,72 +6,62 @@
 <h3 align="center">CronoPay</h3>
 
 <p align="center">
-    A demo banking app made with React Native and Supabase. 
+    Aplicación para llevar tus gastos e ingresos construida con React Native, Expo y Supabase. 
     <br />
-    Designed by <a href="#">CronoUXTeam</a>
+    Desarrollada por <a href="https://github.com/jjgalindez">Jhon Galindez, Kedin Valencia, Jhonatan Tobar, Manuel Ruge, Jair Hoyos</a>
     <br />
     Demo app created by <a href="#">CronoTeam</a>
     <br />
     <br />
 </p>
 
-![Mockup](docs/images/mockup.png)
+![Mockup](docs/images/mockupCronoPay.png)
 
-This project uses designs from Adrian Kuleszo's
-book [The UI Professional's Design Manual](https://uiadrian.gumroad.com/l/design-manual). Support him by purchasing a
-copy of his book on [Gumroad](https://uiadrian.gumroad.com/l/design-manual).
+CronoPay es una aplicación de finanzas moderna construida con Expo, NativeWind y Supabase.  
+Se enfoca en flujos de onboarding limpios, UI modular y estructura de proyecto mantenible.
 
-## Demo
+---
 
-<p align="center">
-  <img src="docs/demo.gif" alt="demo" width="360" />
-</p>
+## 📱 Flujos implementados
 
-## 📱 Flows
+## 📱 Flujos implementados
 
-These are groups of screens based on the design manual above.
-Some of these screens have been created without adding functionality yet. For example,
-the phone verifications screens have been created but do not integrate with a phone verification service.
+- [x] Walkthrough / Carrusel de onboarding
+- [x] Login with google and supabase auth
+- [x] Configuración de cuenta
+- [x] Pantalla principal
+- [ ] Configuración de perfil
 
-- [x] Walkthrough
-- [x] Login
-- [x] Account setup
-- [x] Phone verification
-- [x] Create passcode
-- [ ] Legal information
-- [ ] Notifications
-- [ ] Verify Identity
-- [ ] Selfie
-- [ ] Create a card
-- [ ] Top up account
-- [x] Home screen
-- [ ] Transfer money
-- [ ] Exchange money
-- [x] Profile settings
-- [x] Upload avatar
+👉 Funcionalidades como **notificaciones notificaciones** aún no están implementadas.
 
-## ✨ Features
+---
 
-- [x] 🔒 Sign Up / Log In
-- [x] Bar Navigation
-- [ ] Payments CRUD
-- [ ] 📞 Phone Verification
-- [ ] 🔐 Setup PIN + Face ID
-- [ ] 📷 Photo Verification
-- [ ] 🔔 Request for Notifications
-- [ ] 👤 Upload Avatar
+## ✨ Funcionalidades
 
-## 🔧 Built with
+- [x] 🔒 Registro / Login (auth con Supabase y Google)
+- [x] 🎨 Carrusel de onboarding con imágene
+- [ ] 💸 HOME dentro de la app con los reportes (pendiente)
 
-- [Expo](https://expo.dev/) - A framework for building React Native apps
-- [NativeWind](https://www.nativewind.dev/) - Tailwind CSS for React Native
-- [Supabase](https://supabase.com/) - Auth & Database platform
+---
 
+## 🔧 Construido con
+
+- [Expo](https://expo.dev/) – Framework para apps en React Native
+- [NativeWind](https://www.nativewind.dev/) – Tailwind CSS para React Native
+- [Supabase](https://supabase.com/) – Plataforma de Auth y Base de Datos
+- [Bun](https://bun.sh/) – Runtime y gestor de paquetes rápido
 ## 🚀 Local Development
 
-1. Install Bun
+---
 
-```shell
+## 🚀 Desarrollo local
+
+### 1. Instalar Bun Windows
+```sh
+powershell -c "irm bun.sh/install.ps1|iex"
+
+#### macOS
+```sh
 brew install bun
 ```
 with NPM:
