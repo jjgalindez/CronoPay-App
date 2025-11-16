@@ -31,7 +31,8 @@ export default function InicioScreen() {
             {displayName}
           </Text>
           <Text className="mt-6 text-base text-neutral-700">
-            Gestiona tus finanzas, revisa movimientos y mantén tus cobros al día.
+            Gestiona tus finanzas, revisa movimientos y mantén tus cobros al
+            día.
           </Text>
         </View>
 
