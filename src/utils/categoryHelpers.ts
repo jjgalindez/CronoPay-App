@@ -3,17 +3,17 @@
  */
 export function getCategoryIcon(categoria: string): string {
   const iconMap: Record<string, string> = {
-    "Suscripción": "tv-outline",
-    "Suscripciones": "tv-outline",
-    "Servicios": "flash-outline",
-    "Deudores": "people-outline",
-    "Transporte": "car-outline",
-    "Comida": "fast-food-outline",
-    "Vivienda": "home-outline",
-    "Salud": "medical-outline",
-    "Educación": "school-outline",
-    "Entretenimiento": "game-controller-outline",
-    "Otros": "ellipsis-horizontal-outline",
+    Suscripción: "tv-outline",
+    Suscripciones: "tv-outline",
+    Servicios: "flash-outline",
+    Deudores: "people-outline",
+    Transporte: "car-outline",
+    Comida: "fast-food-outline",
+    Vivienda: "home-outline",
+    Salud: "medical-outline",
+    Educación: "school-outline",
+    Entretenimiento: "game-controller-outline",
+    Otros: "ellipsis-horizontal-outline",
   }
   return iconMap[categoria] || "wallet-outline"
 }

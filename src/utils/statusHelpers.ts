@@ -7,27 +7,27 @@ export type PaymentStatus = "Pagado" | "Pendiente" | "Vencido"
  * Mapeo de íconos por estado
  */
 export const ICON_MAP: Record<PaymentStatus, string> = {
-  "Pagado": "checkmark-circle-outline",
-  "Pendiente": "time-outline",
-  "Vencido": "alert-circle-outline",
+  Pagado: "checkmark-circle-outline",
+  Pendiente: "time-outline",
+  Vencido: "alert-circle-outline",
 }
 
 /**
  * Mapeo de colores por estado
  */
 export const STATUS_COLOR_MAP: Record<PaymentStatus, string> = {
-  "Pagado": "#1AAE6F",
-  "Pendiente": "#FF6B00",
-  "Vencido": "#FF3B30",
+  Pagado: "#1AAE6F",
+  Pendiente: "#FF6B00",
+  Vencido: "#FF3B30",
 }
 
 /**
  * Mapeo de colores de fondo de íconos por estado
  */
 export const STATUS_BACKGROUND_MAP: Record<PaymentStatus, string> = {
-  "Pagado": "#E8F9F1",
-  "Pendiente": "#FFF1E3",
-  "Vencido": "#FFEBEB",
+  Pagado: "#E8F9F1",
+  Pendiente: "#FFF1E3",
+  Vencido: "#FFEBEB",
 }
 
 /**

@@ -115,6 +115,8 @@ Para evitar errores con Google Sign-In en Expo + Android, sigue estos pasos uno 
 
    bun install
 
+   Nota: Abrir Android Studio y conectar el celular por cable al pc, o hacer un dispositivo virtual. Si es con adb entonces solo conectar al pc. (Tener la depuración por USB activada en el celular)
+
    bun expo prebuild
 
    Crear el archivo: local.properties 

@@ -11,7 +11,10 @@ export function formatCurrency(amount: number): string {
 /**
  * Formatea un número como moneda con símbolo
  */
-export function formatCurrencyWithSymbol(amount: number, currency: string = "DOP"): string {
+export function formatCurrencyWithSymbol(
+  amount: number,
+  currency: string = "DOP",
+): string {
   return new Intl.NumberFormat("es-DO", {
     style: "currency",
     currency,
@@ -23,9 +26,12 @@ export function formatCurrencyWithSymbol(amount: number, currency: string = "DOP
 /**
  * Formatea una fecha en formato legible
  */
-export function formatDate(date: Date | string, format: "short" | "long" = "short"): string {
+export function formatDate(
+  date: Date | string,
+  format: "short" | "long" = "short",
+): string {
   const dateObj = typeof date === "string" ? new Date(date) : date
-  
+
   if (format === "short") {
     return dateObj.toLocaleDateString("es-DO", {
       day: "2-digit",
@@ -33,7 +39,7 @@ export function formatDate(date: Date | string, format: "short" | "long" = "shor
       year: "numeric",
     })
   }
-  
+
   return dateObj.toLocaleDateString("es-DO", {
     day: "numeric",
     month: "long",
