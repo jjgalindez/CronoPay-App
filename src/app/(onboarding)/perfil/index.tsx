@@ -9,7 +9,6 @@ import { LogoutButton } from "../../../components/profile/LogoutButton"
 import { VersionInfo } from "../../../components/profile/VersionInfo"
 import { router } from "expo-router"
 
-
 export default function PerfilScreen() {
   const { session, signOut } = useAuth()
   const { data: perfil, isLoading, refetch } = useUsuarioPerfil(session?.user?.id)
@@ -26,11 +25,9 @@ export default function PerfilScreen() {
   }
 
   const handleEditProfile = () => {
-    // Navegar a la pantalla de edición (la crearemos después)
     router.push("/(onboarding)/perfil/editar")
   }
 
-  // Obtener el nombre para mostrar usando solo propiedades existentes
   const getDisplayName = () => {
     return perfil?.nombre || session?.user?.email?.split('@')[0] || "Usuario"
   }
@@ -48,7 +45,11 @@ export default function PerfilScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView 
-        contentContainerStyle={{ paddingBottom: 40 }}
+        className="flex-1"
+        contentContainerStyle={{ 
+          flexGrow: 1, // Importante para Android
+          paddingBottom: 40 
+        }}
         showsVerticalScrollIndicator={false}
       >
         <ProfileHeader

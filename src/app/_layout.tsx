@@ -1,5 +1,4 @@
 //src/app/_layout.tsx
-// Quitar el import web
 import "@/global.css"
 
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
