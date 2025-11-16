@@ -1,6 +1,6 @@
 // src/components/profile/ProfileHeader.tsx
 import React from "react"
-import { View, Text, Pressable, Image } from "react-native"
+import { View, Text, Pressable, Image, useWindowDimensions } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 
 interface ProfileHeaderProps {
@@ -11,6 +11,11 @@ interface ProfileHeaderProps {
 }
 
 export const ProfileHeader = React.memo(({ name, email, avatarUrl, onEditProfile }: ProfileHeaderProps) => {
+  const { width } = useWindowDimensions()
+  const isSmallScreen = width < 375
+  
+  const avatarSize = isSmallScreen ? 56 : 64
+  const titleSize = isSmallScreen ? 18 : 24
   
   const getIniciales = (nombreCompleto: string) => {
     return nombreCompleto
@@ -22,20 +27,26 @@ export const ProfileHeader = React.memo(({ name, email, avatarUrl, onEditProfile
   }
 
   return (
-    <View className="border-b border-gray-200 px-6 py-6">
-      <View className="mb-4 flex-row items-center" style={{ columnGap: 16 }}>
+    <View className="border-b border-gray-200" style={{ paddingHorizontal: Math.max(16, width * 0.05), paddingVertical: isSmallScreen ? 16 : 24 }}>
+      <View className="mb-4 flex-row items-center" style={{ columnGap: isSmallScreen ? 12 : 16 }}>
         <View className="relative">
           {avatarUrl ? (
-            <View className="h-16 w-16 overflow-hidden rounded-full border-2 border-gray-200">
+            <View 
+              className="overflow-hidden rounded-full border-2 border-gray-200"
+              style={{ height: avatarSize, width: avatarSize }}
+            >
               <Image
                 source={{ uri: avatarUrl }}
-                className="h-full w-full"
+                style={{ height: avatarSize, width: avatarSize }}
                 resizeMode="cover"
               />
             </View>
           ) : (
-            <View className="h-16 w-16 items-center justify-center rounded-full border-2 border-gray-200 bg-green-500">
-              <Text className="text-lg font-bold text-white">
+            <View 
+              className="items-center justify-center rounded-full border-2 border-gray-200 bg-green-500"
+              style={{ height: avatarSize, width: avatarSize }}
+            >
+              <Text className="font-bold text-white" style={{ fontSize: avatarSize * 0.3 }}>
                 {getIniciales(name || "U")}
               </Text>
             </View>
@@ -46,7 +57,7 @@ export const ProfileHeader = React.memo(({ name, email, avatarUrl, onEditProfile
         </View>
         
         <View className="flex-1">
-          <Text className="mb-1 text-2xl font-bold text-gray-900" numberOfLines={1}>{name}</Text>
+          <Text className="mb-1 font-bold text-gray-900" style={{ fontSize: titleSize }} numberOfLines={1}>{name}</Text>
           <View className="flex-row items-center" style={{ columnGap: 4 }}>
             <Ionicons name="mail-outline" size={14} color="#6B7280" />
             <Text className="flex-1 text-sm text-gray-600" numberOfLines={1}>{email}</Text>

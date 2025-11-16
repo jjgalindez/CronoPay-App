@@ -1,5 +1,5 @@
 // app/(onboarding)/perfil/index.tsx
-import { View, ScrollView, Alert, Text } from "react-native"
+import { View, ScrollView, Alert, Text, useWindowDimensions } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useAuth } from "../../../../providers/AuthProvider"
 import { useUsuarioPerfil } from "../../../hooks/useUsuarioPerfil"
@@ -12,6 +12,8 @@ import { router } from "expo-router"
 export default function PerfilScreen() {
   const { session, signOut } = useAuth()
   const { data: perfil, isLoading, refetch } = useUsuarioPerfil(session?.user?.id)
+  const { width } = useWindowDimensions()
+  const isSmallScreen = width < 375
 
   const handleLogout = () => {
     Alert.alert(
@@ -47,14 +49,15 @@ export default function PerfilScreen() {
       <ScrollView 
         className="flex-1"
         contentContainerStyle={{ 
-          flexGrow: 1, // Importante para Android
-          paddingBottom: 40 
+          flexGrow: 1,
+          paddingBottom: isSmallScreen ? 32 : 40
         }}
         showsVerticalScrollIndicator={false}
       >
         <ProfileHeader
           name={getDisplayName()}
           email={session?.user?.email || "jose@correo.com"}
+          avatarUrl={perfil?.avatar_url}
           onEditProfile={handleEditProfile}
         />
         
