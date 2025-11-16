@@ -31,8 +31,6 @@ Se enfoca en flujos de onboarding limpios, UI modular y estructura de proyecto m
 
 ## 📱 Flujos implementados
 
-## 📱 Flujos implementados
-
 - [x] Walkthrough / Carrusel de onboarding
 - [x] Login with google and supabase auth
 - [x] Configuración de cuenta
@@ -47,7 +45,7 @@ Se enfoca en flujos de onboarding limpios, UI modular y estructura de proyecto m
 
 - [x] 🔒 Registro / Login (auth con Supabase y Google)
 - [x] 🎨 Carrusel de onboarding con imágene
-- [ ] 💸 HOME dentro de la app con los reportes (pendiente)
+- [x] 💸 HOME dentro de la app con los reportes (pendiente)
 
 ---
 
@@ -87,6 +85,8 @@ powershell -c "irm bun.sh/install.ps1|iex"
 git clone https://github.com/jjgalindez/cronopay-app
 ```
 
+
+
 3. Install NPM packages
 
 ```sh
@@ -99,9 +99,31 @@ bun install
    You will need to update your Site URL under Authentication > URL Configuration > Site URL to
    `com.cronopay.app`.
 
+   ---
 
-5. Run the development server
+## 🔐 Estado funcional del inicio con Google
 
-```shell
-bun start
-```
+Para evitar errores con Google Sign-In en Expo + Android, sigue estos pasos uno por uno en este orden:
+
+### ✅ Pasos para configurar correctamente Google Sign-In
+
+5. Eliminar módulos y lockfile:
+   ```sh
+   rm -rf node_modules
+   rm -rf bun.lock
+   rm -rf android
+
+   bun install
+
+   bun expo prebuild
+
+   Crear el archivo: local.properties 
+   dentro de la carpeta android/ y agregar:
+   sdk.dir=C:\\Users\\<usuario>\\AppData\\Local\\Android\\Sdk
+
+
+6. Run the development server
+
+    ```shell
+     bun expo run:android
+    ```
