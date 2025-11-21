@@ -1,8 +1,7 @@
 // app/(onboarding)/perfil/_layout.tsx
-import { Stack } from "expo-router"
-import { TouchableOpacity } from "react-native"
 import Ionicons from "@expo/vector-icons/Ionicons"
-import { router } from "expo-router"
+import { Stack, router } from "expo-router"
+import { TouchableOpacity } from "react-native"
 
 export default function PerfilLayout() {
   return (
@@ -13,7 +12,7 @@ export default function PerfilLayout() {
           title: "Perfil y Configuración",
           headerShadowVisible: false,
           headerLeft: () => (
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => router.back()}
               style={{ marginLeft: 10 }}
             >
@@ -28,7 +27,7 @@ export default function PerfilLayout() {
           title: "Editar Perfil",
           headerShadowVisible: false,
           headerLeft: () => (
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => router.back()}
               style={{ marginLeft: 10 }}
             >

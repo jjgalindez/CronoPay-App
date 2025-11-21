@@ -18,14 +18,18 @@ const benefits = [
   },
 ] as const
 
-const BenefitItem = React.memo<{ icon: string; text: string }>(({ icon, text }) => (
-  <View className="flex-row items-start" style={{ columnGap: 12 }}>
-    <View className="mt-0.5 w-6 items-center">
-      <Icon name={icon} size={22} color="#3b82f6" />
+const BenefitItem = React.memo<{ icon: string; text: string }>(
+  ({ icon, text }) => (
+    <View className="flex-row items-start" style={{ columnGap: 12 }}>
+      <View className="mt-0.5 w-6 items-center">
+        <Icon name={icon} size={22} color="#3b82f6" />
+      </View>
+      <Text className="flex-1 text-[14px] leading-relaxed text-neutral-700">
+        {text}
+      </Text>
     </View>
-    <Text className="flex-1 text-[14px] leading-relaxed text-neutral-700">{text}</Text>
-  </View>
-))
+  ),
+)
 
 BenefitItem.displayName = "BenefitItem"
 

@@ -1,6 +1,6 @@
 // src/components/home/AuthActions.tsx
-import React from "react"
 import { Link } from "expo-router"
+import React from "react"
 import { Pressable, Text, View } from "react-native"
 
 const AuthActions = React.memo(() => {
