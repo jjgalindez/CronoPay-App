@@ -12,7 +12,7 @@ const images = [
 const AppPreview = React.memo(() => {
   const { width } = useWindowDimensions()
   const imageHeight = width * 0.6 // Altura proporcional al ancho
-  
+
   return (
     <View className="my-4 w-full" style={{ height: imageHeight }}>
       <SwiperFlatList
@@ -24,10 +24,10 @@ const AppPreview = React.memo(() => {
         renderItem={({ item }) => (
           <Image
             source={item}
-            style={{ 
+            style={{
               width: width - 32, // Full width menos padding horizontal (16px cada lado)
               height: imageHeight,
-              borderRadius: 12
+              borderRadius: 12,
             }}
             resizeMode="cover"
           />

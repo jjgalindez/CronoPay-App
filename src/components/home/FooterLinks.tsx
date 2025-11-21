@@ -1,6 +1,6 @@
 // src/components/home/FooterLinks.tsx
-import React from "react"
 import { Link } from "expo-router"
+import React from "react"
 import { View, Text, Pressable } from "react-native"
 
 const FooterLinks = React.memo(() => {
