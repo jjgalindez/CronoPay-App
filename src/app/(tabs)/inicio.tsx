@@ -1,12 +1,10 @@
 import { useMemo } from "react"
-import { ScrollView, Text, View, Alert } from "react-native"
+import { ScrollView, Text, View, Alert, Pressable } from "react-native"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import Box from "../../components/Box"
 import { getCategoryIcon, getCategoryColor } from "../../utils/categoryHelpers"
-
 import { useAuth } from "../../../providers/AuthProvider"
 import { usePagos } from "../../hooks/usePagos"
-import Button from "@/components/Button";
 import DonutChart from "../../components/DonutChart"
 import PaymentsList from "../../components/PaymentsList"
 
