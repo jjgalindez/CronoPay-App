@@ -34,12 +34,28 @@ export const MONTH_NAMES_SHORT = [
   "Dic",
 ]
 
+import i18n from '../i18n'
+
 /**
  * Obtiene el nombre del mes dado su índice (0-11)
  */
 export function getMonthName(month: number, short: boolean = false): string {
-  const months = short ? MONTH_NAMES_SHORT : MONTH_NAMES
+  const months = getMonthNames(short)
   return months[month] || ""
+}
+
+/**
+ * Devuelve el array completo de nombres de meses en español (o cortos)
+ */
+export function getMonthNames(short: boolean = false): string[] {
+  try {
+    const key = short ? 'monthNamesShort' : 'monthNames'
+    const res = i18n.t(key, { returnObjects: true }) as unknown
+    if (Array.isArray(res) && res.length > 0) return res as string[]
+  } catch (e) {
+    // ignore and fallback
+  }
+  return short ? MONTH_NAMES_SHORT.slice() : MONTH_NAMES.slice()
 }
 
 /**

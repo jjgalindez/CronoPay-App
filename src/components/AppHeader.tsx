@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons"
 import { router } from "expo-router"
 import { Image, Pressable, Text, View } from "react-native"
+import { useTranslation } from "react-i18next"
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"]
 
@@ -35,6 +36,7 @@ export default function AppHeader({
 
     router.push("/(onboarding)/perfil")
   }
+  const { t } = useTranslation()
   if (variant === "home") {
     return (
       <View
@@ -53,10 +55,10 @@ export default function AppHeader({
 
           <View>
             <Text style={{ fontSize: 20, fontWeight: "700", color: "#0B2E35" }}>
-              Hola, {userName ?? "Usuario"} 👋
+              {t("Hi")}, {userName ?? t("User")} 👋
             </Text>
             <Text style={{ fontSize: 13, color: "#7C8A8C", marginTop: 2 }}>
-              Aquí tienes el resumen de tus pagos.
+              {t("WelcomeMessage")}
             </Text>
           </View>
         </Pressable>

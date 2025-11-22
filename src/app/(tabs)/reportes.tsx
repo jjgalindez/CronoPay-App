@@ -14,11 +14,13 @@ import { useMemo, useState } from "react"
 import { formatCurrency } from "../../utils/formatters"
 import { getCategoryIcon, CATEGORY_COLORS } from "../../utils/categoryHelpers"
 import { getStatusColors } from "../../utils/statusHelpers"
-import { MONTH_NAMES, filterByMonth, getPreviousMonth } from "../../utils/dateHelpers"
+import { getMonthNames, filterByMonth, getPreviousMonth } from "../../utils/dateHelpers"
+import { useTranslation } from "react-i18next"
 
 export default function ReportesScreen() {
   const colorScheme = useColorScheme()
   const isDark = colorScheme === 'dark'
+  const { t } = useTranslation()
 
   const { session } = useAuth()
   const userId = session?.user?.id
@@ -66,7 +68,7 @@ export default function ReportesScreen() {
     const categoriaMap = new Map<string, { nombre: string; total: number }>()
 
     filteredPayments.forEach((pago) => {
-      const categoriaNombre = pago.categoria?.nombre || "Sin categoría"
+      const categoriaNombre = pago.categoria?.nombre || t("Uncategoryed")
       const existing = categoriaMap.get(categoriaNombre)
       if (existing) {
         existing.total += Number(pago.monto)
@@ -117,7 +119,7 @@ export default function ReportesScreen() {
   const dynamicCards = useMemo(() => [
     {
       id: "pagos",
-      title: "Pagos Totales",
+      title: t("TotalPayments"),
       value: String(stats.total),
       iconName: "receipt-outline" as const,
       iconBackgroundColor: "#E8F1FF",
@@ -130,7 +132,7 @@ export default function ReportesScreen() {
     },
     {
       id: "completados",
-      title: "Completados",
+      title: t("Completed"),
       value: String(stats.completed),
       valueColor: "#12C48B",
       iconName: "checkmark-circle-outline" as const,
@@ -144,7 +146,7 @@ export default function ReportesScreen() {
     },
     {
       id: "pendientes",
-      title: "Pendientes",
+      title: t("Pendings"),
       value: String(stats.pending),
       valueColor: "#FF6B00",
       iconName: "time-outline" as const,
@@ -158,14 +160,14 @@ export default function ReportesScreen() {
     },
     {
       id: "total",
-      title: "Monto Total",
+      title: t("TotalAmount"),
       value: `$${formatCurrency(stats.totalAmount)}`,
       iconName: "cash-outline" as const,
       iconBackgroundColor: "#EEE8FF",
       iconColor: "#1B3D48",
       backgroundColor: isDark ? "#171717" : "#FFFFFF",
       showComparison: true,
-      comparisonText: "vs mes anterior",
+      comparisonText: t("VsLastMonth"),
       comparisonPercentage: stats.comparisonPercentage,
       comparisonColor: stats.comparisonPercentage >= 0 ? "#12C48B" : "#FF6B00",
     },
@@ -176,7 +178,7 @@ export default function ReportesScreen() {
       <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-black">
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#1B3D48" />
-          <Text className="mt-4 text-neutral-600 dark:text-neutral-400">Cargando reportes...</Text>
+          <Text className="mt-4 text-neutral-600 dark:text-neutral-400">{t("LoadingReports")}</Text>
         </View>
       </SafeAreaView>
     )
@@ -189,7 +191,7 @@ export default function ReportesScreen() {
         showsVerticalScrollIndicator={false}
       >
         <MonthYearSelector
-          label="Selecciona el mes para ver el resumen de tus pagos"
+          label={t("SelectMonthMessage")}
           value={selectedPeriod}
           onChange={setSelectedPeriod}
           minYear={2020}
@@ -201,7 +203,7 @@ export default function ReportesScreen() {
             iconName="card-outline"
             iconColor="#2791B5"
             iconBackgroundColor="#E8F4F8"
-            title="Total de Pagos"
+            title={t("TotalPayments")}
             value={String(stats.total)}
             backgroundColor={isDark ? "#171717" : "#FFFFFF"}
             compact
@@ -215,7 +217,7 @@ export default function ReportesScreen() {
             iconName="checkmark-circle-outline"
             iconColor="#12C48B"
             iconBackgroundColor="#E6F9F3"
-            title="Completados"
+            title={t("Completed")}
             value={String(stats.completed)}
             backgroundColor={isDark ? "#171717" : "#FFFFFF"}
             compact
@@ -229,7 +231,7 @@ export default function ReportesScreen() {
             iconName="time-outline"
             iconColor="#FF6B00"
             iconBackgroundColor="#FFF1E3"
-            title="Pendientes"
+            title={t("Pendings")}
             value={String(stats.pending)}
             backgroundColor={isDark ? "#171717" : "#FFFFFF"}
             compact
@@ -243,12 +245,12 @@ export default function ReportesScreen() {
             iconName="cash-outline"
             iconColor="#7C4DFF"
             iconBackgroundColor="#F3EEFF"
-            title="Monto Total"
+            title={t("TotalAmount")}
             value={`$${formatCurrency(stats.totalAmount)}`}
             backgroundColor={isDark ? "#171717" : "#FFFFFF"}
             compact
             showComparison
-            comparisonText={stats.comparisonPercentage >= 0 ? "vs mes anterior" : "vs mes anterior"}
+            comparisonText={stats.comparisonPercentage >= 0 ? t("VsLastMonth") : t("VsLastMonth")}
             comparisonPercentage={stats.comparisonPercentage}
             comparisonColor={stats.comparisonPercentage >= 0 ? "#12C48B" : "#FF6B6B"}
             style={[styles.gridItem, styles.gridItemRight]}
@@ -257,7 +259,7 @@ export default function ReportesScreen() {
 
         <View style={styles.chartSection}>
           <Text className="text-lg font-bold text-[#1B3D48] dark:text-gray-100 mb-4">
-            Distribución por Categoría - {MONTH_NAMES[selectedPeriod.month]}
+            {t("DistributionByCategory")} - {getMonthNames()[selectedPeriod.month]}
           </Text>
           {donutData.length > 0 ? (
             <View className="bg-white dark:bg-neutral-900 rounded-[18px] p-4 mt-3 shadow-sm items-center">
@@ -272,7 +274,7 @@ export default function ReportesScreen() {
           ) : (
             <View style={styles.emptyState}>
               <Text className="text-sm text-[#6B7280] dark:text-neutral-400 text-center">
-                No hay datos de categorías para este mes
+                {t("NoCategoryData")}
               </Text>
             </View>
           )}
@@ -282,43 +284,43 @@ export default function ReportesScreen() {
           <PaymentsList
             items={paymentsListData}
             filterMonth={selectedPeriod.month}
-            title={`Detalle de Pagos - ${MONTH_NAMES[selectedPeriod.month]}`}
+            title={`${t("PaymentsDetails")} - ${getMonthNames()[selectedPeriod.month]}`}
           />
         </View>
 
         <View style={styles.exportSection}>
-          <Text className="text-lg font-bold text-[#1B3D48] dark:text-gray-100 mb-4">Exportar Reporte</Text>
+          <Text className="text-lg font-bold text-[#1B3D48] dark:text-gray-100 mb-4">{t("ExportReport")}</Text>
 
           <Button
-            label="Descargar PDF"
+            label={t("DownloadPDF")}
             icon="document-text"
             backgroundColor="#0B2B34"
             textColor="#FFFFFF"
             iconColor="#FFFFFF"
             size="large"
-            onPress={() => Alert.alert("Work in Progress", "La función de exportar PDF estará disponible próximamente.")}
+            onPress={() => Alert.alert(t("WIP"), t("WIPPdf"))}
             style={styles.exportButton}
           />
 
           <Button
-            label="Exportar Excel"
+            label={t("ExportExcel")}
             icon="document"
             backgroundColor="#12C48B"
             textColor="#FFFFFF"
             iconColor="#FFFFFF"
             size="large"
-            onPress={() => Alert.alert("Work in Progress", "La función de exportar Excel estará disponible próximamente.")}
+            onPress={() => Alert.alert(t("WIP"), t("WIPExcel"))}
             style={styles.exportButton}
           />
 
           <Button
-            label="Enviar por Correo"
+            label={t("SendMail")}
             icon="mail"
             backgroundColor="#5B6B73"
             textColor="#FFFFFF"
             iconColor="#FFFFFF"
             size="large"
-            onPress={() => Alert.alert("Work in Progress", "La función de enviar por correo estará disponible próximamente.")}
+            onPress={() => Alert.alert(t("WIP"), t("WIPEmail"))}
             style={styles.exportButton}
           />
         </View>

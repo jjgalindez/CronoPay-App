@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
-import { View, Text, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { useTranslation } from "react-i18next"
 
 export type PaymentItem = {
   id?: string
@@ -53,40 +54,43 @@ export default function PaymentsList({
   // parse and sort by date desc
   const sorted = useMemo(() => {
     return [...items]
-      .map((it) => ({
-        ...it,
-        parsedDate: typeof it.date === 'string' ? new Date(it.date) : it.date,
-      }))
-      .sort((a, b) => (b.parsedDate as Date).getTime() - (a.parsedDate as Date).getTime())
+      .map((it) => ({ ...it, _date: typeof it.date === 'string' ? new Date(it.date) : it.date }))
+      .sort((a, b) => (b._date as Date).getTime() - (a._date as Date).getTime())
   }, [items])
+  const { t } = useTranslation()
 
-  // filter by month and category
+  // filter by month and/or category
   const filtered = useMemo(() => {
     let result = sorted
-    if (typeof filterMonth === 'number') {
+
+    // filter by month if specified
+    if (filterMonth !== undefined) {
       result = result.filter((it) => {
-        const itemDate = it.parsedDate as Date
+        const itemDate = it._date as Date
         return itemDate.getMonth() === filterMonth
       })
     }
+
+    // filter by category if specified
     if (filterCategory) {
       result = result.filter((it) => it.category === filterCategory)
     }
+
     return result
   }, [sorted, filterMonth, filterCategory])
 
   return (
-    <View className="bg-white dark:bg-black rounded-[18px] p-4 mb-4 shadow-sm">
-      <Text className="text-lg font-bold text-[#1B3D48] dark:text-gray-100 mb-3">{title}</Text>
+    <View style={styles.card}>
+      <Text style={styles.title}>{title}</Text>
 
       {filtered.length === 0 ? (
-        <Text className="text-[#6B7C82] dark:text-gray-400 text-sm text-center py-6">
+        <Text style={styles.empty}>
           No hay pagos registrados para los filtros seleccionados.
         </Text>
       ) : (
-        <View className="max-h-[400px]">
+        <View style={styles.listContainer}>
           <ScrollView
-            className="max-h-[400px]"
+            style={styles.scrollView}
             nestedScrollEnabled={true}
             showsVerticalScrollIndicator={true}
           >
@@ -95,34 +99,28 @@ export default function PaymentsList({
               const statusColor = STATUS_COLORS[status] ?? '#D1E9E6'
 
               return (
-                <View key={it.id ?? `${idx}`} className="flex-row items-center py-3 border-b border-[#F1F5F6] dark:border-gray-800">
-                  <View
-                    className="w-11 h-11 rounded-full mr-3 items-center justify-center"
-                    style={{ backgroundColor: it.iconBackgroundColor ?? '#E8F1FF' }}
-                  >
+              <View key={it.id ?? `${idx}`} style={styles.row}>
+                <View style={[styles.avatar, { backgroundColor: it.iconBackgroundColor ?? '#E8F1FF' }]}> 
                     {it.iconName ? (
                       <Ionicons name={it.iconName as any} size={20} color={it.iconColor ?? '#1B3D48'} />
                     ) : null}
                   </View>
 
-                  <View className="flex-1">
-                    <Text className="text-[15px] font-semibold text-[#1B3D48] dark:text-gray-100" numberOfLines={1}>
+                <View style={styles.meta}>
+                  <Text style={styles.itemTitle} numberOfLines={1}>
                       {it.title}
                     </Text>
-                    <Text className="text-xs text-[#8A9AA0] dark:text-gray-400 mt-1">
+                  <Text style={styles.itemDate}>
                       {formatDate(it.date)}
                       {it.category ? ` • ${it.category}` : ''}
                     </Text>
                   </View>
 
-                  <View className="items-end ml-3">
-                    <Text className="text-base font-bold text-[#1B3D48] dark:text-gray-100">${formatCurrency(it.amount)}</Text>
+                <View style={styles.amountWrap}>
+                  <Text style={styles.amount}>${formatCurrency(it.amount)}</Text>
                     {status ? (
-                      <View
-                        className="mt-1.5 px-2.5 py-1 rounded-xl"
-                        style={{ backgroundColor: statusColor }}
-                      >
-                        <Text className="text-[11px] text-[#0B2B28] font-bold">{status}</Text>
+                    <View style={[styles.badge, { backgroundColor: statusColor }]}> 
+                      <Text style={styles.badgeText}>{status}</Text>
                       </View>
                     ) : null}
                   </View>
@@ -134,12 +132,105 @@ export default function PaymentsList({
       )}
 
       {filtered.length > 0 && (
-        <View className="mt-3 pt-3 border-t border-[#F1F5F6] dark:border-gray-800 items-center">
-          <Text className="text-[13px] text-[#6B7C82] dark:text-gray-400 font-semibold">
-            {filtered.length} {filtered.length === 1 ? 'pago' : 'pagos'} encontrados
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            {filtered.length} {filtered.length === 1 ? t("Payment") : t("Payments")} {t("Found")}
           </Text>
         </View>
       )}
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 5,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1B3D48',
+    marginBottom: 12,
+  },
+  listContainer: {
+    maxHeight: 400,
+  },
+  scrollView: {
+    maxHeight: 400,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F6',
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#E8F1FF',
+    marginRight: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  meta: {
+    flex: 1,
+  },
+  itemTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1B3D48',
+  },
+  itemDate: {
+    fontSize: 12,
+    color: '#8A9AA0',
+    marginTop: 4,
+  },
+  amountWrap: {
+    alignItems: 'flex-end',
+    marginLeft: 12,
+  },
+  amount: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1B3D48',
+  },
+  badge: {
+    marginTop: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    fontSize: 11,
+    color: '#0B2B28',
+    fontWeight: '700',
+  },
+  footer: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F6',
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 13,
+    color: '#6B7C82',
+    fontWeight: '600',
+  },
+  empty: {
+    color: '#6B7C82',
+    fontSize: 14,
+    paddingVertical: 24,
+    textAlign: 'center',
+  },
+})

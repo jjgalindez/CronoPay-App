@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, useColorScheme } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { useTranslation } from "react-i18next"
 
 export type PaymentItem = {
   id?: string
@@ -46,7 +47,7 @@ function formatCurrency(value: number) {
 export default function RecentPayments({ items = [], maxItems = 5 }: RecentPaymentsProps) {
   const colorScheme = useColorScheme()
   const isDark = colorScheme === 'dark'
-
+  const { t } = useTranslation()
   // filter state: 'month' | 'trimester' | 'year'
   const [filter, setFilter] = useState<'month' | 'trimester' | 'year'>('month')
 
@@ -80,10 +81,10 @@ export default function RecentPayments({ items = [], maxItems = 5 }: RecentPayme
 
   return (
     <View style={[styles.card, isDark && styles.cardDark]}>
-      <Text style={[styles.title, isDark && styles.titleDark]}>Últimos Movimientos</Text>
+      <Text style={[styles.title, isDark && styles.titleDark]}>{t("LastMovements")}</Text>
 
       {visible.length === 0 ? (
-        <Text style={[styles.empty, isDark && styles.emptyDark]}>No hay movimientos para este periodo.</Text>
+        <Text style={[styles.empty, isDark && styles.emptyDark]}>{t("NoPeriodMovements")}</Text>
       ) : (
         visible.map((it, idx) => {
           const status = it.status ?? ''
@@ -123,19 +124,19 @@ export default function RecentPayments({ items = [], maxItems = 5 }: RecentPayme
           style={[styles.filterBtn, filter === 'month' ? styles.filterActive : null]}
           onPress={() => setFilter('month')}
         >
-          <Text style={filter === 'month' ? styles.filterTextActive : styles.filterText}>Mes</Text>
+          <Text style={filter === 'month' ? styles.filterTextActive : styles.filterText}>{t("Month")}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.filterBtn, filter === 'trimester' ? styles.filterActive : null]}
           onPress={() => setFilter('trimester')}
         >
-          <Text style={filter === 'trimester' ? styles.filterTextActive : styles.filterText}>Trimestre</Text>
+          <Text style={filter === 'trimester' ? styles.filterTextActive : styles.filterText}>{t("Trimester")}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.filterBtn, filter === 'year' ? styles.filterActive : null]}
           onPress={() => setFilter('year')}
         >
-          <Text style={filter === 'year' ? styles.filterTextActive : styles.filterText}>Año</Text>
+          <Text style={filter === 'year' ? styles.filterTextActive : styles.filterText}>{t("Year")}</Text>
         </TouchableOpacity>
       </View>
     </View>

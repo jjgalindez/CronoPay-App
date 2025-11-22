@@ -3,25 +3,17 @@ import { Tabs, useRouter } from "expo-router"
 import { useEffect, type ComponentProps } from "react"
 import { Text, useColorScheme } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-
 import { useAuth } from "../../../providers/AuthProvider"
 import AppHeader from "../../components/AppHeader"
 import { useUsuarioPerfil } from "../../hooks/useUsuarioPerfil"
-
+import { useTranslation } from "react-i18next"
 const ACTIVE_COLOR = "#0C212C"
 const INACTIVE_COLOR = "#94A5AB"
 
 type IconName = ComponentProps<typeof Ionicons>["name"]
 
-const TAB_CONFIG: Record<string, { title: string; icon: IconName }> = {
-  pagos: { title: "Pagos", icon: "card-outline" },
-  calendario: { title: "Calendario", icon: "calendar-outline" },
-  inicio: { title: "Inicio", icon: "home-outline" },
-  estadisticas: { title: "Panel de Estadísticas", icon: "stats-chart-outline" },
-  reportes: { title: "Reportes Mensuales", icon: "document-text-outline" },
-}
-
 function TabLabel({ focused, label, isDark }: { focused: boolean; label: string; isDark: boolean }) {
+
   return (
     <Text
       style={{
@@ -38,12 +30,21 @@ function TabLabel({ focused, label, isDark }: { focused: boolean; label: string;
 export default function TabsLayout() {
   const colorScheme = useColorScheme()
   const isDark = colorScheme === 'dark'
-
+  const { t } = useTranslation()
   const { loading, session } = useAuth()
   const router = useRouter()
   const userId = session?.user?.id ?? null
   const { data: perfil } = useUsuarioPerfil(userId)
   const insets = useSafeAreaInsets()
+
+
+  const TAB_CONFIG: Record<string, { title: string; icon: IconName }> = {
+    pagos: { title: t("PaymentsTitle"), icon: "card-outline" },
+    calendario: { title: t("CalendarTitle"), icon: "calendar-outline" },
+    inicio: { title: t("HomeTitle"), icon: "home-outline" },
+    estadisticas: { title: t("StatisticsTitle"), icon: "stats-chart-outline" },
+    reportes: { title: t("ReportsTitle"), icon: "document-text-outline" },
+  }
 
   useEffect(() => {
     if (loading) return
@@ -100,7 +101,7 @@ export default function TabsLayout() {
             <Ionicons name="card-outline" size={24} color={color} />
           ),
           tabBarLabel: ({ focused }) => (
-            <TabLabel focused={focused} label="Pagos" isDark={isDark} />
+            <TabLabel focused={focused} label={t("PaymentTab")} isDark={isDark} />
           ),
         }}
       />
@@ -112,7 +113,7 @@ export default function TabsLayout() {
             <Ionicons name="calendar-outline" size={24} color={color} />
           ),
           tabBarLabel: ({ focused }) => (
-            <TabLabel focused={focused} label="Calendario" isDark={isDark} />
+            <TabLabel focused={focused} label={t("CalendarTab")} isDark={isDark} />
           ),
         }}
       />
@@ -124,7 +125,7 @@ export default function TabsLayout() {
             <Ionicons name="home-outline" size={24} color={color} />
           ),
           tabBarLabel: ({ focused }) => (
-            <TabLabel focused={focused} label="Inicio" isDark={isDark} />
+            <TabLabel focused={focused} label={t("HomeTab")} isDark={isDark} />
           ),
         }}
       />
@@ -136,7 +137,7 @@ export default function TabsLayout() {
             <Ionicons name="stats-chart-outline" size={24} color={color} />
           ),
           tabBarLabel: ({ focused }) => (
-            <TabLabel focused={focused} label="Estadísticas" isDark={isDark} />
+            <TabLabel focused={focused} label={t("StatisticsTab")} isDark={isDark} />
           ),
         }}
       />
@@ -148,7 +149,7 @@ export default function TabsLayout() {
             <Ionicons name="document-text-outline" size={24} color={color} />
           ),
           tabBarLabel: ({ focused }) => (
-            <TabLabel focused={focused} label="Reportes" isDark={isDark} />
+            <TabLabel focused={focused} label={t("ReportsTab")} isDark={isDark} />
           ),
         }}
       />

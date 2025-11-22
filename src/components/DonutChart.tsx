@@ -160,7 +160,7 @@ export default function DonutChart({
           </Svg>
 
           {/* legend to the right for better readability */}
-          <View className="ml-4">
+          <View style={styles.legend}>
             {slices.map((s, i) => (
               <View key={`legend-${i}`} className="flex-row items-center mb-2">
                 <View className="w-3 h-3 rounded-sm mr-2" style={{ backgroundColor: s.color }} />
@@ -203,4 +203,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 8,
   },
+  legend: {
+    marginLeft: 12,
+    width: 150,
+    justifyContent: 'center'
+  },
+  legendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  swatch: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  legendTextWrap: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flex: 1,
+  },
+  legendLabel: {
+    fontSize: 13,
+    color: '#12343A',
+  },
+  legendPercent: {
+    fontSize: 13,
+    color: '#12343A',
+    fontWeight: '600'
+  }
 })

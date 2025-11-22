@@ -8,21 +8,10 @@ import {
   Text,
   View,
 } from "react-native"
+import { useTranslation } from "react-i18next"
+import { getMonthNames } from "../utils/dateHelpers"
 
-const MONTHS = [
-  "Enero",
-  "Febrero",
-  "Marzo",
-  "Abril",
-  "Mayo",
-  "Junio",
-  "Julio",
-  "Agosto",
-  "Septiembre",
-  "Octubre",
-  "Noviembre",
-  "Diciembre",
-]
+// month names are provided by i18n via getMonthNames()
 
 export type MonthYearValue = {
   month: number // 0-11
@@ -47,7 +36,9 @@ export default function MonthYearSelector({
   const [isOpen, setIsOpen] = useState(false)
   const [tempValue, setTempValue] = useState<MonthYearValue>(value)
 
-  const formattedValue = `${MONTHS[value.month]} ${value.year}`
+  const { t } = useTranslation()
+  const monthNames = getMonthNames()
+  const formattedValue = `${monthNames[value.month]} ${value.year}`
 
   const years = Array.from(
     { length: maxYear - minYear + 1 },
@@ -100,9 +91,9 @@ export default function MonthYearSelector({
 
             <View style={styles.modalHeader}>
               <View style={styles.modalTitleContainer}>
-                <Text style={styles.modalTitle}>Elige un periodo</Text>
+                <Text style={styles.modalTitle}>{t("SelectPeriod")}</Text>
                 <Text style={styles.modalSubtitle}>
-                  Selecciona el año y luego el mes para filtrar tus reportes.
+                  {t("MonthSelectorMessage")}
                 </Text>
               </View>
 
@@ -146,11 +137,11 @@ export default function MonthYearSelector({
             </ScrollView>
 
             <View style={styles.monthGrid}>
-              {MONTHS.map((monthName, index) => {
+              {monthNames.map((monthName, index) => {
                 const isActive = index === tempValue.month
                 return (
                   <Pressable
-                    key={monthName}
+                      key={index}
                     onPress={() => setTempValue({ ...tempValue, month: index })}
                     style={[
                       styles.monthChip,
@@ -175,13 +166,13 @@ export default function MonthYearSelector({
                 onPress={handleCancel}
                 style={[styles.actionButton, styles.cancelButton]}
               >
-                <Text style={styles.cancelButtonText}>Cancelar</Text>
+                <Text style={styles.cancelButtonText}>{t("Cancel")}</Text>
               </Pressable>
               <Pressable
                 onPress={handleConfirm}
                 style={[styles.actionButton, styles.confirmButton]}
               >
-                <Text style={styles.confirmButtonText}>Confirmar</Text>
+                <Text style={styles.confirmButtonText}>{t("Confirm")}</Text>
               </Pressable>
             </View>
           </View>
