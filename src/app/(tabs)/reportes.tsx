@@ -1,4 +1,4 @@
-import { Alert, ScrollView, StyleSheet, Text, View, ActivityIndicator } from "react-native"
+import { Alert, ScrollView, StyleSheet, Text, View, ActivityIndicator, useColorScheme } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useAuth } from "../../../providers/AuthProvider"
 import { usePagos } from "../../hooks/usePagos"
@@ -17,6 +17,9 @@ import { getStatusColors } from "../../utils/statusHelpers"
 import { MONTH_NAMES, filterByMonth, getPreviousMonth } from "../../utils/dateHelpers"
 
 export default function ReportesScreen() {
+  const colorScheme = useColorScheme()
+  const isDark = colorScheme === 'dark'
+
   const { session } = useAuth()
   const userId = session?.user?.id
   const { data: pagos, isLoading: pagosLoading } = usePagos(userId)
@@ -46,10 +49,10 @@ export default function ReportesScreen() {
       selectedPeriod.month,
       selectedPeriod.year
     )
-    
+
     const prevMonthPayments = filterByMonth(pagos, prevMonth, prevYear)
     const prevMonthAmount = prevMonthPayments.reduce((sum, p) => sum + Number(p.monto), 0)
-    const comparisonPercentage = prevMonthAmount > 0 
+    const comparisonPercentage = prevMonthAmount > 0
       ? Math.round(((totalAmount - prevMonthAmount) / prevMonthAmount) * 100)
       : 0
 
@@ -119,7 +122,7 @@ export default function ReportesScreen() {
       iconName: "receipt-outline" as const,
       iconBackgroundColor: "#E8F1FF",
       iconColor: "#1B3D48",
-      backgroundColor: "#FFFFFF",
+      backgroundColor: isDark ? "#171717" : "#FFFFFF",
       showProgress: true,
       currentAmount: stats.completed,
       totalAmount: stats.total,
@@ -133,7 +136,7 @@ export default function ReportesScreen() {
       iconName: "checkmark-circle-outline" as const,
       iconBackgroundColor: "#E8F9F1",
       iconColor: "#12C48B",
-      backgroundColor: "#FFFFFF",
+      backgroundColor: isDark ? "#171717" : "#FFFFFF",
       showProgress: true,
       currentAmount: stats.completed,
       totalAmount: stats.total,
@@ -147,7 +150,7 @@ export default function ReportesScreen() {
       iconName: "time-outline" as const,
       iconBackgroundColor: "#FFF1E3",
       iconColor: "#FF6B00",
-      backgroundColor: "#FFFFFF",
+      backgroundColor: isDark ? "#171717" : "#FFFFFF",
       showProgress: true,
       currentAmount: stats.pending,
       totalAmount: stats.total,
@@ -160,27 +163,27 @@ export default function ReportesScreen() {
       iconName: "cash-outline" as const,
       iconBackgroundColor: "#EEE8FF",
       iconColor: "#1B3D48",
-      backgroundColor: "#FFFFFF",
+      backgroundColor: isDark ? "#171717" : "#FFFFFF",
       showComparison: true,
       comparisonText: "vs mes anterior",
       comparisonPercentage: stats.comparisonPercentage,
       comparisonColor: stats.comparisonPercentage >= 0 ? "#12C48B" : "#FF6B00",
     },
-  ], [stats])
+  ], [stats, isDark])
 
   if (pagosLoading || categoriasLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-neutral-50">
+      <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-black">
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#1B3D48" />
-          <Text className="mt-4 text-neutral-600">Cargando reportes...</Text>
+          <Text className="mt-4 text-neutral-600 dark:text-neutral-400">Cargando reportes...</Text>
         </View>
       </SafeAreaView>
     )
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-neutral-50">
+    <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-black">
       <ScrollView
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
@@ -194,39 +197,70 @@ export default function ReportesScreen() {
         />
 
         <View style={styles.grid}>
-          {dynamicCards.map((card, index) => (
-            <Box
-              key={card.id}
-              title={card.title}
-              value={card.value}
-              valueColor={card.valueColor}
-              iconName={card.iconName}
-              iconColor={card.iconColor}
-              iconBackgroundColor={card.iconBackgroundColor}
-              backgroundColor={card.backgroundColor}
-              compact
-              showProgress={card.showProgress}
-              currentAmount={card.currentAmount}
-              totalAmount={card.totalAmount}
-              progressColor={card.progressColor}
-              showComparison={card.showComparison}
-              comparisonText={card.comparisonText}
-              comparisonPercentage={card.comparisonPercentage}
-              comparisonColor={card.comparisonColor}
-              style={[
-                styles.gridItem,
-                index % 2 === 0 ? styles.gridItemLeft : styles.gridItemRight,
-              ]}
-            />
-          ))}
+          <Box
+            iconName="card-outline"
+            iconColor="#2791B5"
+            iconBackgroundColor="#E8F4F8"
+            title="Total de Pagos"
+            value={String(stats.total)}
+            backgroundColor={isDark ? "#171717" : "#FFFFFF"}
+            compact
+            showProgress
+            currentAmount={stats.completed}
+            totalAmount={stats.total}
+            progressColor="#12C48B"
+            style={[styles.gridItem, styles.gridItemLeft]}
+          />
+          <Box
+            iconName="checkmark-circle-outline"
+            iconColor="#12C48B"
+            iconBackgroundColor="#E6F9F3"
+            title="Completados"
+            value={String(stats.completed)}
+            backgroundColor={isDark ? "#171717" : "#FFFFFF"}
+            compact
+            showProgress
+            currentAmount={stats.completed}
+            totalAmount={stats.total}
+            progressColor="#12C48B"
+            style={[styles.gridItem, styles.gridItemRight]}
+          />
+          <Box
+            iconName="time-outline"
+            iconColor="#FF6B00"
+            iconBackgroundColor="#FFF1E3"
+            title="Pendientes"
+            value={String(stats.pending)}
+            backgroundColor={isDark ? "#171717" : "#FFFFFF"}
+            compact
+            showProgress
+            currentAmount={stats.pending}
+            totalAmount={stats.total}
+            progressColor="#FF6B00"
+            style={[styles.gridItem, styles.gridItemLeft]}
+          />
+          <Box
+            iconName="cash-outline"
+            iconColor="#7C4DFF"
+            iconBackgroundColor="#F3EEFF"
+            title="Monto Total"
+            value={`$${formatCurrency(stats.totalAmount)}`}
+            backgroundColor={isDark ? "#171717" : "#FFFFFF"}
+            compact
+            showComparison
+            comparisonText={stats.comparisonPercentage >= 0 ? "vs mes anterior" : "vs mes anterior"}
+            comparisonPercentage={stats.comparisonPercentage}
+            comparisonColor={stats.comparisonPercentage >= 0 ? "#12C48B" : "#FF6B6B"}
+            style={[styles.gridItem, styles.gridItemRight]}
+          />
         </View>
 
         <View style={styles.chartSection}>
-          <Text style={styles.sectionTitle}>
+          <Text className="text-lg font-bold text-[#1B3D48] dark:text-gray-100 mb-4">
             Distribución por Categoría - {MONTH_NAMES[selectedPeriod.month]}
           </Text>
           {donutData.length > 0 ? (
-            <View style={styles.donutCard}>
+            <View className="bg-white dark:bg-neutral-900 rounded-[18px] p-4 mt-3 shadow-sm items-center">
               <DonutChart
                 data={donutData}
                 filterMonth={selectedPeriod.month}
@@ -237,7 +271,7 @@ export default function ReportesScreen() {
             </View>
           ) : (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>
+              <Text className="text-sm text-[#6B7280] dark:text-neutral-400 text-center">
                 No hay datos de categorías para este mes
               </Text>
             </View>
@@ -253,7 +287,7 @@ export default function ReportesScreen() {
         </View>
 
         <View style={styles.exportSection}>
-          <Text style={styles.sectionTitle}>Exportar Reporte</Text>
+          <Text className="text-lg font-bold text-[#1B3D48] dark:text-gray-100 mb-4">Exportar Reporte</Text>
 
           <Button
             label="Descargar PDF"

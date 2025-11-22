@@ -10,13 +10,13 @@ import HeroSection from "@/components/home/HeroSection"
 
 export default function Page() {
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView 
-        className="flex-1"
+    <SafeAreaView className="flex-1 bg-white dark:bg-black">
+      <ScrollView
+        className="flex-1 bg-white dark:bg-black"
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
       >
-        <View className="flex-1 justify-between px-4 py-6">
+        <View className="flex-1 justify-between bg-white px-4 py-6 dark:bg-black">
           <HeroSection />
           <AppPreview />
           <AuthActions />

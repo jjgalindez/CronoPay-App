@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, useColorScheme } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons'
 
 export type PaymentItem = {
@@ -44,6 +44,9 @@ function formatCurrency(value: number) {
 }
 
 export default function RecentPayments({ items = [], maxItems = 5 }: RecentPaymentsProps) {
+  const colorScheme = useColorScheme()
+  const isDark = colorScheme === 'dark'
+
   // filter state: 'month' | 'trimester' | 'year'
   const [filter, setFilter] = useState<'month' | 'trimester' | 'year'>('month')
 
@@ -76,11 +79,11 @@ export default function RecentPayments({ items = [], maxItems = 5 }: RecentPayme
   const visible = filtered.slice(0, maxItems)
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>Últimos Movimientos</Text>
+    <View style={[styles.card, isDark && styles.cardDark]}>
+      <Text style={[styles.title, isDark && styles.titleDark]}>Últimos Movimientos</Text>
 
       {visible.length === 0 ? (
-        <Text style={styles.empty}>No hay movimientos para este periodo.</Text>
+        <Text style={[styles.empty, isDark && styles.emptyDark]}>No hay movimientos para este periodo.</Text>
       ) : (
         visible.map((it, idx) => {
           const status = it.status ?? ''
@@ -88,23 +91,23 @@ export default function RecentPayments({ items = [], maxItems = 5 }: RecentPayme
 
           return (
             <View key={it.id ?? `${idx}`} style={styles.row}>
-                <View style={[styles.avatar, { backgroundColor: it.iconBackgroundColor ?? '#E8F1FF' }]}> 
-                  {it.iconName ? (
-                    <Ionicons name={it.iconName as any} size={20} color={it.iconColor ?? '#1B3D48'} />
-                  ) : null}
-                </View>
+              <View style={[styles.avatar, { backgroundColor: it.iconBackgroundColor ?? '#E8F1FF' }]}>
+                {it.iconName ? (
+                  <Ionicons name={it.iconName as any} size={20} color={it.iconColor ?? '#1B3D48'} />
+                ) : null}
+              </View>
 
               <View style={styles.meta}>
-                <Text style={styles.itemTitle} numberOfLines={1}>
+                <Text style={[styles.itemTitle, isDark && styles.itemTitleDark]} numberOfLines={1}>
                   {it.title}
                 </Text>
-                <Text style={styles.itemDate}>{formatDate(it.date)}</Text>
+                <Text style={[styles.itemDate, isDark && styles.itemDateDark]}>{formatDate(it.date)}</Text>
               </View>
 
               <View style={styles.amountWrap}>
-                <Text style={styles.amount}>${formatCurrency(it.amount)}</Text>
+                <Text style={[styles.amount, isDark && styles.amountDark]}>${formatCurrency(it.amount)}</Text>
                 {status ? (
-                  <View style={[styles.badge, { backgroundColor: statusColor }]}> 
+                  <View style={[styles.badge, { backgroundColor: statusColor }]}>
                     <Text style={styles.badgeText}>{status}</Text>
                   </View>
                 ) : null}
@@ -151,11 +154,17 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     elevation: 2,
   },
+  cardDark: {
+    backgroundColor: '#171717',
+  },
   title: {
     fontSize: 16,
     fontWeight: '700',
     color: '#12343A',
     marginBottom: 12,
+  },
+  titleDark: {
+    color: '#fafafa',
   },
   row: {
     flexDirection: 'row',
@@ -182,10 +191,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#12343A',
   },
+  itemTitleDark: {
+    color: '#fafafa',
+  },
   itemDate: {
     fontSize: 12,
     color: '#8A9AA0',
     marginTop: 2,
+  },
+  itemDateDark: {
+    color: '#a3a3a3',
   },
   amountWrap: {
     alignItems: 'flex-end',
@@ -195,6 +210,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#12343A',
+  },
+  amountDark: {
+    color: '#fafafa',
   },
   badge: {
     marginTop: 6,
@@ -238,5 +256,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     paddingVertical: 12,
     textAlign: 'center',
+  },
+  emptyDark: {
+    color: '#a3a3a3',
   },
 })

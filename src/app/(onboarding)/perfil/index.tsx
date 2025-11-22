@@ -47,7 +47,7 @@ export default function PerfilScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-white">
+      <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
         <View className="flex-1 items-center justify-center">
           <Text>Cargando perfil...</Text>
         </View>
@@ -56,9 +56,9 @@ export default function PerfilScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
       <ScrollView
-        className="flex-1"
+        className="flex-1 bg-white dark:bg-gray-900"
         contentContainerStyle={{
           flexGrow: 1,
           paddingBottom: isSmallScreen ? 32 : 40,

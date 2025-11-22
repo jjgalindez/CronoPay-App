@@ -25,18 +25,18 @@ function PagoCard({
   const statusColor = estado === "Pagado" ? "#1B3D48" : "#B08A00"
 
   return (
-    <View className="mb-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
-      <Text className="text-lg font-semibold text-primary-800">
+    <View className="mb-4 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-4 shadow-sm">
+      <Text className="text-lg font-semibold text-primary-800 dark:text-primary-400">
         ${parseFloat(monto).toFixed(2)}
       </Text>
-      <Text className="mt-1 text-sm text-neutral-700">
+      <Text className="mt-1 text-sm text-neutral-700 dark:text-neutral-300">
         {categoria ?? "Sin categoría"}
       </Text>
       <View className="mt-3 flex-row items-center justify-between">
-        <Text className="text-xs font-medium text-neutral-600">
+        <Text className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
           Vence: {formattedDate}
         </Text>
-        <Text style={{ color: statusColor }} className="text-xs font-semibold">
+        <Text style={{ color: statusColor, fontSize: 12, fontWeight: '600' }}>
           {estado ?? "Pendiente"}
         </Text>
       </View>
@@ -50,10 +50,10 @@ export default function PagosScreen() {
   const { data, isLoading, error, refetch } = usePagos(userId)
 
   return (
-    <SafeAreaView className="flex-1 bg-neutral-50">
+    <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-black">
       <View className="flex-1 px-6 py-6">
-        <Text className="text-2xl font-bold text-primary-900">Pagos</Text>
-        <Text className="mt-1 text-sm text-neutral-600">
+        <Text className="text-2xl font-bold text-primary-900 dark:text-primary-300">Pagos</Text>
+        <Text className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
           Revisa tus obligaciones próximas y mantente al día.
         </Text>
 
@@ -85,10 +85,10 @@ export default function PagosScreen() {
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={() => (
               <View className="mt-16 items-center">
-                <Text className="text-base font-medium text-neutral-700">
+                <Text className="text-base font-medium text-neutral-700 dark:text-neutral-300">
                   No hay pagos registrados aún.
                 </Text>
-                <Text className="mt-2 text-center text-sm text-neutral-500">
+                <Text className="mt-2 text-center text-sm text-neutral-500 dark:text-neutral-400">
                   Puedes comenzar añadiendo uno desde la versión web o
                   implementando el flujo de creación en esta pantalla.
                 </Text>

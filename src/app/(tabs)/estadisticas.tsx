@@ -15,8 +15,12 @@ import { formatCurrency } from "../../utils/formatters"
 import { getCategoryIcon, CATEGORY_COLORS } from "../../utils/categoryHelpers"
 import { getStatusColor, getStatusBackground } from "../../utils/statusHelpers"
 import { getMonthName } from "../../utils/dateHelpers"
+import { useColorScheme } from "nativewind"
 
 export default function EstadisticasScreen() {
+  const { colorScheme } = useColorScheme()
+  const isDark = colorScheme === 'dark'
+
   const { session } = useAuth()
   const userId = session?.user?.id
   const { data: pagos, isLoading: pagosLoading } = usePagos(userId)
@@ -131,7 +135,7 @@ export default function EstadisticasScreen() {
       iconName: "card-outline" as const,
       iconBackgroundColor: "#E8F1FF",
       iconColor: "#1B3D48",
-      backgroundColor: "#F4F8FF",
+      backgroundColor: isDark ? "#171717" : "#F4F8FF",
     },
     {
       id: "pendientes",
@@ -141,7 +145,7 @@ export default function EstadisticasScreen() {
       iconName: "time-outline" as const,
       iconBackgroundColor: "#FFF1E3",
       iconColor: "#FF6B00",
-      backgroundColor: "#FFF7EE",
+      backgroundColor: isDark ? "#171717" : "#FFF7EE",
     },
     {
       id: "completados",
@@ -151,7 +155,7 @@ export default function EstadisticasScreen() {
       iconName: "checkmark-circle-outline" as const,
       iconBackgroundColor: "#E8F9F1",
       iconColor: "#1AAE6F",
-      backgroundColor: "#F5FCF8",
+      backgroundColor: isDark ? "#171717" : "#F5FCF8",
     },
     {
       id: "total",
@@ -160,23 +164,23 @@ export default function EstadisticasScreen() {
       iconName: "wallet-outline" as const,
       iconBackgroundColor: "#EEE8FF",
       iconColor: "#6C3CF0",
-      backgroundColor: "#F6F2FF",
+      backgroundColor: isDark ? "#171717" : "#F6F2FF",
     },
-  ], [estadisticasMes])
+  ], [estadisticasMes, isDark])
 
   if (pagosLoading || categoriasLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-neutral-50">
+      <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-black">
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#1B3D48" />
-          <Text className="mt-4 text-neutral-600">Cargando estadísticas...</Text>
+          <Text className="mt-4 text-neutral-600 dark:text-neutral-400">Cargando estadísticas...</Text>
         </View>
       </SafeAreaView>
     )
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-neutral-50">
+    <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-black">
       <ScrollView
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
@@ -210,8 +214,8 @@ export default function EstadisticasScreen() {
 
         {donutData.length > 0 && (
           <View style={styles.graphWrapper}>
-            <View style={styles.donutCard}>
-              <Text style={styles.donutTitle}>Distribución por Categoría</Text>
+            <View className="bg-white dark:bg-neutral-900 rounded-xl p-4 mb-4 shadow-sm items-center">
+              <Text className="text-base font-semibold text-[#12343A] dark:text-gray-100 self-start mb-3">Distribución por Categoría</Text>
               <View style={styles.donutInner}>
                 <DonutChart
                   data={donutData}
@@ -230,7 +234,7 @@ export default function EstadisticasScreen() {
 
         {pagos.length === 0 && (
           <View className="items-center justify-center py-12">
-            <Text className="text-neutral-500">No hay datos de pagos disponibles</Text>
+            <Text className="text-neutral-500 dark:text-neutral-400">No hay datos de pagos disponibles</Text>
           </View>
         )}
       </ScrollView>

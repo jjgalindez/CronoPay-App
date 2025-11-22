@@ -5,7 +5,7 @@ import { Pressable, Text, View } from "react-native"
 
 const AuthActions = React.memo(() => {
   return (
-    <View className="my-6" style={{ rowGap: 12 }}>
+    <View className="my-6 gap-3">
       <Link href="/(unauthenticated)/sign-up" asChild>
         <Pressable className="h-12 w-full items-center justify-center rounded-xl bg-primary-500 active:opacity-80">
           <Text className="text-[16px] font-semibold text-white">

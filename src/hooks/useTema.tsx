@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { useColorScheme } from "nativewind"
 import React, {
   createContext,
   useContext,
@@ -6,7 +7,7 @@ import React, {
   useState,
   ReactNode,
 } from "react"
-import { useColorScheme } from "react-native"
+import { useColorScheme as useSystemColorScheme } from "react-native"
 
 type Tema = "light" | "dark"
 
@@ -21,12 +22,14 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 const STORAGE_KEY = "@app_tema"
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const colorScheme = useColorScheme()
+  const systemScheme = useSystemColorScheme()
+  const { setColorScheme } = useColorScheme()
+
   const [tema, setTemaState] = useState<Tema>(
-    colorScheme === "dark" ? "dark" : "light",
+    systemScheme === "dark" ? "dark" : "light",
   )
 
-  // 🔹 Cargar tema guardado
+  // Cargar tema guardado
   useEffect(() => {
     ; (async () => {
       try {
@@ -40,16 +43,20 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     })()
   }, [])
 
-  //  Guardar tema cuando cambie
+  // Guardar tema y sincronizar con NativeWind
   useEffect(() => {
     AsyncStorage.setItem(STORAGE_KEY, tema).catch((error) =>
       console.error("Error guardando el tema:", error),
     )
-  }, [tema])
 
-  const toggleTema = () => {
+    // Usar NativeWind setColorScheme para actualizar todos los dark: variants
+    if (setColorScheme) {
+      setColorScheme(tema)
+    }
+  }, [tema, setColorScheme])
+
+  const toggleTema = () =>
     setTemaState((prev) => (prev === "light" ? "dark" : "light"))
-  }
 
   const setTema = (nuevoTema: Tema) => {
     setTemaState(nuevoTema)
@@ -62,7 +69,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   )
 }
 
-//  Hook para acceder fácilmente al tema
+// Hook para acceder al tema
 export const useTema = (): ThemeContextType => {
   const context = useContext(ThemeContext)
   if (!context) {

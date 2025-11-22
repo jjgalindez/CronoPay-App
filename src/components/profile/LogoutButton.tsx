@@ -10,8 +10,8 @@ interface LogoutButtonProps {
 export const LogoutButton = React.memo(({ onPress }: LogoutButtonProps) => {
   return (
     <View className="mt-8 px-6">
-      <View className="border-t border-gray-300 mb-6" />
-      <Pressable 
+      <View className="border-t border-gray-300 dark:border-gray-700 mb-6" />
+      <Pressable
         className="py-4 items-center flex-row justify-center"
         onPress={onPress}
         style={({ pressed }) => [
@@ -21,7 +21,7 @@ export const LogoutButton = React.memo(({ onPress }: LogoutButtonProps) => {
         ]}
       >
         <Ionicons name="log-out-outline" size={20} color="#DC2626" />
-        <Text 
+        <Text
           className="text-red-600 font-semibold text-base"
           style={{ marginLeft: 8 }}
         >

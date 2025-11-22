@@ -94,7 +94,7 @@ export default function DonutChart({
   }, [filteredData, total, circumference])
 
   // legend width reserved to the right
-  
+
 
   return (
     <View style={[styles.wrapper, { height: finalSize }]}>
@@ -105,11 +105,11 @@ export default function DonutChart({
         contentContainerStyle={{ alignItems: 'center', minWidth: contentWidth }}
         style={{ height: finalSize }}
       >
-        <View style={[styles.container, { height: finalSize, width: contentWidth }]}> 
+        <View style={[styles.container, { height: finalSize, width: contentWidth }]}>
           <Svg width={finalSize} height={finalSize}>
             <G rotation={0} originX={cx} originY={cy}>
               {/* background ring */}
-              <Circle cx={cx} cy={cy} r={radius} stroke="#F3F6F7" strokeWidth={thickness} fill="none" />
+              <Circle cx={cx} cy={cy} r={radius} stroke="#E5E7EB" strokeWidth={thickness} fill="none" />
 
               {/* slices drawn as stroked circles using strokeDasharray */}
               {slices.map((s, i) => {
@@ -160,23 +160,23 @@ export default function DonutChart({
           </Svg>
 
           {/* legend to the right for better readability */}
-          <View style={styles.legend}>
+          <View className="ml-4">
             {slices.map((s, i) => (
-              <View key={`legend-${i}`} style={styles.legendRow}>
-                <View style={[styles.swatch, { backgroundColor: s.color }]} />
-                <View style={styles.legendTextWrap}>
-                  <Text style={styles.legendLabel}>{s.label}</Text>
-                  <Text style={styles.legendPercent}>{s.percent.toFixed(1)}%</Text>
+              <View key={`legend-${i}`} className="flex-row items-center mb-2">
+                <View className="w-3 h-3 rounded-sm mr-2" style={{ backgroundColor: s.color }} />
+                <View className="flex-row justify-between flex-1">
+                  <Text className="text-[13px] text-[#12343A] dark:text-gray-100">{s.label}</Text>
+                  <Text className="text-[13px] text-[#12343A] dark:text-gray-100 font-semibold">{s.percent.toFixed(1)}%</Text>
                 </View>
               </View>
             ))}
           </View>
         </View>
       </ScrollView>
-      
+
       {needsScroll && (
         <View pointerEvents="none" style={styles.scrollIndicator}>
-          <Ionicons name="chevron-forward" size={20} color="rgba(27,61,72,0.6)" />
+          <Ionicons name="chevron-forward" size={20} color="rgba(107,114,128,0.6)" />
         </View>
       )}
     </View>
@@ -203,35 +203,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 8,
   },
-  legend: {
-    marginLeft: 12,
-    width: 150,
-    justifyContent: 'center'
-  },
-  legendRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  swatch: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 8,
-  },
-  legendTextWrap: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flex: 1,
-  },
-  legendLabel: {
-    fontSize: 13,
-    color: '#12343A',
-  },
-  legendPercent: {
-    fontSize: 13,
-    color: '#12343A',
-    fontWeight: '600'
-  }
 })

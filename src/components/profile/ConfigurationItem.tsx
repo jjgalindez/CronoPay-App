@@ -41,18 +41,21 @@ export const ConfigurationItem = React.memo(
     const { name, color } = ICON_MAP[itemKey]
 
     const content = (
-      <View className="flex-1 flex-row items-center" style={{ columnGap: 12 }}>
+      <View
+        className="flex-1 flex-row items-center bg-white dark:bg-black"
+        style={{ columnGap: 12 }}
+      >
         <View className="items-center justify-center">
           <Ionicons name={name} size={22} color={color} />
         </View>
         <View className="flex-1">
           <Text
-            className="text-base font-medium text-gray-900"
+            className="text-base font-medium text-gray-900 dark:text-gray-100"
             numberOfLines={1}
           >
             {title}
           </Text>
-          <Text className="mt-0.5 text-sm text-gray-500" numberOfLines={2}>
+          <Text className="text-sm text-gray-500 dark:text-gray-400" style={{ marginTop: 2 }} numberOfLines={2}>
             {subtitle}
           </Text>
         </View>
@@ -73,7 +76,7 @@ export const ConfigurationItem = React.memo(
     if (hasSwitch) {
       return (
         <View
-          className={`px-6 py-4 ${!isLast ? "border-b border-gray-100" : ""}`}
+          className={`px-6 py-4 ${!isLast ? "border-b border-gray-200 dark:border-gray-800" : ""}`}
         >
           {content}
         </View>
@@ -82,7 +85,7 @@ export const ConfigurationItem = React.memo(
 
     return (
       <Pressable
-        className={`px-6 py-4 ${!isLast ? "border-b border-gray-100" : ""}`}
+        className={`px-6 py-4 ${!isLast ? "border-b border-gray-200 dark:border-gray-800" : ""}`}
         onPress={onPress}
         style={({ pressed }) => [
           {

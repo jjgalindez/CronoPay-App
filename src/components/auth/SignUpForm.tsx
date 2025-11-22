@@ -39,7 +39,7 @@ export function SignUpForm() {
       </View>
 
       {/* Tarjeta del formulario */}
-      <View className=" space-y-5 rounded-2xl border border-neutral-200 bg-white p-5 py-3">
+      <View className=" space-y-5 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-5 py-3">
         <TextInput
           placeholder="Nombre completo"
           placeholderTextColor="#6b7280"
@@ -83,9 +83,8 @@ export function SignUpForm() {
         <Pressable
           onPress={handleSignUp}
           disabled={isLoading}
-          className={`items-center rounded-xl py-3 ${
-            isLoading ? "bg-neutral-300" : "bg-teal-600"
-          } active:opacity-80`}
+          className={`items-center rounded-xl py-3 ${isLoading ? "bg-neutral-300" : "bg-teal-600"
+            } active:opacity-80`}
         >
           {isLoading ? (
             <ActivityIndicator color="#fff" />

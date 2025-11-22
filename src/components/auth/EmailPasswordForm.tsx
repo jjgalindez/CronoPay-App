@@ -37,45 +37,30 @@ export function EmailPasswordForm() {
     <View>
       <TextInput
         placeholder="Correo electrónico"
+        placeholderTextColor="#9ca3af"
         keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          padding: 12,
-          marginBottom: 12,
-          borderRadius: 8,
-        }}
+        className="border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-gray-100 p-3 mb-3 rounded-lg"
       />
       <TextInput
         placeholder="Contraseña"
+        placeholderTextColor="#9ca3af"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          padding: 12,
-          marginBottom: 12,
-          borderRadius: 8,
-        }}
+        className="border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-gray-100 p-3 mb-3 rounded-lg"
       />
-      {error && <Text style={{ color: "red", marginBottom: 12 }}>{error}</Text>}
+      {error && <Text className="text-red-500 mb-3">{error}</Text>}
       <Pressable
         onPress={handleLogin}
         disabled={isLoading}
-        style={{
-          backgroundColor: isLoading ? "#ccc" : "#2791B5",
-          padding: 16,
-          borderRadius: 8,
-          alignItems: "center",
-        }}
+        className={`p-4 rounded-lg items-center ${isLoading ? 'bg-neutral-400' : 'bg-[#2791B5]'}`}
       >
         {isLoading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={{ color: "#fff", fontWeight: "bold" }}>Entrar</Text>
+          <Text className="text-white font-bold">Entrar</Text>
         )}
       </Pressable>
     </View>

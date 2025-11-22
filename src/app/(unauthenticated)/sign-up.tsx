@@ -8,7 +8,7 @@ import FooterLinks from "@/components/home/FooterLinks"
 
 export default function SignUpPage() {
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white dark:bg-black">
       <View className="flex-1 px-4 py-6">
         <View
           className="flex-1 justify-center"

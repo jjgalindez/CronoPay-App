@@ -6,19 +6,24 @@ import { View, Text, Alert } from "react-native"
 
 import { ConfigurationItem } from "./ConfigurationItem"
 
+import { useTema } from "@/hooks/useTema"
 import i18n, { changeLanguage } from "@/i18n"
 
 export function ConfigurationList() {
+  const { tema, setTema, toggleTema } = useTema()
+
   const { t } = useTranslation()
 
   const [notificaciones, setNotificaciones] = useState(true)
-  const [tema, setTema] = useState("Modo claro")
-  const [backup, setBackup] = useState("Respaldo automático")
+
+  const [backup, setBackup] = useState<"backupAuto" | "backupManual">(
+    "backupAuto",
+  )
 
   const handleNotificacionesPress = () => setNotificaciones(!notificaciones)
 
   const handleIdiomaPress = () => {
-    Alert.alert(t("language"), t("Elige tu idioma preferido"), [
+    Alert.alert(t("language"), t("chooseYourPreferredLanguage"), [
       { text: "Español", onPress: () => changeLanguage("es") },
       { text: "English", onPress: () => changeLanguage("en") },
       { text: "Português", onPress: () => changeLanguage("pt") },
@@ -28,35 +33,37 @@ export function ConfigurationList() {
 
   const handleTemaPress = () => {
     Alert.alert(t("theme"), t("Elige tu tema preferido"), [
-      { text: "Modo claro", onPress: () => setTema("Modo claro") },
-      { text: "Modo oscuro", onPress: () => setTema("Modo oscuro") },
-      { text: "Automático", onPress: () => setTema("Automático") },
+      { text: "Modo claro", onPress: () => setTema("light") },
+      { text: "Modo oscuro", onPress: () => setTema("dark") },
+      { text: "Automático", onPress: () => toggleTema() },
       { text: "Cancelar", style: "cancel" },
     ])
   }
 
+  const themeSubtitle = tema === "light" ? t("themeLight") : t("themeDark")
+
   const handleBackupPress = () => {
     Alert.alert(t("backup"), t("Configurar respaldo automático"), [
       {
-        text: "Respaldo automático",
-        onPress: () => setBackup("Respaldo automático"),
+        text: t("backupAuto"),
+        onPress: () => setBackup("backupAuto"),
       },
-      { text: "Respaldo manual", onPress: () => setBackup("Respaldo manual") },
+      { text: t("backupManual"), onPress: () => setBackup("backupManual") },
       { text: "Cancelar", style: "cancel" },
     ])
   }
 
   const handleSeguridadPress = () => {
-    Alert.alert(t("security"), t("Configurar contraseña y autenticación"), [
+    Alert.alert(t("security"), t("ConfigurePasswordAndAuthentication"), [
       {
-        text: t("Cambiar contraseña"),
-        onPress: () => console.log("Cambiar contraseña"),
+        text: t("ChangePassword"),
+        onPress: () => console.log("ChangePassword"),
       },
       {
-        text: t("Autenticación de dos factores"),
+        text: t("TwoFactorAuth"),
         onPress: () => console.log("2FA"),
       },
-      { text: "Cancelar", style: "cancel" },
+      { text: t("Cancel"), style: "cancel" },
     ])
   }
 
@@ -86,30 +93,30 @@ export function ConfigurationList() {
     {
       itemKey: "theme" as const,
       title: t("theme"),
-      subtitle: tema,
+      subtitle: themeSubtitle,
       onPress: handleTemaPress,
     },
     {
       itemKey: "backup" as const,
       title: t("backup"),
-      subtitle: backup,
+      subtitle: t(backup),
       onPress: handleBackupPress,
     },
     {
       itemKey: "security" as const,
       title: t("security"),
-      subtitle: t("Contraseña y autenticación"),
+      subtitle: t("passwordAndAuth"),
       onPress: handleSeguridadPress,
     },
   ]
 
   return (
-    <View className="bg-white">
-      <Text className="bg-gray-50 px-6 py-4 text-lg font-semibold text-gray-900">
+    <View className="bg-white dark:bg-gray-900">
+      <Text className="bg-gray-50 px-6  py-4 text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-gray-100">
         {t("settings")}
       </Text>
 
-      <View className="bg-white">
+      <View className="bg-white dark:bg-black">
         {configItems.map((item, index) => (
           <ConfigurationItem
             key={item.itemKey}

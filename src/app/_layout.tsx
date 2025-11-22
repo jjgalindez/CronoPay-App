@@ -8,6 +8,7 @@ import { ActivityIndicator, View } from "react-native"
 
 import AuthProvider from "../../providers/AuthProvider"
 
+import { ThemeProvider } from "@/hooks/useTema"
 import { initI18n } from "@/i18n"
 
 export default function Layout() {
@@ -30,8 +31,10 @@ export default function Layout() {
   }
 
   return (
-    <AuthProvider>
-      <Slot />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Slot />
+      </AuthProvider>
+    </ThemeProvider>
   )
 }

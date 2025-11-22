@@ -6,7 +6,7 @@ import { View, Text, Pressable } from "react-native"
 const FooterLinks = React.memo(() => {
   return (
     <View className="mt-8 items-center pb-4">
-      <View className="flex-row" style={{ columnGap: 24 }}>
+      <View className="flex-row gap-6">
         <Link href="/terms" asChild>
           <Pressable hitSlop={8}>
             <Text className="text-sm text-neutral-500">Términos</Text>

@@ -20,7 +20,7 @@ const benefits = [
 
 const BenefitItem = React.memo<{ icon: string; text: string }>(
   ({ icon, text }) => (
-    <View className="flex-row items-start" style={{ columnGap: 12 }}>
+    <View className="flex-row items-start gap-3">
       <View className="mt-0.5 w-6 items-center">
         <Icon name={icon} size={22} color="#3b82f6" />
       </View>
@@ -35,7 +35,7 @@ BenefitItem.displayName = "BenefitItem"
 
 const BenefitsList = React.memo(() => {
   return (
-    <View className="my-4" style={{ rowGap: 16 }}>
+    <View className="my-4 gap-4">
       {benefits.map(({ icon, text }, index) => (
         <BenefitItem key={index} icon={icon} text={text} />
       ))}

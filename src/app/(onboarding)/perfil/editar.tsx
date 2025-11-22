@@ -36,7 +36,7 @@ export default function EditarPerfilScreen() {
   const horizontalPadding = Math.max(16, width * 0.05)
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white dark:bg-black">
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -50,7 +50,7 @@ export default function EditarPerfilScreen() {
         >
           <View style={{ padding: horizontalPadding }}>
             <Text
-              className="font-bold text-gray-900"
+              className="font-bold text-gray-900 dark:text-gray-100"
               style={{
                 fontSize: isSmallScreen ? 20 : 24,
                 marginBottom: isSmallScreen ? 16 : 24,
@@ -67,7 +67,7 @@ export default function EditarPerfilScreen() {
               <View className="relative">
                 {imagenAMostrar ? (
                   <View
-                    className="overflow-hidden rounded-full border-2 border-gray-200"
+                    className="overflow-hidden rounded-full border-2 border-gray-200 dark:border-gray-700"
                     style={{ width: avatarSize, height: avatarSize }}
                   >
                     <Image
@@ -87,7 +87,7 @@ export default function EditarPerfilScreen() {
                   </View>
                 ) : (
                   <View
-                    className="items-center justify-center rounded-full border-2 border-gray-200 bg-green-500"
+                    className="items-center justify-center rounded-full border-2 border-gray-200 dark:border-gray-700 bg-green-500"
                     style={{ width: avatarSize, height: avatarSize }}
                   >
                     <Text
@@ -119,7 +119,7 @@ export default function EditarPerfilScreen() {
                 className="mt-4"
               >
                 <Text
-                  className={`font-medium ${subiendoImagen ? "text-gray-400" : "text-blue-500"
+                  className={`font-medium ${subiendoImagen ? "text-gray-400" : "text-blue-500 dark:text-blue-400"
                     }`}
                 >
                   {subiendoImagen
@@ -128,13 +128,13 @@ export default function EditarPerfilScreen() {
                 </Text>
               </TouchableOpacity>
 
-              <Text className="mt-2 text-center text-xs text-gray-500">
+              <Text className="mt-2 text-center text-xs text-gray-500 dark:text-gray-400">
                 Haz clic para cambiar tu foto. Máximo 5MB.
               </Text>
             </View>
 
             {/* Formulario */}
-            <View className="rounded-lg bg-white">
+            <View className="rounded-lg bg-white dark:bg-neutral-900">
               <View style={{ marginBottom: isSmallScreen ? 16 : 24 }}>
                 <Text
                   className="font-medium text-gray-700"
@@ -143,7 +143,7 @@ export default function EditarPerfilScreen() {
                   Nombre completo
                 </Text>
                 <TextInput
-                  className="rounded-lg border border-gray-300 text-gray-900"
+                  className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 text-gray-900 dark:text-gray-100"
                   style={{
                     paddingHorizontal: isSmallScreen ? 12 : 16,
                     paddingVertical: isSmallScreen ? 12 : 16,
@@ -165,7 +165,7 @@ export default function EditarPerfilScreen() {
                   Correo electrónico
                 </Text>
                 <TextInput
-                  className="rounded-lg border border-gray-300 bg-gray-100 text-gray-600"
+                  className="rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400"
                   style={{
                     paddingHorizontal: isSmallScreen ? 12 : 16,
                     paddingVertical: isSmallScreen ? 12 : 16,
@@ -176,7 +176,7 @@ export default function EditarPerfilScreen() {
                   editable={false}
                 />
                 <Text
-                  className="text-gray-500"
+                  className="text-gray-500 dark:text-gray-400"
                   style={{ marginTop: 8, fontSize: isSmallScreen ? 12 : 14 }}
                 >
                   El correo electrónico no se puede modificar por seguridad
@@ -213,7 +213,7 @@ export default function EditarPerfilScreen() {
                 }}
               >
                 <Text
-                  className="text-center font-medium text-gray-700"
+                  className="text-center font-medium text-gray-700 dark:text-gray-300"
                   style={{ fontSize: isSmallScreen ? 14 : 16 }}
                 >
                   Cancelar
@@ -229,7 +229,7 @@ export default function EditarPerfilScreen() {
                 padding: isSmallScreen ? 12 : 16,
               }}
             >
-              <View className="flex-row items-start" style={{ columnGap: 12 }}>
+              <View className="flex-row items-start gap-3">
                 <Ionicons
                   name="information-circle"
                   size={isSmallScreen ? 18 : 20}
