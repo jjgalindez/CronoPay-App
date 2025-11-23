@@ -12,6 +12,7 @@ import { ThemeProvider } from "@/hooks/useTema"
 import { initI18n } from "@/i18n"
 
 export default function Layout() {
+
   const [ready, setReady] = useState(false)
   useEffect(() => {
     GoogleSignin.configure({
