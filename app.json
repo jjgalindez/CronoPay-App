@@ -21,6 +21,13 @@
           "cameraPermission": "La app necesita acceso a tu cámara para tomar fotos de perfil."
         }
       ],
+      [
+        "@evennit/notifee-expo-plugin",
+        {
+          "iosDeploymentTarget": "13.4",
+          "apsEnvMode": "development"
+        }
+      ],
       "expo-localization"
     ],
     "extra": {
