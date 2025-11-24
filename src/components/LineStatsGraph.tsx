@@ -1,5 +1,6 @@
 import { memo, useMemo } from "react"
 import { View, Text, StyleSheet, ScrollView } from "react-native"
+import { useColorScheme } from "nativewind"
 import Ionicons from "@expo/vector-icons/Ionicons"
 import Svg, {
   Circle,
@@ -51,6 +52,17 @@ function LineStatsGraph({
   height = DEFAULT_HEIGHT,
   valueFormatter = defaultFormatter,
 }: LineStatsGraphProps) {
+  const { colorScheme } = useColorScheme()
+  const isDark = colorScheme === "dark"
+
+  const cardBg = isDark ? "#0B1220" : CARD_BG
+  const lineColor = isDark ? "#66E6C8" : LINE_COLOR
+  const nodeColor = isDark ? "#2CE6A6" : NODE_COLOR
+  const gridColor = isDark ? "rgba(255,255,255,0.06)" : GRID_COLOR
+  const titleColor = isDark ? "#E6F6F2" : "#1B3D48"
+  const labelColor = isDark ? "#9FB7B4" : "#6B7C82"
+  const scrollIndicatorColor = isDark ? "rgba(255,255,255,0.6)" : "rgba(27,61,72,0.6)"
+
   const sanitizedData = useMemo(() => data.filter((point) => point.value >= 0), [
     data,
   ])
@@ -127,9 +139,9 @@ function LineStatsGraph({
   const showScrollIndicator = svgInnerWidth > svgContainerWidth
 
   return (
-    <View style={[styles.card, { width: "100%" }]}> 
-      <Text style={styles.title}>{title}</Text>
-      <View style={{ height, marginTop: 12, borderRadius: 12, position: "relative" }}>
+    <View style={[styles.card, { width: "100%", backgroundColor: cardBg }]}> 
+      <Text style={[styles.title, { color: titleColor }]}>{title}</Text>
+      <View className="dark:bg-slate-800" style={{ height, marginTop: 12, borderRadius: 12, position: "relative" }}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -142,7 +154,7 @@ function LineStatsGraph({
             y1={topPadding}
             x2={leftPadding}
             y2={height - bottomPadding}
-            stroke={GRID_COLOR}
+            stroke={gridColor}
             strokeDasharray="4 6"
           />
           <Line
@@ -150,7 +162,7 @@ function LineStatsGraph({
             y1={height - bottomPadding}
             x2={svgInnerWidth - rightPadding}
             y2={height - bottomPadding}
-            stroke={GRID_COLOR}
+            stroke={gridColor}
             strokeDasharray="4 6"
           />
 
@@ -168,7 +180,7 @@ function LineStatsGraph({
                 y1={y}
                 x2={svgInnerWidth - rightPadding}
                 y2={y}
-                stroke={GRID_COLOR}
+                stroke={gridColor}
                 strokeDasharray="4 6"
               />
             )
@@ -191,7 +203,7 @@ function LineStatsGraph({
               <Polyline
                 points={polylinePoints}
                 fill="none"
-                stroke={LINE_COLOR}
+                stroke={lineColor}
                 strokeWidth={2}
                 strokeLinejoin="round"
                 strokeLinecap="round"
@@ -203,8 +215,8 @@ function LineStatsGraph({
                   cx={node.x}
                   cy={node.y}
                   r={5}
-                  fill={NODE_COLOR}
-                  stroke="#FFFFFF"
+                  fill={nodeColor}
+                  stroke={isDark ? cardBg : "#FFFFFF"}
                   strokeWidth={2}
                 />
               ))}
@@ -222,7 +234,7 @@ function LineStatsGraph({
                 x={x}
                 y={y}
                 fontSize={11}
-                fill="#6B7C82"
+                fill={labelColor}
                 textAnchor="middle"
               >
                 {point.label}
@@ -235,7 +247,7 @@ function LineStatsGraph({
         </ScrollView>
         {showScrollIndicator ? (
           <View pointerEvents="none" style={styles.scrollIndicator}>
-            <Ionicons name="chevron-forward" size={20} color="rgba(27,61,72,0.6)" />
+            <Ionicons name="chevron-forward" size={20} color={scrollIndicatorColor} />
           </View>
         ) : null}
 
@@ -244,7 +256,7 @@ function LineStatsGraph({
           pointerEvents="none"
           style={[
             styles.yLabelsContainer,
-            { width: leftPadding + 4, backgroundColor: CARD_BG, zIndex: 2, borderTopLeftRadius: 12 },
+            { width: leftPadding + 4, backgroundColor: cardBg, zIndex: 2, borderTopLeftRadius: 12 },
           ]}
         >
           {yTicks.map((tick, index) => {
@@ -255,7 +267,7 @@ function LineStatsGraph({
                 key={`tick-${tick}-${index}`}
                 style={[
                   styles.yLabel,
-                  { top: y - 8 },
+                  { top: y - 8, color: labelColor },
                 ]}
               >
                 {valueFormatter(tick)}

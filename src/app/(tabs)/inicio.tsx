@@ -2,6 +2,7 @@ import { useMemo } from "react"
 import { ScrollView, Text, View, Alert, Pressable } from "react-native"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import Box from "../../components/Box"
+import { useColorScheme } from "nativewind"
 import { getCategoryIcon, getCategoryColor } from "../../utils/categoryHelpers"
 import { useAuth } from "../../../providers/AuthProvider"
 import { usePagos } from "../../hooks/usePagos"
@@ -14,6 +15,8 @@ export default function InicioScreen() {
   const userId = session?.user?.id ?? null
   const { data: pagos } = usePagos(userId)
   const insets = useSafeAreaInsets()
+  const { colorScheme } = useColorScheme()
+  const isDark = colorScheme === 'dark'
   const { t } = useTranslation()
   const displayName = useMemo(() => {
     const metadataName = session?.user?.user_metadata?.full_name
@@ -55,58 +58,81 @@ export default function InicioScreen() {
       .slice(0, 3)
   }, [pagos])
 
+  // Preparar contadores para las boxes (mes actual, pendientes, completados)
+  const now = new Date()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
+
+  const monthCount = useMemo(() => {
+    return pagos?.filter(p => {
+      const d = new Date(p.fecha_vencimiento)
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear
+    }).length ?? 0
+  }, [pagos, currentMonth, currentYear])
+
+  const pendingsCount = useMemo(() => {
+    return pagos?.filter(p => (p.estado ?? "Pendiente") === "Pendiente").length ?? 0
+  }, [pagos])
+
+  const completedCount = useMemo(() => {
+    return pagos?.filter(p => (p.estado ?? "") === "Pagado").length ?? 0
+  }, [pagos])
+
+  const CARD_DATA = useMemo(() => [
+    {
+      id: 'month',
+      title: t('MonthPayment'),
+      value: monthCount,
+      iconName: 'calendar-outline' as const,
+      iconBackgroundColor: isDark ? '#082027' : '#E8F1FF',
+      iconColor: isDark ? '#E5E7EB' : '#1B3D48',
+      backgroundColor: isDark ? '#171717' : '#F4F8FF',
+    },
+    {
+      id: 'pendings',
+      title: t('Pendings'),
+      value: pendingsCount,
+      valueColor: isDark ? '#FFD59A' : '#FF8A00',
+      iconName: 'time-outline' as const,
+      iconBackgroundColor: isDark ? '#3A2A18' : '#FFF1E3',
+      iconColor: isDark ? '#FFD59A' : '#FF8A00',
+      backgroundColor: isDark ? '#171717' : '#FFF7EE',
+    },
+    {
+      id: 'completed',
+      title: t('Completed'),
+      value: completedCount,
+      valueColor: isDark ? '#9EE6C6' : '#12C48B',
+      iconName: 'checkmark-done-outline' as const,
+      iconBackgroundColor: isDark ? '#073024' : '#E8F9F1',
+      iconColor: isDark ? '#9EE6C6' : '#12C48B',
+      backgroundColor: isDark ? '#171717' : '#F5FCF8',
+    },
+  ], [monthCount, pendingsCount, completedCount, isDark, t])
+
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-black">
-      <ScrollView className="flex-1 bg-white px-6 py-10 dark:bg-black" contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}>
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
+      <ScrollView className="flex-1 bg-white px-6 py-10 dark:bg-slate-900" contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}>
         {/* Estadísticas rápidas */}
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "stretch",
-            justifyContent: "center",
-          }}
-          className="mt-2"
-        >
-          <Box
-            title={t("MonthPayment")}
-            value={useMemo(() => {
-              const now = new Date()
-              const month = now.getMonth()
-              const year = now.getFullYear()
-              return (
-                pagos?.filter(p => {
-                  const d = new Date(p.fecha_vencimiento)
-                  return d.getMonth() === month && d.getFullYear() === year
-                }).length ?? 0
-              )
-            }, [pagos])}
-            iconName="calendar-outline"
-            valueColor="#0B2E35"
-            compact
-            style={{ flex: 1, marginHorizontal: 6 }}
-          />
-
-          <Box
-            title={t("Pendings")}
-            value={useMemo(() => pagos?.filter(p => (p.estado ?? "Pendiente") === "Pendiente").length ?? 0, [pagos])}
-            iconName="time-outline"
-            valueColor="#FF8A00"
-            compact
-            style={{ flex: 1, marginHorizontal: 6 }}
-          />
-
-          <Box
-            title={t("Completed")}
-            value={useMemo(() => pagos?.filter(p => (p.estado ?? "") === "Pagado").length ?? 0, [pagos])}
-            iconName="checkmark-done-outline"
-            valueColor="#12C48B"
-            compact
-            style={{ flex: 1, marginHorizontal: 6 }}
-          />
+        <View className="mt-2 flex-row">
+          {CARD_DATA.map((card) => (
+            <Box
+              key={card.id}
+              title={card.title}
+              value={card.value}
+              valueColor={card.valueColor}
+              iconName={card.iconName}
+              iconColor={card.iconColor}
+              iconBackgroundColor={card.iconBackgroundColor}
+              backgroundColor={card.backgroundColor}
+              compact
+              style={{ flex: 1, marginHorizontal: 6 }}
+            />
+          ))}
         </View>
 
         {/* Resumen mensual (gráfico) */}
-        <View className="mt-6">
+        <View className="mt-6 bg-slate-100 dark:bg-gray-800 dark:text-white rounded-xl items-center justify-center p-4">
           <DonutChart
             data={[
               { label: t("MonthPayment"), value: pagos ? pagos.filter(p => {

@@ -1,4 +1,5 @@
-import { Alert, ScrollView, StyleSheet, Text, View, ActivityIndicator, useColorScheme } from "react-native"
+import { Alert, ScrollView, StyleSheet, Text, View, ActivityIndicator } from "react-native"
+import { useColorScheme } from "nativewind"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useAuth } from "../../../providers/AuthProvider"
 import { usePagos } from "../../hooks/usePagos"
@@ -18,7 +19,7 @@ import { getMonthNames, filterByMonth, getPreviousMonth } from "../../utils/date
 import { useTranslation } from "react-i18next"
 
 export default function ReportesScreen() {
-  const colorScheme = useColorScheme()
+  const { colorScheme } = useColorScheme()
   const isDark = colorScheme === 'dark'
   const { t } = useTranslation()
 
@@ -100,7 +101,7 @@ export default function ReportesScreen() {
     return filteredPayments
       .sort((a, b) => new Date(b.fecha_vencimiento).getTime() - new Date(a.fecha_vencimiento).getTime())
       .map((pago) => {
-        const statusColors = getStatusColors((pago.estado || "Pendiente") as any)
+        const statusColors = getStatusColors((pago.estado || "Pendiente") as any, isDark)
         return {
           id: String(pago.id_pago),
           title: pago.titulo,
@@ -116,7 +117,7 @@ export default function ReportesScreen() {
   }, [filteredPayments])
 
   // Tarjetas dinámicas
-  const dynamicCards = useMemo(() => [
+  useMemo(() => [
     {
       id: "pagos",
       title: t("TotalPayments"),
@@ -175,9 +176,9 @@ export default function ReportesScreen() {
 
   if (pagosLoading || categoriasLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-black">
+      <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-slate-900">
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#1B3D48" />
+          <ActivityIndicator size="large" color={isDark ? '#E5E7EB' : '#1B3D48'} />
           <Text className="mt-4 text-neutral-600 dark:text-neutral-400">{t("LoadingReports")}</Text>
         </View>
       </SafeAreaView>
@@ -185,7 +186,7 @@ export default function ReportesScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-black">
+    <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-slate-900">
       <ScrollView
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
@@ -201,8 +202,8 @@ export default function ReportesScreen() {
         <View style={styles.grid}>
           <Box
             iconName="card-outline"
-            iconColor="#2791B5"
-            iconBackgroundColor="#E8F4F8"
+            iconColor={isDark ? '#E5E7EB' : '#2791B5'}
+            iconBackgroundColor={isDark ? '#082027' : '#E8F4F8'}
             title={t("TotalPayments")}
             value={String(stats.total)}
             backgroundColor={isDark ? "#171717" : "#FFFFFF"}
@@ -210,13 +211,13 @@ export default function ReportesScreen() {
             showProgress
             currentAmount={stats.completed}
             totalAmount={stats.total}
-            progressColor="#12C48B"
+            progressColor={isDark ? '#9EE6C6' : '#12C48B'}
             style={[styles.gridItem, styles.gridItemLeft]}
           />
           <Box
             iconName="checkmark-circle-outline"
-            iconColor="#12C48B"
-            iconBackgroundColor="#E6F9F3"
+            iconColor={isDark ? '#9EE6C6' : '#12C48B'}
+            iconBackgroundColor={isDark ? '#073024' : '#E6F9F3'}
             title={t("Completed")}
             value={String(stats.completed)}
             backgroundColor={isDark ? "#171717" : "#FFFFFF"}
@@ -224,13 +225,13 @@ export default function ReportesScreen() {
             showProgress
             currentAmount={stats.completed}
             totalAmount={stats.total}
-            progressColor="#12C48B"
+            progressColor={isDark ? '#9EE6C6' : '#12C48B'}
             style={[styles.gridItem, styles.gridItemRight]}
           />
           <Box
             iconName="time-outline"
-            iconColor="#FF6B00"
-            iconBackgroundColor="#FFF1E3"
+            iconColor={isDark ? '#FFD59A' : '#FF6B00'}
+            iconBackgroundColor={isDark ? '#3A2A18' : '#FFF1E3'}
             title={t("Pendings")}
             value={String(stats.pending)}
             backgroundColor={isDark ? "#171717" : "#FFFFFF"}
@@ -238,13 +239,13 @@ export default function ReportesScreen() {
             showProgress
             currentAmount={stats.pending}
             totalAmount={stats.total}
-            progressColor="#FF6B00"
+            progressColor={isDark ? '#FFD59A' : '#FF6B00'}
             style={[styles.gridItem, styles.gridItemLeft]}
           />
           <Box
             iconName="cash-outline"
-            iconColor="#7C4DFF"
-            iconBackgroundColor="#F3EEFF"
+            iconColor={isDark ? '#CDBAFF' : '#7C4DFF'}
+            iconBackgroundColor={isDark ? '#1C1333' : '#F3EEFF'}
             title={t("TotalAmount")}
             value={`$${formatCurrency(stats.totalAmount)}`}
             backgroundColor={isDark ? "#171717" : "#FFFFFF"}

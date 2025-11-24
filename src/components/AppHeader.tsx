@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons"
 import { router } from "expo-router"
 import { Image, Pressable, Text, View } from "react-native"
+import { useColorScheme } from "nativewind"
 import { useTranslation } from "react-i18next"
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"]
@@ -37,12 +38,11 @@ export default function AppHeader({
     router.push("/(onboarding)/perfil")
   }
   const { t } = useTranslation()
+  const { colorScheme } = useColorScheme()
+  const isDark = colorScheme === 'dark'
   if (variant === "home") {
     return (
-      <View
-        className="flex-row items-center justify-between rounded-3xl bg-white px-4"
-        style={{ paddingTop: topInset + 12, paddingBottom: 12 }}
-      >
+      <View style={{ paddingTop: topInset + 12 }} className="pb-3 flex-row items-center justify-between px-4 bg-white dark:bg-slate-900">
         <Pressable
           onPress={handleProfilePress}
           style={{ flexDirection: "row", alignItems: "center" }}
@@ -50,22 +50,20 @@ export default function AppHeader({
         >
           <Image
             source={{ uri: profileUri ?? FALLBACK_PROFILE_URI }}
-            style={{ width: 56, height: 56, borderRadius: 28, marginRight: 12 }}
+            className="w-14 h-14 rounded-full mr-3 border border-neutral-200 dark:border-neutral-700"
           />
 
           <View>
-            <Text style={{ fontSize: 20, fontWeight: "700", color: "#0B2E35" }}>
+            <Text className="text-[20px] font-extrabold text-primary-700 dark:text-neutral-50">
               {t("Hi")}, {userName ?? t("User")} 👋
             </Text>
-            <Text style={{ fontSize: 13, color: "#7C8A8C", marginTop: 2 }}>
-              {t("WelcomeMessage")}
-            </Text>
+            <Text className="text-[13px] text-neutral-600 dark:text-neutral-400 mt-0.5">{t("WelcomeMessage")}</Text>
           </View>
         </Pressable>
 
         <Pressable onPress={onNotificationsPress ?? (() => router.push("/notificaciones"))} hitSlop={8}>
-          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary-50">
-            <Ionicons name="notifications-outline" size={22} color="#1B3D48" />
+          <View className="h-12 w-12 items-center justify-center rounded-lg bg-emerald-50 dark:bg-[#082027]">
+            <Ionicons name="notifications-outline" size={22} color={isDark ? '#E5E7EB' : '#065F46'} />
           </View>
         </Pressable>
       </View>
@@ -73,20 +71,17 @@ export default function AppHeader({
   }
 
   return (
-    <View
-      className="flex-row items-center justify-between rounded-3xl bg-white dark:bg-neutral-900 px-4"
-      style={{ paddingTop: topInset + 12, paddingBottom: 12 }}
-    >
-      <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary-50">
-        <Ionicons name={icon} size={24} color="#1B3D48" />
+    <View style={{ paddingTop: topInset + 12 }} className="pb-3 flex-row items-center justify-between px-4 bg-white dark:bg-slate-900">
+      <View className="h-12 w-12 items-center justify-center rounded-lg bg-emerald-50 dark:bg-[#082027]">
+        <Ionicons name={icon} size={24} color={isDark ? '#E5E7EB' : '#1B3D48'} />
       </View>
 
-      <Text className="text-lg font-semibold text-primary-900">{title}</Text>
+      <Text className="text-[18px] font-semibold text-primary-700 dark:text-neutral-50">{title}</Text>
 
       <Pressable onPress={handleProfilePress} hitSlop={8}>
         <Image
           source={{ uri: profileUri ?? FALLBACK_PROFILE_URI }}
-          style={{ width: 40, height: 40, borderRadius: 20 }}
+          className="w-10 h-10 rounded-full border border-neutral-200 dark:border-neutral-700"
         />
       </Pressable>
     </View>

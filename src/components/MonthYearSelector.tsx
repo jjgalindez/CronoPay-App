@@ -1,5 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons"
 import { useState } from "react"
+import { useColorScheme } from 'nativewind'
 import {
   Modal,
   Pressable,
@@ -25,7 +26,6 @@ type MonthYearSelectorProps = {
   minYear?: number
   maxYear?: number
 }
-
 export default function MonthYearSelector({
   label = "Selecciona el mes para ver el resumen de tus pagos",
   value,
@@ -39,6 +39,8 @@ export default function MonthYearSelector({
   const { t } = useTranslation()
   const monthNames = getMonthNames()
   const formattedValue = `${monthNames[value.month]} ${value.year}`
+  const { colorScheme } = useColorScheme()
+  const isDark = colorScheme === 'dark'
 
   const years = Array.from(
     { length: maxYear - minYear + 1 },
@@ -141,7 +143,7 @@ export default function MonthYearSelector({
                 const isActive = index === tempValue.month
                 return (
                   <Pressable
-                      key={index}
+                    key={index}
                     onPress={() => setTempValue({ ...tempValue, month: index })}
                     style={[
                       styles.monthChip,

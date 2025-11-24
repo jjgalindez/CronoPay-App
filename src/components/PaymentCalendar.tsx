@@ -603,7 +603,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: "#e5e5e5",
+    borderTopColor: "#F8FAFC",
   },
   summaryDark: {
     borderTopColor: "#262626",

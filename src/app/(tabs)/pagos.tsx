@@ -50,7 +50,7 @@ export default function PagosScreen() {
   const { data, isLoading, error, refetch } = usePagos(userId)
 
   return (
-    <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-black">
+    <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-slate-900">
       <View className="flex-1 px-6 py-6">
         <Text className="text-2xl font-bold text-primary-900 dark:text-primary-300">Pagos</Text>
         <Text className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">

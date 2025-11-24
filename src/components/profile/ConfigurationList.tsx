@@ -116,7 +116,7 @@ export function ConfigurationList() {
         {t("settings")}
       </Text>
 
-      <View className="bg-white dark:bg-black">
+      <View className="bg-white dark:bg-slate-900">
         {configItems.map((item, index) => (
           <ConfigurationItem
             key={item.itemKey}

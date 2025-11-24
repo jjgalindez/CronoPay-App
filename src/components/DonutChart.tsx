@@ -1,5 +1,6 @@
 import React, { useMemo } from "react"
 import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native"
+import { useColorScheme } from "nativewind"
 import Svg, { G, Circle, Text as SvgText } from "react-native-svg"
 import Ionicons from "@expo/vector-icons/Ionicons"
 
@@ -48,6 +49,8 @@ export default function DonutChart({
   showPercent = true,
   filterMonth,
 }: DonutChartProps) {
+  const { colorScheme } = useColorScheme()
+  const isDark = colorScheme === 'dark'
   // filter data by month if specified
   const filteredData = useMemo(() => {
     if (filterMonth === undefined) {
@@ -97,7 +100,7 @@ export default function DonutChart({
 
 
   return (
-    <View style={[styles.wrapper, { height: finalSize }]}>
+    <View style={[styles.wrapper, { height: finalSize, backgroundColor: isDark ? '#171717' : undefined }]}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -109,7 +112,7 @@ export default function DonutChart({
           <Svg width={finalSize} height={finalSize}>
             <G rotation={0} originX={cx} originY={cy}>
               {/* background ring */}
-              <Circle cx={cx} cy={cy} r={radius} stroke="#E5E7EB" strokeWidth={thickness} fill="none" />
+              <Circle cx={cx} cy={cy} r={radius} stroke={isDark ? '#111827' : '#E5E7EB'} strokeWidth={thickness} fill="none" />
 
               {/* slices drawn as stroked circles using strokeDasharray */}
               {slices.map((s, i) => {
@@ -148,7 +151,7 @@ export default function DonutChart({
                     x={innerLabelPos.x}
                     y={innerLabelPos.y + 4}
                     fontSize={12}
-                    fill={percentFill}
+                      fill={percentFill}
                     fontWeight="700"
                     textAnchor="middle"
                   >
@@ -160,17 +163,17 @@ export default function DonutChart({
           </Svg>
 
           {/* legend to the right for better readability */}
-          <View style={styles.legend}>
-            {slices.map((s, i) => (
-              <View key={`legend-${i}`} className="flex-row items-center mb-2">
-                <View className="w-3 h-3 rounded-sm mr-2" style={{ backgroundColor: s.color }} />
-                <View className="flex-row justify-between flex-1">
-                  <Text className="text-[13px] text-[#12343A] dark:text-gray-100">{s.label}</Text>
-                  <Text className="text-[13px] text-[#12343A] dark:text-gray-100 font-semibold">{s.percent.toFixed(1)}%</Text>
+            <View style={styles.legend}>
+              {slices.map((s, i) => (
+                <View key={`legend-${i}`} style={styles.legendRow}>
+                  <View style={[styles.swatch, { backgroundColor: s.color }]} />
+                  <View style={styles.legendTextWrap}>
+                    <Text style={[styles.legendLabel, isDark ? { color: '#E5E7EB' } : undefined]}>{s.label}</Text>
+                    <Text style={[styles.legendPercent, isDark ? { color: '#E5E7EB' } : undefined]}>{s.percent.toFixed(1)}%</Text>
+                  </View>
                 </View>
-              </View>
-            ))}
-          </View>
+              ))}
+            </View>
         </View>
       </ScrollView>
 

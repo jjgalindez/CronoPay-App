@@ -5,8 +5,8 @@ import RecordatorioForm from '../../../components/RecordatorioForm'
 
 export default function CreateReminderScreen() {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flex: 1 }}>
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
+      <View className="flex-1 p-4">
         <RecordatorioForm />
       </View>
     </SafeAreaView>

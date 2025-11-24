@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { View, Text, Pressable, StyleSheet, Modal, TextInput, Platform, Alert } from 'react-native'
+import { useColorScheme } from 'nativewind'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { RecordatorioItem } from './RecordatoriosList'
 import useNotifee from '../hooks/useNotifee'
@@ -14,6 +15,8 @@ type Props = {
 }
 
 export default function RecordatorioEditor({ visible, recordatorio, onClose, onUpdated, onDeleted }: Props) {
+  const { colorScheme } = useColorScheme()
+  const isDark = colorScheme === 'dark'
   const [fecha, setFecha] = useState<string>('')
   const [hora, setHora] = useState<string>('')
   const [mensaje, setMensaje] = useState<string>('')
@@ -118,33 +121,33 @@ export default function RecordatorioEditor({ visible, recordatorio, onClose, onU
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Editar recordatorio</Text>
+      <View style={[styles.container, isDark ? { backgroundColor: '#0B1220' } : {}]}>
+        <Text style={[styles.title, isDark ? { color: '#E5E7EB' } : {}]}>Editar recordatorio</Text>
 
-        <Text style={styles.label}>Fecha</Text>
-        <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
-          <Text>{(() => {
+        <Text style={[styles.label, isDark ? { color: '#E5E7EB' } : {}]}>Fecha</Text>
+        <Pressable style={[styles.input, isDark ? { backgroundColor: '#0B1220', borderColor: '#1F2933' } : {}]} onPress={() => setShowDatePicker(true)}>
+          <Text style={isDark ? { color: '#E5E7EB' } : undefined}>{(() => {
             if (!fecha) return ''
             const [y, m, d] = fecha.split('-').map(Number)
             return new Date(y, (m || 1) - 1, d || 1).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
           })()}</Text>
         </Pressable>
 
-        <Text style={styles.label}>Hora</Text>
-        <Pressable style={styles.input} onPress={() => setShowTimePicker(true)}>
-          <Text>{(() => {
+        <Text style={[styles.label, isDark ? { color: '#E5E7EB' } : {}]}>Hora</Text>
+        <Pressable style={[styles.input, isDark ? { backgroundColor: '#0B1220', borderColor: '#1F2933' } : {}]} onPress={() => setShowTimePicker(true)}>
+          <Text style={isDark ? { color: '#E5E7EB' } : undefined}>{(() => {
             const [hh, mm] = hora.split(':').map((s) => Number(s))
             return new Date(1970, 0, 1, hh || 0, mm || 0).toLocaleTimeString('es-ES', { hour: 'numeric', minute: '2-digit', hour12: true })
           })()}</Text>
         </Pressable>
 
-        <Text style={styles.label}>Mensaje</Text>
-        <TextInput value={mensaje} onChangeText={setMensaje} style={[styles.input, { height: 100 }]} multiline />
+        <Text style={[styles.label, isDark ? { color: '#E5E7EB' } : {}]}>Mensaje</Text>
+        <TextInput value={mensaje} onChangeText={setMensaje} style={[styles.input, { height: 100 }, isDark ? { backgroundColor: '#071018', borderColor: '#1F2933', color: '#E5E7EB' } : {}]} multiline />
 
         <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }}>
-          <Text style={{ marginRight: 8 }}>Programar notificación</Text>
-          <Pressable onPress={() => setProgramar(!programar)} style={[styles.toggle, programar && styles.toggleActive]}>
-            <Text style={{ color: programar ? '#fff' : '#0B2E35' }}>{programar ? 'ON' : 'OFF'}</Text>
+          <Text style={isDark ? { color: '#E5E7EB', marginRight: 8 } : { marginRight: 8 }}>Programar notificación</Text>
+          <Pressable onPress={() => setProgramar(!programar)} style={[styles.toggle, programar && styles.toggleActive, isDark && programar ? { backgroundColor: '#0B3B3B' } : {}]}>
+            <Text style={{ color: programar ? '#fff' : isDark ? '#E5E7EB' : '#0B2E35' }}>{programar ? 'ON' : 'OFF'}</Text>
           </Pressable>
         </View>
 
@@ -195,7 +198,7 @@ export default function RecordatorioEditor({ visible, recordatorio, onClose, onU
           />
         )}
 
-        <Pressable onPress={onClose} style={styles.close}><Text style={{ color: '#0B2E35' }}>Cerrar</Text></Pressable>
+        <Pressable onPress={onClose} style={styles.close}><Text style={{ color: isDark ? '#E5E7EB' : '#0B2E35' }}>Cerrar</Text></Pressable>
       </View>
     </Modal>
   )

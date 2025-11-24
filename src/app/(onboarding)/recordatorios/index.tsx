@@ -8,7 +8,7 @@ export default function RecordatoriosIndex() {
   const { data, isLoading } = useRecordatorios()
 
   return (
-    <SafeAreaView style={{ flex: 1, padding: 16 }}>
+    <SafeAreaView className="flex-1 p-4 bg-white dark:bg-slate-900">
       <RecordatoriosList items={data} />
     </SafeAreaView>
   )

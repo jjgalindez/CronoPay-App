@@ -8,6 +8,7 @@
     "local": "expo start --tunnel",
     "start:login": "expo login && expo start --go",
     "android": "expo run:android",
+    "build:native": "react-native run-android",
     "ios": "expo run:ios"
   },
   "dependencies": {

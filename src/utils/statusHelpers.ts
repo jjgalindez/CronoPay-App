@@ -54,11 +54,12 @@ export function getStatusBackground(estado: PaymentStatus): string {
 /**
  * Obtiene todos los colores relacionados con un estado
  */
-export function getStatusColors(estado: PaymentStatus): {
+export function getStatusColors(estado: PaymentStatus, isDark: boolean = false): {
   iconColor: string
   iconBg: string
   textColor: string
 } {
+  // For now keep same palette but allow callers to pass `isDark` if they want to switch behavior later
   return {
     iconColor: getStatusColor(estado),
     iconBg: getStatusBackground(estado),

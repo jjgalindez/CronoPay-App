@@ -17,7 +17,7 @@ export default function RootLayout() {
   const { data: perfil } = useUsuarioPerfil(userId, { enabled: !!userId })
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
       <TouchableOpacity
         onPress={() => router.back()}
         style={{ position: 'absolute', left: 10, top: insets.top + 12, zIndex: 10 }}

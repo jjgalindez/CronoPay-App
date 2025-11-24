@@ -6,6 +6,7 @@ import {
   ScrollView,
   Pressable,
   Alert,
+  useColorScheme,
   type StyleProp,
   type ViewStyle,
 } from "react-native"
@@ -86,6 +87,15 @@ export default function RecordatoriosList({
   initialFilter = "Todos",
   onItemPress,
 }: RecordatoriosListProps) {
+  const colorScheme = useColorScheme()
+  const isDark = colorScheme === 'dark'
+
+  // dark fallback colors
+  const DARK_CARD_BG = '#0B0F13'
+  const DARK_MUTED = '#9CA3AF'
+  const DARK_SURFACE = '#111827'
+  const DARK_FILTER_ACTIVE = '#0B3B3B'
+  const DARK_TEXT = '#E5E7EB'
   const [filter, setFilter] = useState<FilterKey>(initialFilter)
   const [schedulingMap, setSchedulingMap] = useState<Record<number, boolean>>({})
   const [notificationIdMap, setNotificationIdMap] = useState<Record<number, string | null>>({})
@@ -146,8 +156,8 @@ export default function RecordatoriosList({
   return (
     <View style={[styles.container, style]}>
       {schedulingSupported === false ? (
-        <View style={{ backgroundColor: '#FFF4E5', padding: 10, borderRadius: 8, marginBottom: 12 }}>
-          <Text style={{ color: '#92400E' }}>
+        <View style={{ backgroundColor: isDark ? '#422006' : '#FFF4E5', padding: 10, borderRadius: 8, marginBottom: 12 }}>
+          <Text style={{ color: isDark ? '#FDE68A' : '#92400E' }}>
             La programación de recordatorios está limitada en este entorno (no hay soporte de triggers). Algunas funciones pueden no estar disponibles.
           </Text>
         </View>
@@ -155,8 +165,8 @@ export default function RecordatoriosList({
       {showFilters && (
         <View style={styles.filterRow}>
           {FILTERS.map((f) => (
-            <Pressable key={f} onPress={() => setFilter(f)} style={({ pressed }) => [styles.filterBtn, filter === f && styles.filterBtnActive, pressed && styles.filterPressed]}>
-              <Text style={[styles.filterText, filter === f && styles.filterTextActive]}>{f}</Text>
+            <Pressable key={f} onPress={() => setFilter(f)} style={({ pressed }) => [styles.filterBtn, filter === f && styles.filterBtnActive, pressed && styles.filterPressed, filter === f && isDark ? { backgroundColor: DARK_FILTER_ACTIVE } : {}]}>
+              <Text style={[styles.filterText, filter === f && styles.filterTextActive, isDark ? { color: filter === f ? '#FFFFFF' : DARK_TEXT } : {}]}>{f}</Text>
             </Pressable>
           ))}
         </View>
@@ -164,7 +174,7 @@ export default function RecordatoriosList({
 
       <ScrollView nestedScrollEnabled style={styles.list}>
         {filtered.length === 0 ? (
-          <Text style={styles.empty}>No hay recordatorios para este filtro.</Text>
+          <Text style={[styles.empty, isDark ? { color: DARK_MUTED } : {}]}>No hay recordatorios para este filtro.</Text>
         ) : (
           filtered.map((it) => {
             const datetime = `${it.fecha_aviso}T${it.hora}`
@@ -175,11 +185,11 @@ export default function RecordatoriosList({
             const scheduled = schedulingMap[it.id_recordatorio] ?? false
 
             return (
-              <Pressable key={it.id_recordatorio} onPress={() => { setSelected(it); setEditorVisible(true); onItemPress?.(it) }} style={styles.card}>
+              <Pressable key={it.id_recordatorio} onPress={() => { setSelected(it); setEditorVisible(true); onItemPress?.(it) }} style={[styles.card, isDark ? { backgroundColor: DARK_CARD_BG } : {}]}>
                 <View style={styles.cardHeader}>
                   <View style={[styles.statusDot, status === "Vencido" ? styles.dotRed : status === "Pagado" ? styles.dotGreen : styles.dotYellow]} />
-                  <Text style={styles.statusLabel}>{status}</Text>
-                  <Text style={styles.timeText}>{formatTime(it.hora)}</Text>
+                  <Text style={[styles.statusLabel, isDark ? { color: '#FCA5A5' } : {}]}>{status}</Text>
+                  <Text style={[styles.timeText, isDark ? { color: DARK_TEXT } : {}]}>{formatTime(it.hora)}</Text>
                   <View style={{ marginLeft: 12 }}>
                     {loadingMap[it.id_recordatorio] ? (
                       <ActivityIndicator size="small" />
@@ -244,12 +254,12 @@ export default function RecordatoriosList({
                   </View>
                 </View>
 
-                <Text style={styles.title}>{it.pago?.titulo ?? it.mensaje ?? "Recordatorio"}</Text>
-                {it.mensaje ? <Text style={styles.message}>{it.mensaje}</Text> : null}
+                <Text style={[styles.title, isDark ? { color: DARK_TEXT } : {}]}>{it.pago?.titulo ?? it.mensaje ?? "Recordatorio"}</Text>
+                {it.mensaje ? <Text style={[styles.message, isDark ? { color: DARK_MUTED } : {}]}>{it.mensaje}</Text> : null}
 
                 <View style={styles.row}>
-                  <Text style={styles.dateLabel}>{status === "Pagado" ? `Pagado el ${formatDateLabel(it.fecha_aviso, it.hora)}` : `Vence el ${formatDateLabel(it.fecha_aviso, it.hora)}`}</Text>
-                  {it.pago?.monto ? <Text style={styles.amount}>${Number(it.pago.monto).toLocaleString('es-CL')}</Text> : null}
+                  <Text style={[styles.dateLabel, isDark ? { color: DARK_MUTED } : {}]}>{status === "Pagado" ? `Pagado el ${formatDateLabel(it.fecha_aviso, it.hora)}` : `Vence el ${formatDateLabel(it.fecha_aviso, it.hora)}`}</Text>
+                  {it.pago?.monto ? <Text style={[styles.amount, isDark ? { color: DARK_TEXT } : {}]}>${Number(it.pago.monto).toLocaleString('es-CL')}</Text> : null}
                 </View>
               </Pressable>
             )

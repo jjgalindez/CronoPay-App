@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, ScrollView } from 'react-native'
+import { useColorScheme } from 'nativewind'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useTranslation } from "react-i18next"
 
@@ -51,6 +52,18 @@ export default function PaymentsList({
   filterCategory,
   title = "Detalle de Pagos"
 }: PaymentsListProps) {
+  const { colorScheme } = useColorScheme()
+  const isDark = colorScheme === 'dark'
+
+  // dark-mode fallbacks (only applied when there is no explicit color prop)
+  const DARK_CARD_BG = '#171717'
+  const DARK_TITLE = '#FFFFFF'
+  const DARK_MUTED = '#9CA3AF'
+  // subtle dark border to sit gently on dark backgrounds (e.g. slate-900)
+  const DARK_BORDER = '#111827'
+  const DARK_AVATAR_BG = '#1F2933'
+  const DARK_AMOUNT = '#FFFFFF'
+  const BADGE_TEXT_COLOR = '#0B2B28'
   // parse and sort by date desc
   const sorted = useMemo(() => {
     return [...items]
@@ -80,17 +93,17 @@ export default function PaymentsList({
   }, [sorted, filterMonth, filterCategory])
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>{title}</Text>
+    <View className="rounded-[18px] p-4 mb-4 bg-white dark:bg-slate-900 shadow-md"> 
+      <Text className="text-primary-700 dark:text-neutral-100 text-lg font-bold mb-3">{title}</Text>
 
       {filtered.length === 0 ? (
-        <Text style={styles.empty}>
+        <Text className="text-[#6B7C82] text-base py-6 text-center">
           No hay pagos registrados para los filtros seleccionados.
         </Text>
       ) : (
-        <View style={styles.listContainer}>
+        <View className="max-h-[400px]">
           <ScrollView
-            style={styles.scrollView}
+            className="max-h-[400px]"
             nestedScrollEnabled={true}
             showsVerticalScrollIndicator={true}
           >
@@ -99,28 +112,28 @@ export default function PaymentsList({
               const statusColor = STATUS_COLORS[status] ?? '#D1E9E6'
 
               return (
-              <View key={it.id ?? `${idx}`} style={styles.row}>
-                <View style={[styles.avatar, { backgroundColor: it.iconBackgroundColor ?? '#E8F1FF' }]}> 
-                    {it.iconName ? (
-                      <Ionicons name={it.iconName as any} size={20} color={it.iconColor ?? '#1B3D48'} />
-                    ) : null}
-                  </View>
+                  <View key={it.id ?? `${idx}`} className="flex-row items-center py-3" style={{ borderBottomWidth: 1, borderBottomColor: isDark ? DARK_BORDER : '#F8FAFC' }}>
+                    <View className="w-11 h-11 rounded-full mr-3 items-center justify-center" style={{ backgroundColor: it.iconBackgroundColor ?? (isDark ? DARK_AVATAR_BG : '#E8F1FF') }}> 
+                        {it.iconName ? (
+                          <Ionicons name={it.iconName as any} size={20} color={it.iconColor ?? (isDark ? '#FFFFFF' : '#1B3D48')} />
+                        ) : null}
+                      </View>
 
-                <View style={styles.meta}>
-                  <Text style={styles.itemTitle} numberOfLines={1}>
+                <View className="flex-1">
+                  <Text className="text-[15px] font-semibold text-[#1B3D48]" numberOfLines={1}>
                       {it.title}
                     </Text>
-                  <Text style={styles.itemDate}>
+                  <Text className={isDark ? 'text-neutral-400 text-[12px] mt-1' : 'text-[12px] text-[#8A9AA0] mt-1'}> 
                       {formatDate(it.date)}
                       {it.category ? ` • ${it.category}` : ''}
                     </Text>
                   </View>
 
-                <View style={styles.amountWrap}>
-                  <Text style={styles.amount}>${formatCurrency(it.amount)}</Text>
+                <View className="items-end ml-3">
+                  <Text className="text-primary-700 dark:text-neutral-100 text-[16px] font-bold">${formatCurrency(it.amount)}</Text>
                     {status ? (
-                    <View style={[styles.badge, { backgroundColor: statusColor }]}> 
-                      <Text style={styles.badgeText}>{status}</Text>
+                    <View className="mt-1 rounded-[12px] px-3 py-1" style={{ backgroundColor: statusColor }}> 
+                      <Text className="text-[11px] font-bold" style={{ color: BADGE_TEXT_COLOR }}>{status}</Text>
                       </View>
                     ) : null}
                   </View>
@@ -132,8 +145,8 @@ export default function PaymentsList({
       )}
 
       {filtered.length > 0 && (
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
+        <View className="mt-3 pt-3 border-t items-center" style={{ borderTopWidth: 1, borderTopColor: isDark ? DARK_BORDER : '#F8FAFC' }}> 
+          <Text className="text-[13px] font-semibold" style={{ color: isDark ? DARK_MUTED : undefined }}> 
             {filtered.length} {filtered.length === 1 ? t("Payment") : t("Payments")} {t("Found")}
           </Text>
         </View>
@@ -142,95 +155,3 @@ export default function PaymentsList({
   )
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 5,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1B3D48',
-    marginBottom: 12,
-  },
-  listContainer: {
-    maxHeight: 400,
-  },
-  scrollView: {
-    maxHeight: 400,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F6',
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#E8F1FF',
-    marginRight: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  meta: {
-    flex: 1,
-  },
-  itemTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1B3D48',
-  },
-  itemDate: {
-    fontSize: 12,
-    color: '#8A9AA0',
-    marginTop: 4,
-  },
-  amountWrap: {
-    alignItems: 'flex-end',
-    marginLeft: 12,
-  },
-  amount: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1B3D48',
-  },
-  badge: {
-    marginTop: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  badgeText: {
-    fontSize: 11,
-    color: '#0B2B28',
-    fontWeight: '700',
-  },
-  footer: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#F1F5F6',
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 13,
-    color: '#6B7C82',
-    fontWeight: '600',
-  },
-  empty: {
-    color: '#6B7C82',
-    fontSize: 14,
-    paddingVertical: 24,
-    textAlign: 'center',
-  },
-})

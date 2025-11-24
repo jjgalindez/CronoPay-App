@@ -8,7 +8,7 @@ export default function CalendarioScreen() {
 
 
   return (
-    <SafeAreaView className="flex-1 bg-[#f5f5f5] dark:bg-black">
+    <SafeAreaView className="flex-1 bg-[#f5f5f5] dark:bg-slate-900">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
