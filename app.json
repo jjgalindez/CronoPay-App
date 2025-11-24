@@ -1,15 +1,33 @@
 {
   "expo": {
-    "scheme": "com.edrickleong.smartbank",
+    "name": "CronoPay",
+    "slug": "cronopay-app",
+    "scheme": "com.cronopay.app",
     "userInterfaceStyle": "light",
+    "icon": "./src/assets/CronoPayLogo.png",
     "ios": {
-      "bundleIdentifier": "com.edrickleong.smartbank"
+      "bundleIdentifier": "com.cronopay.app"
+    },
+    "android": {
+      "package": "com.cronopay.app"
     },
     "plugins": [
-      "expo-router"
+      "@react-native-google-signin/google-signin",
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "La app necesita acceso a tus fotos para cambiar tu foto de perfil.",
+          "cameraPermission": "La app necesita acceso a tu cámara para tomar fotos de perfil."
+        }
+      ],
+      "expo-localization"
     ],
-    "android": {
-      "package": "com.edrickleong.smartbank"
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1184059c-9ccd-4681-bca9-49b9e2328614"
+      }
     }
   }
 }

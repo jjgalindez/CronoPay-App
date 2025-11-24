@@ -1,105 +1,130 @@
 <p align="center">
   <a href="https://github.com/edrickleong/smartbank">
-    <img src="docs/images/smartbank-logo.svg" alt="Logo" width="120" height="120">
+    <img src="src/assets/CronoPayLogo.svg" alt="Logo" width="120" height="120">
   </a>
 
-<h3 align="center">SmartBank</h3>
+<h3 align="center">CronoPay</h3>
 
 <p align="center">
-    A demo banking app made with React Native and Supabase. 
+    Aplicación para llevar tus gastos e ingresos construida con React Native, Expo y Supabase. 
     <br />
-    Designed by <a href="https://twitter.com/uiuxadrian">Adrian Kuleszo</a>
+    Desarrollada por <a href="https://github.com/jjgalindez">Jhon Galindez</a>, <a href="https://github.com/LenKid">Kedin Valencia</a>, Jhonatan Tobar, Manuel Ruge, Jair Hoyos
     <br />
-    Demo app created by <a href="https://twitter.com/edrickleong_">Edrick Leong</a>
+    Demo app created by <a href="#">CronoTeam</a>
     <br />
     <br />
-    <a href="https://github.com/edrickleong/smartbank/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/edrickleong/smartbank/issues">Request Feature</a>
 </p>
 
-![Mockup](docs/images/mockup.png)
-
-This project uses designs from Adrian Kuleszo's
-book [The UI Professional's Design Manual](https://uiadrian.gumroad.com/l/design-manual). Support him by purchasing a
-copy of his book on [Gumroad](https://uiadrian.gumroad.com/l/design-manual).
-
-## Demo
 
 <p align="center">
-  <img src="docs/demo.gif" alt="demo" width="360" />
+  <img src="docs/images/mockupCronoPay.png" alt="Demo CronoPay" width="360" />
 </p>
 
-## 📱 Flows
+<p align="center">
+  <img src="docs/images/App.gif" alt="Demo CronoPay" width="360" />
+</p>
 
-These are groups of screens based on the design manual above.
-Some of these screens have been created without adding functionality yet. For example,
-the phone verifications screens have been created but do not integrate with a phone verification service.
+CronoPay es una aplicación de finanzas moderna construida con Expo, NativeWind y Supabase.  
+Se enfoca en flujos de onboarding limpios, UI modular y estructura de proyecto mantenible.
 
-- [x] Walkthrough
-- [x] Login
-- [x] Account setup
-- [x] Phone verification
-- [x] Create passcode
-- [ ] Legal information
-- [ ] Notifications
-- [ ] Verify Identity
-- [ ] Selfie
-- [ ] Create a card
-- [ ] Top up account
-- [ ] Home screen
-- [ ] Transfer money
-- [ ] Exchange money
-- [ ] Profile settings
-- [ ] Upload avatar
+---
 
-## ✨ Features
+## 📱 Flujos implementados
 
-- [x] 🔒 Sign Up / Log In
-- [ ] 📞 Phone Verification
-- [ ] 🔐 Setup PIN + Face ID
-- [ ] 📷 Photo Verification
-- [ ] 🔔 Request for Notifications
-- [ ] 👤 Upload Avatar
+- [x] Login with google and supabase auth
+- [x] Configuración de cuenta
+- [x] Pantalla principal con reportes
+- [x] Configuración de perfil
+- [x] Pagos
+- [x] Calendario
+- [x] Estadísticas
+- [x] Reportes
 
-## 🔧 Built with
 
-- [Expo](https://expo.dev/) - A framework for building React Native apps
-- [NativeWind](https://www.nativewind.dev/) - Tailwind CSS for React Native
-- [Supabase](https://supabase.com/) - Auth & Database platform
+👉 Funcionalidades como **notificaciones** aún no están implementadas.
 
-## 🚀 Local Development
+---
 
-1. Install Bun
+## ✨ Funcionalidades
 
-```shell
+- [x] 🔒 Registro / Login (auth con Supabase y Google)
+- [x] 🎨 Carrusel de onboarding con imágene
+- [x] 🏠 HOME dentro de la app con los reportes
+- [x] 💸 Funcionalidad de Gastos implementada
+
+---
+
+## 🔧 Construido con
+
+- [Expo](https://expo.dev/) – Framework para apps en React Native
+- [NativeWind](https://www.nativewind.dev/) – Tailwind CSS para React Native
+- [Supabase](https://supabase.com/) – Plataforma de Auth y Base de Datos
+- [Bun](https://bun.sh/) – Runtime y gestor de paquetes rápido
+
+## 🚀 Desarrollo local
+
+### A. Instalar Bun Windows
+```sh
+powershell -c "irm bun.sh/install.ps1|iex"
+```
+### B. Instalar Bun macOS
+```sh
 brew install bun
 ```
+### Alternativa con NPM:
 
-2Clone the repo
-
-```sh
-git clone https://github.com/edrickleong/smartbank
+```shell
+npm install -g bun
 ```
 
-3. Install NPM packages
+## 1. Clona el repositorio
+
+```sh
+git clone https://github.com/jjgalindez/cronopay-app
+```
+
+## 2. Instalar NPM packages
 
 ```sh
 bun install
 ```
 
-4. Copy the `.env.example` file as a `.env` file and add the missing environment variables.
+## 3. Copia el archivo `.env.example` como un archivo `.env` y añade las variables de entorno necesarias.
+   
    You will need to sign up for a [Supabase account](https://supabase.com/) and create a project.
    You will need to update your Site URL under Authentication > URL Configuration > Site URL to
-   `com.edrickleong.smartbank`.
+   `com.cronopay.app`.
 
-```shell
-5. Run the development server
+   ---
 
-```
+## 4. Ejecuta el servidor del entorno de desarrollo
 
-bun start
 
-```
+### 🔐 Estado funcional del inicio con Google
 
-```
+Para evitar errores con Google Sign-In en Expo + Android, sigue estos pasos uno por uno en este orden:
+
+### ✅ Pasos para configurar correctamente Google Sign-In
+
+5. Eliminar módulos y lockfile:
+   ```sh
+   rm -rf node_modules
+   rm -rf bun.lock
+   rm -rf android
+
+   bun install
+
+   Nota: Abrir Android Studio y conectar el celular por cable al pc, o hacer un dispositivo virtual. Si es con adb entonces solo conectar al pc. (Tener la depuración por USB activada en el celular)
+
+   bun expo prebuild
+
+   Crear el archivo: local.properties 
+   dentro de la carpeta android/ y agregar:
+   sdk.dir=C:\\Users\\<usuario>\\AppData\\Local\\Android\\Sdk
+
+
+6. Run the development server
+
+    ```shell
+     bun expo run:android
+    ```

@@ -13,20 +13,23 @@ export interface Database {
         Row: {
           id: string
           nombre: string | null
-          avatar_url: string | null
+          avatar_url: string
           creado_en: string | null
+          email: string
         }
         Insert: {
           id: string
           nombre?: string | null
-          avatar_url?: string | null
+          avatar_url: string
           creado_en?: string | null
+          email?: string
         }
         Update: {
           id?: string
           nombre?: string | null
-          avatar_url?: string | null
+          avatar_url?: string
           creado_en?: string | null
+          email?: string
         }
         Relationships: []
       }
@@ -77,6 +80,7 @@ export interface Database {
           id_metodo: number | null
           created_at: string | null
           updated_at: string | null
+          titulo: string
         }
         Insert: {
           id_pago?: number
@@ -88,6 +92,7 @@ export interface Database {
           id_metodo?: number | null
           created_at?: string | null
           updated_at?: string | null
+          titulo: string
         }
         Update: {
           id_pago?: number
@@ -99,6 +104,7 @@ export interface Database {
           id_metodo?: number | null
           created_at?: string | null
           updated_at?: string | null
+          titulo?: string
         }
         Relationships: [
           {
@@ -121,7 +127,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "usuarios_perfil"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       recordatorio: {
@@ -153,7 +159,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "pago"
             referencedColumns: ["id_pago"]
-          }
+          },
         ]
       }
       informe: {
@@ -188,13 +194,13 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "usuarios_perfil"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
-    Views: {}
-    Functions: {}
-    Enums: {}
-    CompositeTypes: {}
+    Views: object
+    Functions: object
+    Enums: object
+    CompositeTypes: object
   }
 }

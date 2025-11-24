@@ -32,7 +32,7 @@ export default function AppHeader({
 
   return (
     <View
-      className="flex-row items-center justify-between rounded-3xl bg-white px-4"
+      className="flex-row items-center justify-between rounded-3xl bg-white dark:bg-neutral-900 px-4"
       style={{ paddingTop: topInset + 12, paddingBottom: 12 }}
     >
       <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary-50">
