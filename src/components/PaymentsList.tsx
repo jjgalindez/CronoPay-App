@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react'
 import { View, Text, ScrollView } from 'react-native'
+import { useColorScheme } from 'nativewind'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { useTranslation } from "react-i18next"
 
 export type PaymentItem = {
   id?: string
@@ -50,37 +52,52 @@ export default function PaymentsList({
   filterCategory,
   title = "Detalle de Pagos"
 }: PaymentsListProps) {
+  const { colorScheme } = useColorScheme()
+  const isDark = colorScheme === 'dark'
+
+  // dark-mode fallbacks (only applied when there is no explicit color prop)
+  const DARK_CARD_BG = '#171717'
+  const DARK_TITLE = '#FFFFFF'
+  const DARK_MUTED = '#9CA3AF'
+  // subtle dark border to sit gently on dark backgrounds (e.g. slate-900)
+  const DARK_BORDER = '#111827'
+  const DARK_AVATAR_BG = '#1F2933'
+  const DARK_AMOUNT = '#FFFFFF'
+  const BADGE_TEXT_COLOR = '#0B2B28'
   // parse and sort by date desc
   const sorted = useMemo(() => {
     return [...items]
-      .map((it) => ({
-        ...it,
-        parsedDate: typeof it.date === 'string' ? new Date(it.date) : it.date,
-      }))
-      .sort((a, b) => (b.parsedDate as Date).getTime() - (a.parsedDate as Date).getTime())
+      .map((it) => ({ ...it, _date: typeof it.date === 'string' ? new Date(it.date) : it.date }))
+      .sort((a, b) => (b._date as Date).getTime() - (a._date as Date).getTime())
   }, [items])
+  const { t } = useTranslation()
 
-  // filter by month and category
+  // filter by month and/or category
   const filtered = useMemo(() => {
     let result = sorted
-    if (typeof filterMonth === 'number') {
+
+    // filter by month if specified
+    if (filterMonth !== undefined) {
       result = result.filter((it) => {
-        const itemDate = it.parsedDate as Date
+        const itemDate = it._date as Date
         return itemDate.getMonth() === filterMonth
       })
     }
+
+    // filter by category if specified
     if (filterCategory) {
       result = result.filter((it) => it.category === filterCategory)
     }
+
     return result
   }, [sorted, filterMonth, filterCategory])
 
   return (
-    <View className="bg-white dark:bg-black rounded-[18px] p-4 mb-4 shadow-sm">
-      <Text className="text-lg font-bold text-[#1B3D48] dark:text-gray-100 mb-3">{title}</Text>
+    <View className="rounded-[18px] p-4 mb-4 bg-white dark:bg-slate-900 shadow-md"> 
+      <Text className="text-primary-700 dark:text-neutral-100 text-lg font-bold mb-3">{title}</Text>
 
       {filtered.length === 0 ? (
-        <Text className="text-[#6B7C82] dark:text-gray-400 text-sm text-center py-6">
+        <Text className="text-[#6B7C82] text-base py-6 text-center">
           No hay pagos registrados para los filtros seleccionados.
         </Text>
       ) : (
@@ -95,34 +112,28 @@ export default function PaymentsList({
               const statusColor = STATUS_COLORS[status] ?? '#D1E9E6'
 
               return (
-                <View key={it.id ?? `${idx}`} className="flex-row items-center py-3 border-b border-[#F1F5F6] dark:border-gray-800">
-                  <View
-                    className="w-11 h-11 rounded-full mr-3 items-center justify-center"
-                    style={{ backgroundColor: it.iconBackgroundColor ?? '#E8F1FF' }}
-                  >
-                    {it.iconName ? (
-                      <Ionicons name={it.iconName as any} size={20} color={it.iconColor ?? '#1B3D48'} />
-                    ) : null}
-                  </View>
+                  <View key={it.id ?? `${idx}`} className="flex-row items-center py-3" style={{ borderBottomWidth: 1, borderBottomColor: isDark ? DARK_BORDER : '#F8FAFC' }}>
+                    <View className="w-11 h-11 rounded-full mr-3 items-center justify-center" style={{ backgroundColor: it.iconBackgroundColor ?? (isDark ? DARK_AVATAR_BG : '#E8F1FF') }}> 
+                        {it.iconName ? (
+                          <Ionicons name={it.iconName as any} size={20} color={it.iconColor ?? (isDark ? '#FFFFFF' : '#1B3D48')} />
+                        ) : null}
+                      </View>
 
-                  <View className="flex-1">
-                    <Text className="text-[15px] font-semibold text-[#1B3D48] dark:text-gray-100" numberOfLines={1}>
+                <View className="flex-1">
+                  <Text className="text-[15px] font-semibold text-[#1B3D48]" numberOfLines={1}>
                       {it.title}
                     </Text>
-                    <Text className="text-xs text-[#8A9AA0] dark:text-gray-400 mt-1">
+                  <Text className={isDark ? 'text-neutral-400 text-[12px] mt-1' : 'text-[12px] text-[#8A9AA0] mt-1'}> 
                       {formatDate(it.date)}
                       {it.category ? ` • ${it.category}` : ''}
                     </Text>
                   </View>
 
-                  <View className="items-end ml-3">
-                    <Text className="text-base font-bold text-[#1B3D48] dark:text-gray-100">${formatCurrency(it.amount)}</Text>
+                <View className="items-end ml-3">
+                  <Text className="text-primary-700 dark:text-neutral-100 text-[16px] font-bold">${formatCurrency(it.amount)}</Text>
                     {status ? (
-                      <View
-                        className="mt-1.5 px-2.5 py-1 rounded-xl"
-                        style={{ backgroundColor: statusColor }}
-                      >
-                        <Text className="text-[11px] text-[#0B2B28] font-bold">{status}</Text>
+                    <View className="mt-1 rounded-[12px] px-3 py-1" style={{ backgroundColor: statusColor }}> 
+                      <Text className="text-[11px] font-bold" style={{ color: BADGE_TEXT_COLOR }}>{status}</Text>
                       </View>
                     ) : null}
                   </View>
@@ -134,12 +145,13 @@ export default function PaymentsList({
       )}
 
       {filtered.length > 0 && (
-        <View className="mt-3 pt-3 border-t border-[#F1F5F6] dark:border-gray-800 items-center">
-          <Text className="text-[13px] text-[#6B7C82] dark:text-gray-400 font-semibold">
-            {filtered.length} {filtered.length === 1 ? 'pago' : 'pagos'} encontrados
+        <View className="mt-3 pt-3 border-t items-center" style={{ borderTopWidth: 1, borderTopColor: isDark ? DARK_BORDER : '#F8FAFC' }}> 
+          <Text className="text-[13px] font-semibold" style={{ color: isDark ? DARK_MUTED : undefined }}> 
+            {filtered.length} {filtered.length === 1 ? t("Payment") : t("Payments")} {t("Found")}
           </Text>
         </View>
       )}
     </View>
   )
 }
+

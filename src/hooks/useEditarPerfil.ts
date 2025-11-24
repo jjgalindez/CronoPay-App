@@ -1,8 +1,9 @@
 // src/hooks/useEditarPerfil.ts
 import { router } from "expo-router"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { Alert, Platform } from "react-native"
 import ImagePicker from "react-native-image-crop-picker"
+import * as Crypto from 'expo-crypto'
 
 import { useUsuarioPerfil } from "./useUsuarioPerfil"
 import { supabase } from "../../lib/supabase"
@@ -20,8 +21,61 @@ export function useEditarPerfil() {
   )
   const [fotoPerfilLocal, setFotoPerfilLocal] = useState<string | null>(null)
   const [imagenTemporal, setImagenTemporal] = useState<string | null>(null)
+  const [uploadedPath, setUploadedPath] = useState<string | null>(null)
+  const [uploadedHash, setUploadedHash] = useState<string | null>(null)
   const [cargando, setCargando] = useState(false)
   const [subiendoImagen, setSubiendoImagen] = useState(false)
+  // Ref para evitar que el cleanup borre la imagen si el usuario guardó cambios
+  const keepUploadedOnSave = useRef(false)
+
+  // Helper: normaliza una URL o path a la ruta de storage (ej. "avatars/archivo.jpg")
+  const getStoragePathFromUrl = useCallback((urlOrPath?: string | null) => {
+    if (!urlOrPath) return null
+    if (urlOrPath.startsWith("avatars/")) return urlOrPath
+    if (urlOrPath.includes("avatars/")) {
+      const parts = urlOrPath.split("avatars/")
+      if (parts.length > 1) {
+        return `avatars/${parts[1].split('?')[0]}`
+      }
+    }
+    return null
+  }, [])
+
+  // Nota: la funcionalidad de borrado en el storage se ha deshabilitado
+  // Anteriormente existía `eliminarImagenAnterior` que removía objetos
+  // del bucket. Lo mantenemos fuera del hook para evitar borrados
+  // accidentales; las llamadas a borrado se reemplazan por logs.
+
+  // Calcular SHA256 a partir de un ArrayBuffer (convertimos a hex y hasheamos)
+  const computeSha256FromArrayBuffer = useCallback(
+    async (buffer: ArrayBuffer) => {
+      const bytes = new Uint8Array(buffer)
+      // convertir a hex string
+      let hex = ''
+      for (let i = 0; i < bytes.length; i++) {
+        const h = bytes[i].toString(16).padStart(2, '0')
+        hex += h
+      }
+      // usar expo-crypto para hashear la representación hex
+      const hash = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, hex)
+      console.log('[useEditarPerfil] computeSha256FromArrayBuffer -> hash:', hash)
+      return hash
+    }, []);
+
+  // Calcular SHA256 a partir de una URL pública (fetch -> arrayBuffer -> hash)
+  const computeSha256FromUrl = useCallback(async (url: string | null) => {
+    if (!url) return null
+    try {
+      console.log('[useEditarPerfil] computeSha256FromUrl fetching:', url)
+      const res = await fetch(url)
+      if (!res.ok) return null
+      const buffer = await res.arrayBuffer()
+      return await computeSha256FromArrayBuffer(buffer)
+    } catch (e) {
+      console.warn('Error calculando hash desde URL:', e)
+      return null
+    }
+  }, [computeSha256FromArrayBuffer])
 
   // Sincronizar estados cuando cambie el perfil
   useEffect(() => {
@@ -42,13 +96,46 @@ export function useEditarPerfil() {
   // Limpiar imagen temporal al desmontar
   useEffect(() => {
     return () => {
-      if (imagenTemporal && fotoPerfil !== fotoPerfilOriginal) {
-        eliminarImagenAnterior(imagenTemporal).catch((err) =>
-          console.warn("Error limpiando imagen temporal:", err),
-        )
+      // Si hay una imagen subida temporalmente y el usuario no la guardó,
+      // eliminamos el archivo subido usando su path en el storage.
+      if (uploadedPath) {
+        if (keepUploadedOnSave.current) {
+          console.log('[useEditarPerfil] cleanup: preservando uploadedPath porque el usuario guardó (skip delete)')
+          return
+        }
+        // si tenemos hash del archivo subido, comparamos con el original por contenido
+        (async () => {
+          try {
+            if (uploadedHash && fotoPerfilOriginal) {
+              console.log('[useEditarPerfil] cleanup: comparing uploadedHash with original')
+              const origPath = getStoragePathFromUrl(fotoPerfilOriginal)
+              const origPublicUrl = origPath ? (supabase.storage.from('UserData').getPublicUrl(origPath).data?.publicUrl || null) : null
+              console.log('[useEditarPerfil] cleanup: origPublicUrl=', origPublicUrl, ' uploadedHash=', uploadedHash)
+              const origHash = await computeSha256FromUrl(origPublicUrl)
+              console.log('[useEditarPerfil] cleanup: origHash=', origHash)
+              if (!origHash || origHash !== uploadedHash) {
+                console.log('[useEditarPerfil] cleanup: hashes differ -> deletion disabled (no-op) for', uploadedPath)
+              } else {
+                console.log('[useEditarPerfil] cleanup: hashes equal -> not deleting uploadedPath')
+              }
+            } else {
+              // fallback a comparar rutas
+              const currentPath = getStoragePathFromUrl(fotoPerfil)
+              const originalPath = getStoragePathFromUrl(fotoPerfilOriginal)
+              console.log('[useEditarPerfil] cleanup: path compare currentPath=', currentPath, 'originalPath=', originalPath)
+              if (currentPath !== originalPath) {
+                console.log('[useEditarPerfil] cleanup: paths differ -> deletion disabled (no-op) for', uploadedPath)
+              } else {
+                console.log('[useEditarPerfil] cleanup: paths equal -> not deleting uploadedPath')
+              }
+            }
+          } catch (err) {
+            console.warn("Error limpiando imagen temporal:", err)
+          }
+        })()
       }
     }
-  }, [imagenTemporal, fotoPerfil, fotoPerfilOriginal, eliminarImagenAnterior])
+  }, [uploadedPath, fotoPerfil, fotoPerfilOriginal, getStoragePathFromUrl])
 
   // Verificar permisos ya no es necesario con react-native-image-crop-picker
   // La librería maneja los permisos automáticamente
@@ -96,14 +183,15 @@ export function useEditarPerfil() {
             }
             reader.onerror = reject
             reader.readAsArrayBuffer(blob)
-          },
+          }
         )
 
         // Subir el ArrayBuffer
         console.log("☁️ Subiendo a Supabase...")
+        const storagePath = `avatars/${nombreArchivo}`
         const { data, error } = await supabase.storage
           .from("UserData")
-          .upload(`avatars/${nombreArchivo}`, arrayBuffer, {
+          .upload(storagePath, arrayBuffer, {
             cacheControl: "3600",
             upsert: true,
             contentType: mimeType,
@@ -120,37 +208,28 @@ export function useEditarPerfil() {
           data: { publicUrl },
         } = supabase.storage
           .from("UserData")
-          .getPublicUrl(`avatars/${nombreArchivo}`)
+          .getPublicUrl(storagePath)
 
         console.log("🔗 URL pública generada:", publicUrl)
-        return publicUrl
+        // calcular hash del arrayBuffer y devolverlo
+        try {
+          const hash = await computeSha256FromArrayBuffer(arrayBuffer)
+          console.log('[useEditarPerfil] subirImagenASupabase -> computed hash for upload:', hash)
+          return { publicUrl, storagePath, hash }
+        } catch (e) {
+          console.warn('No se pudo calcular hash del archivo subido:', e)
+          return { publicUrl, storagePath, hash: null }
+        }
       } catch (error) {
         console.error("❌ Error subiendo imagen:", error)
         throw error
       }
     },
-    [],
+    [computeSha256FromArrayBuffer],
   )
 
   // Eliminar imagen del bucket
-  const eliminarImagenAnterior = useCallback(async (urlAnterior: string) => {
-    try {
-      if (!urlAnterior || !urlAnterior.includes("avatars/")) return
-
-      const nombreArchivo = urlAnterior.split("avatars/").pop()
-      if (!nombreArchivo) return
-
-      const { error } = await supabase.storage
-        .from("UserData")
-        .remove([`avatars/${nombreArchivo}`])
-
-      if (error) {
-        console.warn("No se pudo eliminar la imagen anterior:", error)
-      }
-    } catch (error) {
-      console.warn("Error eliminando imagen anterior:", error)
-    }
-  }, [])
+  
 
   // Seleccionar foto de la galería con recorte
   const seleccionarFoto = useCallback(async () => {
@@ -195,23 +274,27 @@ export function useEditarPerfil() {
 
         console.log("🚀 Iniciando proceso de subida...")
         // Subir
-        const publicUrl = await subirImagenASupabase(
+        const result = await subirImagenASupabase(
           uri,
           nombreArchivo,
           mimeType,
         )
+        const publicUrl = (result as any).publicUrl
+        const storagePath = (result as any).storagePath
+        const hash = (result as any).hash || null
         console.log("✅ URL pública obtenida:", publicUrl)
 
-        // Eliminar temporal anterior si existe
-        if (fotoPerfil && fotoPerfil !== fotoPerfilOriginal) {
-          console.log("🗑️ Eliminando imagen anterior:", fotoPerfil)
-          await eliminarImagenAnterior(fotoPerfil)
-        }
+        // NOTA: No eliminamos la imagen anterior aquí para evitar borrar
+        // la imagen recién subida por error. La eliminación de la imagen
+        // anterior se realiza únicamente al guardar los cambios.
 
         // Actualizar estados
         console.log("💾 Actualizando estados con URL:", publicUrl)
         setFotoPerfil(publicUrl)
         setImagenTemporal(publicUrl)
+        setUploadedPath(storagePath)
+        setUploadedHash(hash)
+        console.log('[useEditarPerfil] Uploaded path/hash set ->', storagePath, hash)
         setFotoPerfilLocal(null)
         console.log("✅ Estados actualizados correctamente")
       } catch (error) {
@@ -231,7 +314,6 @@ export function useEditarPerfil() {
     fotoPerfil,
     fotoPerfilOriginal,
     subirImagenASupabase,
-    eliminarImagenAnterior,
   ])
 
   // Guardar cambios
@@ -253,25 +335,23 @@ export function useEditarPerfil() {
         avatar_url: fotoPerfil || undefined,
       })
 
-      // Eliminar imagen original si cambió
-      if (
-        fotoPerfilOriginal &&
-        fotoPerfil &&
-        fotoPerfilOriginal !== fotoPerfil
-      ) {
-        await eliminarImagenAnterior(fotoPerfilOriginal).catch((err) =>
-          console.warn("Error eliminando imagen anterior:", err),
-        )
-      }
+      // Nota: no eliminamos aquí la imagen subida; la eliminación de
+      // archivos temporales se realiza únicamente al cancelar para evitar
+      // borrar por error la imagen recién subida. Dejar solo la actualización
+      // del perfil y actualizar el estado local.
+      console.log('[useEditarPerfil] Guardar: no se elimina ninguna imagen en este paso (solo al cancelar)')
 
       // Limpiar flags
       setImagenTemporal(null)
+      setUploadedPath(null)
       setFotoPerfilOriginal(fotoPerfil)
 
       Alert.alert("Éxito", "Perfil actualizado correctamente", [
         {
           text: "OK",
           onPress: () => {
+            // Marcamos que el archivo subido debe preservarse (no borrar)
+            keepUploadedOnSave.current = true
             refetch()
             router.back()
           },
@@ -295,21 +375,33 @@ export function useEditarPerfil() {
     fotoPerfilOriginal,
     update,
     refetch,
-    eliminarImagenAnterior,
   ])
 
   // Cancelar cambios
   const handleCancelar = useCallback(async () => {
-    if (imagenTemporal && fotoPerfil !== fotoPerfilOriginal) {
+    if (uploadedPath) {
       try {
-        await eliminarImagenAnterior(imagenTemporal)
+        if (uploadedHash && fotoPerfilOriginal) {
+          const origPath = getStoragePathFromUrl(fotoPerfilOriginal)
+          const origPublicUrl = origPath ? (supabase.storage.from('UserData').getPublicUrl(origPath).data?.publicUrl || null) : null
+          const origHash = await computeSha256FromUrl(origPublicUrl)
+          if (!origHash || origHash !== uploadedHash) {
+            console.log('[useEditarPerfil] cancelar: eliminación deshabilitada (no-op) para', uploadedPath)
+          }
+        } else {
+          const currentPath = getStoragePathFromUrl(fotoPerfil)
+          const originalPath = getStoragePathFromUrl(fotoPerfilOriginal)
+          if (currentPath !== originalPath) {
+            console.log('[useEditarPerfil] cancelar: eliminación deshabilitada (no-op) para', uploadedPath)
+          }
+        }
       } catch (error) {
         console.warn("Error eliminando imagen temporal al cancelar:", error)
       }
     }
     setFotoPerfilLocal(null)
     router.back()
-  }, [imagenTemporal, fotoPerfil, fotoPerfilOriginal, eliminarImagenAnterior])
+  }, [uploadedPath, fotoPerfil, fotoPerfilOriginal, getStoragePathFromUrl])
 
   // Obtener iniciales del nombre
   const getIniciales = useCallback((nombreCompleto: string) => {

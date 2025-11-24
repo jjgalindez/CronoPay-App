@@ -16,11 +16,12 @@ import { getCategoryIcon, CATEGORY_COLORS } from "../../utils/categoryHelpers"
 import { getStatusColor, getStatusBackground } from "../../utils/statusHelpers"
 import { getMonthName } from "../../utils/dateHelpers"
 import { useColorScheme } from "nativewind"
+import { useTranslation } from "react-i18next"
 
 export default function EstadisticasScreen() {
   const { colorScheme } = useColorScheme()
   const isDark = colorScheme === 'dark'
-
+  const { t } = useTranslation()
   const { session } = useAuth()
   const userId = session?.user?.id
   const { data: pagos, isLoading: pagosLoading } = usePagos(userId)
@@ -57,7 +58,7 @@ export default function EstadisticasScreen() {
     const categoriaMap = new Map<string, { nombre: string; total: number }>()
 
     pagos.forEach((pago) => {
-      const categoriaNombre = pago.categoria?.nombre || "Sin categoría"
+      const categoriaNombre = pago.categoria?.nombre || t("Uncategoryed")
       const existing = categoriaMap.get(categoriaNombre)
       if (existing) {
         existing.total += Number(pago.monto)
@@ -119,10 +120,10 @@ export default function EstadisticasScreen() {
         title: pago.titulo,
         date: pago.fecha_vencimiento,
         amount: Number(pago.monto),
-        status: pago.estado || "Pendiente",
+        status: pago.estado || t("Pending"),
         iconName: pago.categoria?.nombre ? getCategoryIcon(pago.categoria.nombre) : "wallet-outline",
-        iconColor: getStatusColor((pago.estado || "Pendiente") as any),
-        iconBackgroundColor: getStatusBackground((pago.estado || "Pendiente") as any),
+        iconColor: getStatusColor((pago.estado || t("Pending")) as any),
+        iconBackgroundColor: getStatusBackground((pago.estado || t("Pending")) as any),
       }))
   }, [pagos])
 
@@ -130,57 +131,57 @@ export default function EstadisticasScreen() {
   const CARD_DATA = useMemo(() => [
     {
       id: "pagos",
-      title: "Pagos del mes",
+      title: t("MonthPayment"),
       value: estadisticasMes.totalPagos.toString(),
       iconName: "card-outline" as const,
-      iconBackgroundColor: "#E8F1FF",
-      iconColor: "#1B3D48",
+      iconBackgroundColor: isDark ? '#082027' : '#E8F1FF',
+      iconColor: isDark ? '#E5E7EB' : '#1B3D48',
       backgroundColor: isDark ? "#171717" : "#F4F8FF",
     },
     {
       id: "pendientes",
-      title: "Pendientes",
+      title: t("Pendings"),
       value: estadisticasMes.pendientes.toString(),
-      valueColor: "#FF6B00",
+      valueColor: isDark ? '#FFD59A' : '#FF6B00',
       iconName: "time-outline" as const,
-      iconBackgroundColor: "#FFF1E3",
-      iconColor: "#FF6B00",
+      iconBackgroundColor: isDark ? '#3A2A18' : '#FFF1E3',
+      iconColor: isDark ? '#FFD59A' : '#FF6B00',
       backgroundColor: isDark ? "#171717" : "#FFF7EE",
     },
     {
       id: "completados",
-      title: "Completados",
+      title: t("Completed"),
       value: estadisticasMes.pagados.toString(),
-      valueColor: "#1AAE6F",
+      valueColor: isDark ? '#9EE6C6' : '#1AAE6F',
       iconName: "checkmark-circle-outline" as const,
-      iconBackgroundColor: "#E8F9F1",
-      iconColor: "#1AAE6F",
+      iconBackgroundColor: isDark ? '#073024' : '#E8F9F1',
+      iconColor: isDark ? '#9EE6C6' : '#1AAE6F',
       backgroundColor: isDark ? "#171717" : "#F5FCF8",
     },
     {
       id: "total",
-      title: "Total mensual",
+      title: t("TotalMonth"),
       value: `$${formatCurrency(estadisticasMes.totalMonto)}`,
       iconName: "wallet-outline" as const,
-      iconBackgroundColor: "#EEE8FF",
-      iconColor: "#6C3CF0",
+      iconBackgroundColor: isDark ? '#1C1333' : '#EEE8FF',
+      iconColor: isDark ? '#CDBAFF' : '#6C3CF0',
       backgroundColor: isDark ? "#171717" : "#F6F2FF",
     },
   ], [estadisticasMes, isDark])
 
   if (pagosLoading || categoriasLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-black">
+        <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-slate-900">
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#1B3D48" />
-          <Text className="mt-4 text-neutral-600 dark:text-neutral-400">Cargando estadísticas...</Text>
+            <ActivityIndicator size="large" color={isDark ? '#E5E7EB' : '#1B3D48'} />
+          <Text className="mt-4 text-neutral-600 dark:text-neutral-400">{t("LoadingStats")}</Text>
         </View>
       </SafeAreaView>
     )
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-black">
+      <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-slate-900">
       <ScrollView
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
@@ -207,15 +208,15 @@ export default function EstadisticasScreen() {
 
         {lineGraphData.length > 0 && (
           <LineStatsGraph
-            title="Evolución de pagos"
+            title={t("PaymentsEvolution")}
             data={lineGraphData}
           />
         )}
 
         {donutData.length > 0 && (
           <View style={styles.graphWrapper}>
-            <View className="bg-white dark:bg-neutral-900 rounded-xl p-4 mb-4 shadow-sm items-center">
-              <Text className="text-base font-semibold text-[#12343A] dark:text-gray-100 self-start mb-3">Distribución por Categoría</Text>
+            <View style={[styles.donutCard, { backgroundColor: isDark ? '#0B1220' : '#FFFFFF' }]}>
+              <Text style={[styles.donutTitle, { color: isDark ? '#E5E7EB' : '#12343A' }]}>{t("DistributionByCategory")}</Text>
               <View style={styles.donutInner}>
                 <DonutChart
                   data={donutData}
@@ -234,7 +235,7 @@ export default function EstadisticasScreen() {
 
         {pagos.length === 0 && (
           <View className="items-center justify-center py-12">
-            <Text className="text-neutral-500 dark:text-neutral-400">No hay datos de pagos disponibles</Text>
+            <Text className="text-neutral-500 dark:text-neutral-400">{t("NoPaymentsData")}</Text>
           </View>
         )}
       </ScrollView>

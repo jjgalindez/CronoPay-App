@@ -28,9 +28,9 @@ export const ProfileHeader = React.memo(
     }
 
     return (
-      <View className="flex-1 bg-white dark:bg-black">
+      <View className="flex-1 bg-white dark:bg-slate-900">
         <View
-          className="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-black"
+          className="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-slate-900"
           style={{
             paddingHorizontal: Math.max(16, width * 0.05),
             paddingVertical: isSmallScreen ? 16 : 24,

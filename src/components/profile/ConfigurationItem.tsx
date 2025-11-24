@@ -42,7 +42,7 @@ export const ConfigurationItem = React.memo(
 
     const content = (
       <View
-        className="flex-1 flex-row items-center bg-white dark:bg-black"
+        className="flex-1 flex-row items-center bg-white dark:bg-slate-900"
         style={{ columnGap: 12 }}
       >
         <View className="items-center justify-center">
