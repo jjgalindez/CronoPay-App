@@ -1,7 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons"
 import { Tabs, useRouter } from "expo-router"
 import { useEffect, type ComponentProps } from "react"
-import { Text, useColorScheme } from "react-native"
+import { Text } from "react-native"
+import { useColorScheme } from 'nativewind'
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useAuth } from "../../../providers/AuthProvider"
 import AppHeader from "../../components/AppHeader"
@@ -28,7 +29,7 @@ function TabLabel({ focused, label, isDark }: { focused: boolean; label: string;
 }
 
 export default function TabsLayout() {
-  const colorScheme = useColorScheme()
+  const { colorScheme } = useColorScheme()
   const isDark = colorScheme === 'dark'
   const { t } = useTranslation()
   const { loading, session } = useAuth()
