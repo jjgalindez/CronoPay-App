@@ -10,7 +10,7 @@ import FooterLinks from "@/components/home/FooterLinks"
 
 export default function LoginPage() {
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-black">
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
       <View className="flex-1 justify-between px-4 py-6">
         <View
           className="flex-1 justify-center"

@@ -8,6 +8,7 @@
     "local": "expo start --tunnel",
     "start:login": "expo login && expo start --go",
     "android": "expo run:android",
+    "build:native": "react-native run-android",
     "ios": "expo run:ios"
   },
   "dependencies": {
@@ -15,7 +16,9 @@
     "@expo/vector-icons": "^15.0.3",
     "@expo/webpack-config": "19.0.1",
     "@hookform/resolvers": "3.3.4",
+    "@notifee/react-native": "9.1.8",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/datetimepicker": "8.5.0",
     "@react-native-google-signin/google-signin": "16.0.0",
     "@react-navigation/bottom-tabs": "7.8.4",
     "@react-navigation/native": "7.1.19",
@@ -62,7 +65,8 @@
     "eslint-config-universe": "12.0.0",
     "prettier": "3.1.1",
     "prettier-plugin-tailwindcss": "0.5.11",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "@react-native-community/cli": "latest"
   },
   "eslintConfig": {
     "extends": "universe/native"

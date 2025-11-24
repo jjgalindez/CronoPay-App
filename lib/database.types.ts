@@ -134,21 +134,27 @@ export interface Database {
         Row: {
           id_recordatorio: number
           fecha_aviso: string
+          hora: string
           mensaje: string | null
+          notification_id: string | null
           id_pago: number
           created_at: string | null
         }
         Insert: {
           id_recordatorio?: number
           fecha_aviso: string
+          hora: string
           mensaje?: string | null
+          notification_id?: string | null
           id_pago: number
           created_at?: string | null
         }
         Update: {
           id_recordatorio?: number
           fecha_aviso?: string
+          hora?: string
           mensaje?: string | null
+          notification_id?: string | null
           id_pago?: number
           created_at?: string | null
         }

@@ -21,7 +21,9 @@
           "cameraPermission": "La app necesita acceso a tu cámara para tomar fotos de perfil."
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "./plugins/notifee.plugin.js",
+      "./plugins/notifee-noop.plugin.js"
     ],
     "extra": {
       "router": {},

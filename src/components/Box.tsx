@@ -5,6 +5,7 @@ import {
     StyleSheet,
     Text,
     View,
+    useColorScheme,
     type StyleProp,
     type ViewStyle,
 } from "react-native"
@@ -39,6 +40,13 @@ const DEFAULT_ICON_COLOR = "#1B3D48"
 const DEFAULT_ICON_BG = "#E5F1F5"
 const DEFAULT_CARD_BG = "#FFFFFF"
 
+// dark-mode fallback colors (used only when caller didn't override)
+const DARK_VALUE_COLOR = "#FFFFFF"
+const DARK_ICON_COLOR = "#FFFFFF"
+const DARK_ICON_BG = "#1F2933"
+const DARK_CARD_BG = "#171717"
+const DARK_TITLE_MUTED = "#D1D5DB"
+
 export default function Box({
     icon,
     iconName,
@@ -61,16 +69,25 @@ export default function Box({
     comparisonPercentage,
     comparisonColor = "#12C48B",
 }: BoxProps) {
+    const colorScheme = useColorScheme()
+    const isDark = colorScheme === "dark"
+
+    // resolve colors but preserve any explicit prop provided by caller
+    const effectiveBackground = backgroundColor === DEFAULT_CARD_BG && isDark ? DARK_CARD_BG : backgroundColor
+    const effectiveIconBg = iconBackgroundColor === DEFAULT_ICON_BG && isDark ? DARK_ICON_BG : iconBackgroundColor
+    const effectiveIconColor = iconColor === DEFAULT_ICON_COLOR && isDark ? DARK_ICON_COLOR : iconColor
+    const effectiveValueColor = valueColor === DEFAULT_VALUE_COLOR && isDark ? DARK_VALUE_COLOR : valueColor
+    const effectiveTitleColor = isDark ? DARK_TITLE_MUTED : undefined
     const containerStyles = [
         styles.container,
         compact ? styles.containerCompact : styles.containerRegular,
-        { backgroundColor },
+        { backgroundColor: effectiveBackground },
         style,
     ]
 
     const iconWrapperStyles = [
         compact ? styles.iconCompact : styles.iconRegular,
-        { backgroundColor: iconBackgroundColor },
+        { backgroundColor: effectiveIconBg },
     ]
 
     const resolvedIcon =
@@ -78,7 +95,7 @@ export default function Box({
             <Ionicons
                 name={iconName ?? "stats-chart-outline"}
                 size={compact ? 22 : 26}
-                color={iconColor}
+                color={effectiveIconColor}
             />
         )
 
@@ -91,13 +108,13 @@ export default function Box({
                 {resolvedIcon}
             </View>
             <View style={styles.textWrapper}>
-                <Text style={compact ? styles.titleCompact : styles.titleRegular}>
+                <Text style={[compact ? styles.titleCompact : styles.titleRegular, effectiveTitleColor ? { color: effectiveTitleColor } : {}]}>
                     {title}
                 </Text>
                 <Text
                     style={[
                         compact ? styles.valueCompact : styles.valueRegular,
-                        { color: valueColor },
+                        { color: effectiveValueColor },
                     ]}
                 >
                     {value}
