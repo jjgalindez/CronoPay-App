@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/edrickleong/smartbank">
+  <a href="https://github.com/jjgalindez/CronoPay-App">
     <img src="src/assets/CronoPayLogo.svg" alt="Logo" width="120" height="120">
   </a>
 
