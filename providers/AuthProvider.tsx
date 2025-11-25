@@ -5,6 +5,7 @@ import React, { createContext, useState, useEffect, useContext } from "react"
 
 import { supabase } from "../lib/supabase"
 
+
 type AuthData = {
   loading: boolean
   session: Session | null
@@ -14,7 +15,7 @@ type AuthData = {
 const AuthContext = createContext<AuthData>({
   loading: true,
   session: null,
-  signOut: async () => {},
+  signOut: async () => { },
 })
 
 interface Props {
@@ -50,6 +51,7 @@ export default function AuthProvider({ children }: Props) {
         //  Redirección automática según estado
         if (event === "SIGNED_IN" && authSession) {
           router.replace("/(tabs)/inicio")
+
         }
         if (event === "SIGNED_OUT") {
           router.replace("/(unauthenticated)/login")

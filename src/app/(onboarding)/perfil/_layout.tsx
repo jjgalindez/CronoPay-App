@@ -1,23 +1,34 @@
 // app/(onboarding)/perfil/_layout.tsx
-import { Stack } from "expo-router"
-import { TouchableOpacity } from "react-native"
 import Ionicons from "@expo/vector-icons/Ionicons"
-import { router } from "expo-router"
+import { Stack, router } from "expo-router"
+import { use } from "react"
+import { useTranslation } from "react-i18next"
+import { TouchableOpacity, View } from "react-native"
+
+import { useTema } from "@/hooks/useTema"
 
 export default function PerfilLayout() {
+  const { t } = useTranslation()
+  const { tema } = useTema()
+  const headerStyle = {
+    backgroundColor: tema === "dark" ? "#0F172A" : "#FFFFFF",
+  }
+  const headerTintColor = tema === "dark" ? "#FFFFFF" : "#1B3D48"
   return (
     <Stack>
       <Stack.Screen
         name="index"
         options={{
-          title: "Perfil y Configuración",
+          title: t("profilAndSettings"),
           headerShadowVisible: false,
+          headerStyle,
+          headerTintColor,
           headerLeft: () => (
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => router.back()}
               style={{ marginLeft: 10 }}
             >
-              <Ionicons name="arrow-back" size={24} color="#1B3D48" />
+              <Ionicons name="arrow-back" size={24} color={headerTintColor} />
             </TouchableOpacity>
           ),
         }}
@@ -27,12 +38,14 @@ export default function PerfilLayout() {
         options={{
           title: "Editar Perfil",
           headerShadowVisible: false,
+          headerStyle,
+          headerTintColor,
           headerLeft: () => (
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => router.back()}
               style={{ marginLeft: 10 }}
             >
-              <Ionicons name="arrow-back" size={24} color="#1B3D48" />
+              <Ionicons name="arrow-back" size={24} color={headerTintColor} />
             </TouchableOpacity>
           ),
         }}

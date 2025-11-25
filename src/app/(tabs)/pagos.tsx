@@ -27,18 +27,18 @@ function PagoCard({
   const statusColor = estado === "Pagado" ? "#1B3D48" : "#B08A00"
 
   return (
-    <View style={cardStyles.container}>
-      <Text style={cardStyles.amount}>
+    <View className="mb-4 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-4 shadow-sm">
+      <Text className="text-lg font-semibold text-primary-800 dark:text-primary-400">
         ${parseFloat(monto).toFixed(2)}
       </Text>
-      <Text style={cardStyles.category}>
+      <Text className="mt-1 text-sm text-neutral-700 dark:text-neutral-300">
         {categoria ?? "Sin categoría"}
       </Text>
-      <View style={cardStyles.footer}>
-        <Text style={cardStyles.date}>
+      <View className="mt-3 flex-row items-center justify-between">
+        <Text className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
           Vence: {formattedDate}
         </Text>
-        <Text style={[cardStyles.status, { color: statusColor }]}>
+        <Text style={{ color: statusColor, fontSize: 12, fontWeight: '600' }}>
           {estado ?? "Pendiente"}
         </Text>
       </View>
@@ -52,10 +52,10 @@ export default function PagosScreen() {
   const { data, isLoading, error, refetch } = usePagos(userId)
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Pagos</Text>
-        <Text style={styles.subtitle}>
+    <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-slate-900">
+      <View className="flex-1 px-6 py-6">
+        <Text className="text-2xl font-bold text-primary-900 dark:text-primary-300">Pagos</Text>
+        <Text className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
           Revisa tus obligaciones próximas y mantente al día.
         </Text>
 
@@ -87,12 +87,13 @@ export default function PagosScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContent}
             ListEmptyComponent={() => (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>
+              <View className="mt-16 items-center">
+                <Text className="text-base font-medium text-neutral-700 dark:text-neutral-300">
                   No hay pagos registrados aún.
                 </Text>
-                <Text style={styles.emptySubtext}>
-                  Usa el botón de abajo para agregar tu primer pago.
+                <Text className="mt-2 text-center text-sm text-neutral-500 dark:text-neutral-400">
+                  Puedes comenzar añadiendo uno desde la versión web o
+                  implementando el flujo de creación en esta pantalla.
                 </Text>
               </View>
             )}
@@ -111,25 +112,6 @@ export default function PagosScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fafaf9',
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 24,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1B3D48',
-  },
-  subtitle: {
-    marginTop: 4,
-    fontSize: 14,
-    color: '#737373',
-  },
   errorContainer: {
     marginTop: 40,
     alignItems: 'center',
@@ -150,66 +132,10 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 100,
   },
-  emptyContainer: {
-    marginTop: 64,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#404040',
-  },
-  emptySubtext: {
-    marginTop: 8,
-    textAlign: 'center',
-    fontSize: 14,
-    color: '#737373',
-  },
   buttonContainer: {
     position: 'absolute',
     bottom: 20,
     left: 24,
     right: 24,
-  },
-})
-
-const cardStyles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#e5e5e5',
-    backgroundColor: '#ffffff',
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  amount: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1B3D48',
-  },
-  category: {
-    marginTop: 4,
-    fontSize: 14,
-    color: '#404040',
-  },
-  footer: {
-    marginTop: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  date: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#737373',
-  },
-  status: {
-    fontSize: 12,
-    fontWeight: '600',
   },
 })

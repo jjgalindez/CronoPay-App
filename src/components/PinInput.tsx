@@ -58,12 +58,12 @@ const PinInput = ({ code, setCode }: PinInputProps) => {
         style={{ columnGap: 24 }}
         onPress={handleOnPress}
       >
-        <View className="flex-row justify-between" style={{ columnGap: 8 }}>
+        <View className="flex-row justify-between gap-2">
           {renderBoxDigit(0)}
           {renderBoxDigit(1)}
           {renderBoxDigit(2)}
         </View>
-        <View className="flex-row justify-between" style={{ columnGap: 8 }}>
+        <View className="flex-row justify-between gap-2">
           {renderBoxDigit(3)}
           {renderBoxDigit(4)}
           {renderBoxDigit(5)}

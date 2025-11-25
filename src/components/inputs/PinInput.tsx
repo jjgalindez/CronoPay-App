@@ -42,12 +42,12 @@ export default function PinInput({ maxLength = 6, onComplete }: Props) {
         style={{ columnGap: 24 }}
         onPress={onPress}
       >
-        <View className="flex-row justify-between" style={{ columnGap: 8 }}>
+        <View className="flex-row justify-between gap-2">
           {Array.from({ length: Math.ceil(maxLength / 2) }, (_, i) =>
             renderBoxDigit(i),
           )}
         </View>
-        <View className="flex-row justify-between" style={{ columnGap: 8 }}>
+        <View className="flex-row justify-between gap-2">
           {Array.from({ length: Math.floor(maxLength / 2) }, (_, i) =>
             renderBoxDigit(i + Math.ceil(maxLength / 2)),
           )}

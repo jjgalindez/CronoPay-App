@@ -1,5 +1,6 @@
 import React, { useMemo } from "react"
 import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native"
+import { useColorScheme } from "nativewind"
 import Svg, { G, Circle, Text as SvgText } from "react-native-svg"
 import Ionicons from "@expo/vector-icons/Ionicons"
 
@@ -48,6 +49,8 @@ export default function DonutChart({
   showPercent = true,
   filterMonth,
 }: DonutChartProps) {
+  const { colorScheme } = useColorScheme()
+  const isDark = colorScheme === 'dark'
   // filter data by month if specified
   const filteredData = useMemo(() => {
     if (filterMonth === undefined) {
@@ -94,10 +97,10 @@ export default function DonutChart({
   }, [filteredData, total, circumference])
 
   // legend width reserved to the right
-  
+
 
   return (
-    <View style={[styles.wrapper, { height: finalSize }]}>
+    <View style={[styles.wrapper, { height: finalSize, backgroundColor: isDark ? '#171717' : undefined }]}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -105,11 +108,11 @@ export default function DonutChart({
         contentContainerStyle={{ alignItems: 'center', minWidth: contentWidth }}
         style={{ height: finalSize }}
       >
-        <View style={[styles.container, { height: finalSize, width: contentWidth }]}> 
+        <View style={[styles.container, { height: finalSize, width: contentWidth }]}>
           <Svg width={finalSize} height={finalSize}>
             <G rotation={0} originX={cx} originY={cy}>
               {/* background ring */}
-              <Circle cx={cx} cy={cy} r={radius} stroke="#F3F6F7" strokeWidth={thickness} fill="none" />
+              <Circle cx={cx} cy={cy} r={radius} stroke={isDark ? '#111827' : '#E5E7EB'} strokeWidth={thickness} fill="none" />
 
               {/* slices drawn as stroked circles using strokeDasharray */}
               {slices.map((s, i) => {
@@ -148,7 +151,7 @@ export default function DonutChart({
                     x={innerLabelPos.x}
                     y={innerLabelPos.y + 4}
                     fontSize={12}
-                    fill={percentFill}
+                      fill={percentFill}
                     fontWeight="700"
                     textAnchor="middle"
                   >
@@ -160,23 +163,23 @@ export default function DonutChart({
           </Svg>
 
           {/* legend to the right for better readability */}
-          <View style={styles.legend}>
-            {slices.map((s, i) => (
-              <View key={`legend-${i}`} style={styles.legendRow}>
-                <View style={[styles.swatch, { backgroundColor: s.color }]} />
-                <View style={styles.legendTextWrap}>
-                  <Text style={styles.legendLabel}>{s.label}</Text>
-                  <Text style={styles.legendPercent}>{s.percent.toFixed(1)}%</Text>
+            <View style={styles.legend}>
+              {slices.map((s, i) => (
+                <View key={`legend-${i}`} style={styles.legendRow}>
+                  <View style={[styles.swatch, { backgroundColor: s.color }]} />
+                  <View style={styles.legendTextWrap}>
+                    <Text style={[styles.legendLabel, isDark ? { color: '#E5E7EB' } : undefined]}>{s.label}</Text>
+                    <Text style={[styles.legendPercent, isDark ? { color: '#E5E7EB' } : undefined]}>{s.percent.toFixed(1)}%</Text>
+                  </View>
                 </View>
-              </View>
-            ))}
-          </View>
+              ))}
+            </View>
         </View>
       </ScrollView>
-      
+
       {needsScroll && (
         <View pointerEvents="none" style={styles.scrollIndicator}>
-          <Ionicons name="chevron-forward" size={20} color="rgba(27,61,72,0.6)" />
+          <Ionicons name="chevron-forward" size={20} color="rgba(107,114,128,0.6)" />
         </View>
       )}
     </View>

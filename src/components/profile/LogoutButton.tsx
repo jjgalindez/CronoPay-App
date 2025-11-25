@@ -1,31 +1,34 @@
 // src/components/profile/LogoutButton.tsx
-import React from "react"
-import { View, Pressable, Text, Platform } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
+import React from "react"
+import { useTranslation } from "react-i18next"
+import { View, Pressable, Text, Platform } from "react-native"
 
 interface LogoutButtonProps {
   onPress: () => void
 }
 
 export const LogoutButton = React.memo(({ onPress }: LogoutButtonProps) => {
+  const { t } = useTranslation()
+
   return (
     <View className="mt-8 px-6">
-      <View className="border-t border-gray-300 mb-6" />
-      <Pressable 
-        className="py-4 items-center flex-row justify-center"
+      <View className="mb-6 border-t border-gray-300 dark:border-gray-700" />
+      <Pressable
+        className="flex-row items-center justify-center py-4"
         onPress={onPress}
         style={({ pressed }) => [
           {
             opacity: pressed ? 0.6 : 1,
-          }
+          },
         ]}
       >
         <Ionicons name="log-out-outline" size={20} color="#DC2626" />
-        <Text 
-          className="text-red-600 font-semibold text-base"
+        <Text
+          className="text-base font-semibold text-red-600"
           style={{ marginLeft: 8 }}
         >
-          Cerrar sesión
+          {t("signOut")}
         </Text>
       </Pressable>
     </View>
