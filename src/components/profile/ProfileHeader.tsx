@@ -1,6 +1,7 @@
 // src/components/profile/ProfileHeader.tsx
 import { Ionicons } from "@expo/vector-icons"
 import React from "react"
+import { useTranslation } from "react-i18next"
 import { View, Text, Pressable, Image, useWindowDimensions } from "react-native"
 
 interface ProfileHeaderProps {
@@ -12,6 +13,7 @@ interface ProfileHeaderProps {
 
 export const ProfileHeader = React.memo(
   ({ name, email, avatarUrl, onEditProfile }: ProfileHeaderProps) => {
+    const { t } = useTranslation()
     const { width } = useWindowDimensions()
     const isSmallScreen = width < 375
 
@@ -28,9 +30,9 @@ export const ProfileHeader = React.memo(
     }
 
     return (
-      <View className="flex-1 bg-white dark:bg-black">
+      <View className="flex-1 bg-white dark:bg-slate-900">
         <View
-          className="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-black"
+          className="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-slate-900"
           style={{
             paddingHorizontal: Math.max(16, width * 0.05),
             paddingVertical: isSmallScreen ? 16 : 24,
@@ -54,7 +56,7 @@ export const ProfileHeader = React.memo(
                 </View>
               ) : (
                 <View
-                  className="items-center justify-center rounded-full border-2 border-gray-200 dark:border-gray-700 bg-green-500"
+                  className="items-center justify-center rounded-full border-2 border-gray-200 bg-green-500 dark:border-gray-700"
                   style={{ height: avatarSize, width: avatarSize }}
                 >
                   <Text
@@ -65,7 +67,7 @@ export const ProfileHeader = React.memo(
                   </Text>
                 </View>
               )}
-              <View className="absolute -bottom-1 -right-1 h-5 w-5 items-center justify-center rounded-full border border-white dark:border-gray-800 bg-gray-100 dark:bg-gray-700">
+              <View className="absolute -bottom-1 -right-1 h-5 w-5 items-center justify-center rounded-full border border-white bg-gray-100 dark:border-gray-800 dark:bg-gray-700">
                 <Ionicons name="person" size={12} color="#6B7280" />
               </View>
             </View>
@@ -78,7 +80,7 @@ export const ProfileHeader = React.memo(
               >
                 {name}
               </Text>
-              <View className="flex-row items-center gap-1">
+              <View className="gap-1 flex-row items-center">
                 <Ionicons name="mail-outline" size={14} color="#6B7280" />
                 <Text
                   className="flex-1 text-sm text-gray-600 dark:text-gray-400"
@@ -92,14 +94,14 @@ export const ProfileHeader = React.memo(
 
           <Pressable
             onPress={onEditProfile}
-            className="self-start rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 px-4 py-3"
+            className="self-start rounded-lg border border-gray-300 bg-gray-100 px-4 py-3 dark:border-gray-600 dark:bg-gray-800"
             style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
           >
             {({ pressed }) => (
-              <View className="flex-row items-center gap-1.5">
+              <View className="gap-1.5 flex-row items-center">
                 <Ionicons name="pencil-outline" size={16} color="#374151" />
                 <Text className="text-base font-medium text-gray-800 dark:text-gray-200">
-                  Editar perfil
+                  {t("editProfile")}
                 </Text>
               </View>
             )}

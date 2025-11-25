@@ -36,7 +36,7 @@ export default function EditarPerfilScreen() {
   const horizontalPadding = Math.max(16, width * 0.05)
 
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-black">
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -76,7 +76,7 @@ export default function EditarPerfilScreen() {
                       resizeMode="cover"
                     />
                     {subiendoImagen && (
-                      <View className="absolute inset-0 flex items-center justify-center bg-black/50">
+                      <View className="absolute inset-0 flex items-center justify-center bg-slate-900/50">
                         <Ionicons
                           name="cloud-upload"
                           size={avatarSize * 0.2}

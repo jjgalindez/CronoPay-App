@@ -1,5 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons"
 import type { ComponentProps } from "react"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 import {
   Pressable,
   StyleSheet,
@@ -18,6 +19,7 @@ type ButtonProps = {
   size?: "small" | "medium" | "large"
   disabled?: boolean
   style?: StyleProp<ViewStyle>
+  safeArea?: boolean // añade marginBottom igual al inset inferior
 }
 
 const DEFAULT_BG_COLOR = "#1B3D48"
@@ -54,7 +56,9 @@ export default function Button({
   size = "medium",
   disabled = false,
   style,
+  safeArea = false,
 }: ButtonProps) {
+  const insets = useSafeAreaInsets()
   const sizeConfig = SIZE_STYLES[size]
   
   const containerStyles = [
@@ -65,6 +69,7 @@ export default function Button({
       paddingHorizontal: sizeConfig.paddingHorizontal,
     },
     style,
+    safeArea ? { marginBottom: insets.bottom ?? 0 } : undefined,
   ]
 
   const textStyles = [

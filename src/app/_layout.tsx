@@ -12,6 +12,7 @@ import { ThemeProvider } from "@/hooks/useTema"
 import { initI18n } from "@/i18n"
 
 export default function Layout() {
+
   const [ready, setReady] = useState(false)
   useEffect(() => {
     GoogleSignin.configure({
@@ -24,7 +25,7 @@ export default function Layout() {
 
   if (!ready) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" color="#0C212C" />
       </View>
     )

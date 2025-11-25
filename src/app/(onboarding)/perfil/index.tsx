@@ -1,5 +1,6 @@
 // app/(onboarding)/perfil/index.tsx
 import { router } from "expo-router"
+import { useTranslation } from "react-i18next"
 import {
   View,
   ScrollView,
@@ -26,15 +27,13 @@ export default function PerfilScreen() {
   const { width } = useWindowDimensions()
   const isSmallScreen = width < 375
 
+  const { t } = useTranslation()
+
   const handleLogout = () => {
-    Alert.alert(
-      "Cerrar sesión",
-      "¿Estás seguro de que quieres cerrar sesión?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Cerrar sesión", style: "destructive", onPress: signOut },
-      ],
-    )
+    Alert.alert(t("signOut"), t("AreYouSureYouWantToLogOut"), [
+      { text: t("Cancel"), style: "cancel" },
+      { text: t("signOut"), style: "destructive", onPress: signOut },
+    ])
   }
 
   const handleEditProfile = () => {

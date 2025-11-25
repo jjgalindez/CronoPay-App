@@ -18,6 +18,7 @@ export async function fetchRecordatoriosByPago(
     .select("*")
     .eq("id_pago", pagoId)
     .order("fecha_aviso", { ascending: true })
+    .order("hora", { ascending: true })
 
   if (error) throw error
   return data ?? []
@@ -57,6 +58,7 @@ export async function fetchRecordatoriosProximos(
     .gte("fecha_aviso", hoy.toISOString().split("T")[0])
     .lte("fecha_aviso", fechaLimite.toISOString().split("T")[0])
     .order("fecha_aviso", { ascending: true })
+    .order("hora", { ascending: true })
 
   if (error) throw error
   return data ?? []

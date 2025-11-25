@@ -2,11 +2,13 @@
 import Ionicons from "@expo/vector-icons/Ionicons"
 import { Stack, router } from "expo-router"
 import { use } from "react"
+import { useTranslation } from "react-i18next"
 import { TouchableOpacity, View } from "react-native"
 
 import { useTema } from "@/hooks/useTema"
 
 export default function PerfilLayout() {
+  const { t } = useTranslation()
   const { tema } = useTema()
   const headerStyle = {
     backgroundColor: tema === "dark" ? "#0F172A" : "#FFFFFF",
@@ -17,7 +19,7 @@ export default function PerfilLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: "Perfil y Configuración",
+          title: t("profilAndSettings"),
           headerShadowVisible: false,
           headerStyle,
           headerTintColor,

@@ -1,5 +1,5 @@
 // src/app/index.tsx
-import { ScrollView, View } from "react-native"
+import { Pressable, ScrollView, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import AppPreview from "@/components/home/AppPreview"
@@ -10,13 +10,13 @@ import HeroSection from "@/components/home/HeroSection"
 
 export default function Page() {
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-black">
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
       <ScrollView
-        className="flex-1 bg-white dark:bg-black"
+        className="flex-1 bg-white dark:bg-slate-900"
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
       >
-        <View className="flex-1 justify-between bg-white px-4 py-6 dark:bg-black">
+        <View className="flex-1 justify-between bg-white px-4 py-6 dark:bg-slate-900">
           <HeroSection />
           <AppPreview />
           <AuthActions />
