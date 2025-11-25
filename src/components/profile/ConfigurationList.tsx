@@ -24,32 +24,32 @@ export function ConfigurationList() {
 
   const handleIdiomaPress = () => {
     Alert.alert(t("language"), t("chooseYourPreferredLanguage"), [
-      { text: "Español", onPress: () => changeLanguage("es") },
+      { text: t("Spanish"), onPress: () => changeLanguage("es") },
       { text: "English", onPress: () => changeLanguage("en") },
       { text: "Português", onPress: () => changeLanguage("pt") },
-      { text: "Cancelar", style: "cancel" },
+      { text: t("Cancel"), style: "cancel" },
     ])
   }
 
   const handleTemaPress = () => {
-    Alert.alert(t("theme"), t("Elige tu tema preferido"), [
-      { text: "Modo claro", onPress: () => setTema("light") },
-      { text: "Modo oscuro", onPress: () => setTema("dark") },
-      { text: "Automático", onPress: () => toggleTema() },
-      { text: "Cancelar", style: "cancel" },
+    Alert.alert(t("theme"), t("chooseYourFavoriteTheme"), [
+      { text: t("themeLight"), onPress: () => setTema("light") },
+      { text: t("themeDark"), onPress: () => setTema("dark") },
+      { text: t("Automatic"), onPress: () => toggleTema() },
+      { text: t("Cancel"), style: "cancel" },
     ])
   }
 
   const themeSubtitle = tema === "light" ? t("themeLight") : t("themeDark")
 
   const handleBackupPress = () => {
-    Alert.alert(t("backup"), t("Configurar respaldo automático"), [
+    Alert.alert(t("backup"), t("setUpAutomaticBackup"), [
       {
         text: t("backupAuto"),
         onPress: () => setBackup("backupAuto"),
       },
       { text: t("backupManual"), onPress: () => setBackup("backupManual") },
-      { text: "Cancelar", style: "cancel" },
+      { text: t("Cancel"), style: "cancel" },
     ])
   }
 
@@ -71,7 +71,7 @@ export function ConfigurationList() {
     {
       itemKey: "notifications" as const,
       title: t("notifications"),
-      subtitle: t("Recordatorios de pagos"),
+      subtitle: t("PaymentReminders"),
       hasSwitch: true,
       switchValue: notificaciones,
       onSwitchChange: setNotificaciones,

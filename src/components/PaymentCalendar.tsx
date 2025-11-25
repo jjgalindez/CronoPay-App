@@ -8,15 +8,16 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  useColorScheme,
   Alert,
 } from "react-native"
 
 import { usePagos } from "../hooks/usePagos"
 
+import { useTema } from "@/hooks/useTema"
+
 export function PaymentCalendar() {
-  const colorScheme = useColorScheme()
-  const isDark = colorScheme === "dark"
+  const { tema } = useTema()
+  const isDark = tema === "dark"
 
   // Obtener usuario del contexto de autenticación
   const { session } = useAuth()
