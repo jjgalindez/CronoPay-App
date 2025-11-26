@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { View, Text, Pressable, StyleSheet, Modal, TextInput, Platform, Alert } from 'react-native'
+import showToast from '../utils/toast'
 import { useColorScheme } from 'nativewind'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { RecordatorioItem } from './RecordatoriosList'
@@ -52,7 +53,18 @@ export default function RecordatorioEditor({ visible, recordatorio, onClose, onU
   async function handleSave() {
     if (!recordatorio) return
     const v = validate()
-    if (v) return Alert.alert('Error', v)
+    if (v) return showToast(v)
+    // Validar que la fecha+hora sea futura antes de intentar guardar o programar
+    try {
+      const dateCheck = buildDateFromFechaHora(fecha, hora)
+      if (dateCheck.getTime() <= Date.now()) {
+        showToast('El recordatorio debe programarse en una fecha y hora futuras.')
+        return
+      }
+    } catch (e) {
+      showToast('El recordatorio debe programarse en una fecha y hora futuras.')
+      return
+    }
 
     setSubmitting(true)
     try {
@@ -89,7 +101,7 @@ export default function RecordatorioEditor({ visible, recordatorio, onClose, onU
       onClose()
     } catch (err: any) {
       console.error('Error updating reminder', err)
-      Alert.alert('Error', err?.message ?? 'Error actualizando recordatorio')
+      showToast(err?.message ?? 'Error actualizando recordatorio')
     } finally {
       setSubmitting(false)
     }
@@ -111,7 +123,7 @@ export default function RecordatorioEditor({ visible, recordatorio, onClose, onU
           onClose()
         } catch (e) {
           console.error('Error deleting', e)
-          Alert.alert('Error', 'No se pudo eliminar el recordatorio')
+          showToast('No se pudo eliminar el recordatorio')
         } finally { setSubmitting(false) }
       }}
     ])

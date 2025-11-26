@@ -1,7 +1,8 @@
 // src/hooks/useEditarPerfil.ts
 import { router } from "expo-router"
 import { useState, useEffect, useCallback, useRef } from "react"
-import { Alert, Platform } from "react-native"
+import { Platform } from "react-native"
+import showToast from '../utils/toast'
 import ImagePicker from "react-native-image-crop-picker"
 import * as Crypto from 'expo-crypto'
 
@@ -256,7 +257,7 @@ export function useEditarPerfil() {
       // Validar tamaño
       const maxSize = 5 * 1024 * 1024
       if (imagen.size && imagen.size > maxSize) {
-        Alert.alert("Error", "La imagen debe ser menor a 5MB")
+        showToast("La imagen debe ser menor a 5MB")
         return
       }
 
@@ -297,16 +298,16 @@ export function useEditarPerfil() {
         console.log('[useEditarPerfil] Uploaded path/hash set ->', storagePath, hash)
         setFotoPerfilLocal(null)
         console.log("✅ Estados actualizados correctamente")
-      } catch (error) {
+        } catch (error) {
         console.error("❌ Error en proceso de subida:", error)
-        Alert.alert("Error", "No se pudo subir la imagen")
+        showToast("No se pudo subir la imagen")
       } finally {
         console.log("🏁 Finalizando proceso de subida")
         setSubiendoImagen(false)
       }
     } catch (error) {
       console.error("❌ Error seleccionando imagen:", error)
-      Alert.alert("Error", "No se pudo seleccionar la imagen")
+      showToast("No se pudo seleccionar la imagen")
       setFotoPerfilLocal(null)
     }
   }, [
@@ -319,12 +320,12 @@ export function useEditarPerfil() {
   // Guardar cambios
   const handleGuardar = useCallback(async () => {
     if (!nombre.trim()) {
-      Alert.alert("Error", "El nombre no puede estar vacío")
+      showToast("El nombre no puede estar vacío")
       return
     }
 
     if (!session?.user?.id) {
-      Alert.alert("Error", "No hay sesión activa")
+      showToast("No hay sesión activa")
       return
     }
 
@@ -346,24 +347,16 @@ export function useEditarPerfil() {
       setUploadedPath(null)
       setFotoPerfilOriginal(fotoPerfil)
 
-      Alert.alert("Éxito", "Perfil actualizado correctamente", [
-        {
-          text: "OK",
-          onPress: () => {
-            // Marcamos que el archivo subido debe preservarse (no borrar)
-            keepUploadedOnSave.current = true
-            refetch()
-            router.back()
-          },
-        },
-      ])
+      // Mostrar toast informativo y proceder con acciones
+      showToast("Perfil actualizado correctamente")
+      // Marcamos que el archivo subido debe preservarse (no borrar)
+      keepUploadedOnSave.current = true
+      refetch()
+      router.back()
     } catch (error) {
       console.error("Error actualizando perfil:", error)
-      Alert.alert(
-        "Error",
-        error instanceof Error
-          ? error.message
-          : "No se pudo actualizar el perfil",
+      showToast(
+        error instanceof Error ? error.message : "No se pudo actualizar el perfil",
       )
     } finally {
       setCargando(false)

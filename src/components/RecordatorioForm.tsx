@@ -69,6 +69,18 @@ export default function RecordatorioForm({ onSaved }: Props) {
       setError(v)
       return
     }
+    // Validar que la fecha+hora sea futura antes de crear el recordatorio
+    function buildDateFromFechaHoraLocal(fechaStr: string, horaStr: string) {
+      const [y, m, d] = fechaStr.split("-").map(Number)
+      const [hh, mm] = horaStr.split(":").map((s) => Number(s))
+      return new Date(y, (m || 1) - 1, d || 1, hh || 0, mm || 0, 0)
+    }
+
+    const date = buildDateFromFechaHoraLocal(fecha, hora)
+    if (date.getTime() <= Date.now()) {
+      setError('La fecha del recordatorio debe ser futura')
+      return
+    }
 
     try {
       setSubmitting(true)
@@ -81,13 +93,7 @@ export default function RecordatorioForm({ onSaved }: Props) {
       // created may be the new record or nothing; try to extract id
       const recId =
         (created as any)?.id_recordatorio ?? (created as any)?.id ?? null
-      if (recId) {
-        function buildDateFromFechaHora(fechaStr: string, horaStr: string) {
-          const [y, m, d] = fechaStr.split("-").map(Number)
-          const [hh, mm] = horaStr.split(":").map((s) => Number(s))
-          return new Date(y, (m || 1) - 1, d || 1, hh || 0, mm || 0, 0)
-        }
-        const date = buildDateFromFechaHora(fecha, hora)
+        if (recId) {
         try {
           const nid = await nf.scheduleTrigger({
             title: selectedPagoTitle ?? "Recordatorio",

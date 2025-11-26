@@ -1,3 +1,5 @@
+import { Alert } from 'react-native'
+import showToast from '../utils/toast'
 import notifee, { AndroidImportance, TimestampTrigger, TriggerType } from '@notifee/react-native'
 
 const DEFAULT_CHANNEL_ID = 'default'
@@ -86,6 +88,86 @@ export default function useNotifee() {
   async function scheduleTrigger(opts: ScheduleOptions) {
     if (typeof notifee.createTriggerNotification !== 'function') {
       throw new Error('createTriggerNotification not available in this runtime')
+    }
+
+    // Validación: la fecha debe ser futura
+    try {
+      if (!opts?.date || !(opts.date instanceof Date) || opts.date.getTime() <= Date.now()) {
+        showToast('El recordatorio debe programarse en una fecha y hora futuras.')
+        console.log('useNotifee.scheduleTrigger -> fecha inválida, debe ser futura', opts?.date)
+        return null
+      }
+    } catch (e) {
+      // en caso de tipos inesperados, abortar con toast
+      showToast('El recordatorio debe programarse en una fecha y hora futuras.')
+      console.warn('useNotifee.scheduleTrigger -> error validando fecha', e)
+      return null
+    }
+
+    // Verificar ajustes/permisos antes de programar: si no están habilitados, pedir al usuario
+    try {
+      const settings = await getNotificationSettings()
+      const s: any = settings
+      // Interpretar distintos formatos: algunos campos vienen como enums/nums (0/1) y otros como strings
+      const authGranted = s
+        ? typeof s.authorizationStatus === 'number'
+          ? s.authorizationStatus === 1
+          : s.authorizationStatus === 'granted'
+        : false
+      const alarmFlag = s?.android?.alarm ?? s?.alarm
+      const alarmGranted = alarmFlag === true || alarmFlag === 1
+      const permissionDenied = !(authGranted && alarmGranted)
+      if (permissionDenied) {
+        // Mostrar Alert y esperar la respuesta del usuario (resuelve Promise)
+        const openSettings = await new Promise<boolean>((resolve) => {
+          Alert.alert(
+            'Permitir alarmas y recordatorios',
+            'La app necesita permiso para programar alarmas y recordatorios. ¿Abrir configuración?',
+            [
+              { text: 'Cancelar', style: 'cancel', onPress: () => resolve(false) },
+              { text: 'Abrir configuración', onPress: () => resolve(true) },
+            ],
+            { cancelable: true, onDismiss: () => resolve(false) },
+          )
+        })
+
+        if (!openSettings) {
+          console.log('useNotifee.scheduleTrigger -> usuario canceló habilitar permisos')
+          return null
+        }
+
+        // Abrir ajustes y esperar que el usuario conceda permiso (polling con timeout)
+        console.log('useNotifee.scheduleTrigger -> abriendo ajustes de alarmas')
+        await openAlarmPermissionSettings()
+
+        // Wait for the user to grant permission after opening settings.
+        // Limit waiting to a few seconds to avoid long 'loading' hangs in the UI.
+        const waitForGrant = async (timeoutMs = 8_000, intervalMs = 1000) => {
+          const start = Date.now()
+          while (Date.now() - start < timeoutMs) {
+            try {
+              const s: any = await getNotificationSettings()
+              if (s) {
+                const granted = s.authorizationStatus === 'granted' || s.areNotificationsEnabled === true || s.alarm === true
+                if (granted) return true
+              }
+            } catch (e) {
+              // ignore and retry
+            }
+            await new Promise((r) => setTimeout(r, intervalMs))
+          }
+          return false
+        }
+
+        const granted = await waitForGrant()
+        if (!granted) {
+          console.log('useNotifee.scheduleTrigger -> permiso no concedido tras abrir ajustes')
+          return null
+        }
+        console.log('useNotifee.scheduleTrigger -> permiso concedido tras abrir ajustes, continúo')
+      }
+    } catch (e) {
+      console.warn('scheduleTrigger: error comprobando permisos', e)
     }
 
     await requestPermission()

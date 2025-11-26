@@ -1,4 +1,5 @@
-import { Alert, ScrollView, StyleSheet, Text, View, ActivityIndicator } from "react-native"
+import { ScrollView, StyleSheet, Text, View, ActivityIndicator } from "react-native"
+import showToast from "../../utils/toast"
 import { useColorScheme } from "nativewind"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useAuth } from "../../../providers/AuthProvider"
@@ -299,7 +300,7 @@ export default function ReportesScreen() {
             textColor="#FFFFFF"
             iconColor="#FFFFFF"
             size="large"
-            onPress={() => Alert.alert(t("WIP"), t("WIPPdf"))}
+            onPress={() => showToast(t("WIPPdf"))}
             style={styles.exportButton}
           />
 
@@ -310,7 +311,7 @@ export default function ReportesScreen() {
             textColor="#FFFFFF"
             iconColor="#FFFFFF"
             size="large"
-            onPress={() => Alert.alert(t("WIP"), t("WIPExcel"))}
+            onPress={() => showToast(t("WIPExcel"))}
             style={styles.exportButton}
           />
 
@@ -321,7 +322,7 @@ export default function ReportesScreen() {
             textColor="#FFFFFF"
             iconColor="#FFFFFF"
             size="large"
-            onPress={() => Alert.alert(t("WIP"), t("WIPEmail"))}
+            onPress={() => showToast(t("WIPEmail"))}
             style={styles.exportButton}
           />
         </View>

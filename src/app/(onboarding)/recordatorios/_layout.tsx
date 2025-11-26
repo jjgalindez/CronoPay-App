@@ -18,13 +18,6 @@ export default function RootLayout() {
 
   return (
     <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
-      <TouchableOpacity
-        onPress={() => router.back()}
-        style={{ position: 'absolute', left: 10, top: insets.top + 12, zIndex: 10 }}
-        hitSlop={8}
-      >
-        <Ionicons name="arrow-back" size={24} color="#1B3D48" />
-      </TouchableOpacity>
       <AppHeader
         icon="alarm-outline"
         title="Recordatorios"
@@ -32,6 +25,13 @@ export default function RootLayout() {
         profileUri={perfil?.avatar_url}
         userName={perfil?.nombre ?? null}
       />
+      <TouchableOpacity
+        onPress={() => router.back()}
+        style={{ position: 'relative', left: 10, top: insets.top, zIndex: 10 }}
+        hitSlop={8}
+      >
+        <Ionicons name="arrow-back" size={24} color="#1B3D48" />
+      </TouchableOpacity>
       <Slot />
       <FloatButton
         onPress={() => router.push('/(onboarding)/recordatorios/create-reminder')}
