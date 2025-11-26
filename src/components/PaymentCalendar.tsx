@@ -32,12 +32,10 @@ export function PaymentCalendar() {
   const month = currentDate.getMonth()
 
   // Obtener el primer día del mes y cuántos días tiene
-  const { firstDay, lastDay, daysInMonth, startDayOfWeek } = useMemo(() => {
+  const { daysInMonth, startDayOfWeek } = useMemo(() => {
     const first = new Date(year, month, 1)
     const last = new Date(year, month + 1, 0)
     return {
-      firstDay: first,
-      lastDay: last,
       daysInMonth: last.getDate(),
       startDayOfWeek: first.getDay(),
     }
@@ -210,10 +208,9 @@ export function PaymentCalendar() {
 
     return (
       <TouchableOpacity
-        key={`day-${index}-${day}`}
+        key={`day-${index}`}
         style={dayStyle}
         disabled={!hasPayments}
-        activeOpacity={0.7}
         onPress={() => {
           if (hasPayments) {
             const pagosList = dayPayments
@@ -232,6 +229,7 @@ export function PaymentCalendar() {
         }}
       >
         <Text style={textStyle}>{day}</Text>
+
         {hasPayments && (
           <View style={styles.indicatorContainer}>
             {pendingPayments.length > 0 && (
@@ -362,16 +360,13 @@ export function PaymentCalendar() {
         {isLoading && (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="small" color="#3b82f6" />
-            <Text style={dynamicStyles.loadingText}>Cargando pagos...</Text>
           </View>
         )}
 
-        {/* Empty state */}
         {!isLoading && paymentsThisMonth.length === 0 && (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>📅</Text>
-            <Text style={dynamicStyles.legendText}>No hay pagos este mes</Text>
-          </View>
+          <Text style={[styles.emptyText, isDark && styles.emptyTextDark]}>
+            No hay pagos este mes
+          </Text>
         )}
       </View>
     </ScrollView>
@@ -379,7 +374,6 @@ export function PaymentCalendar() {
 }
 
 const styles = StyleSheet.create({
-  // Container
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
@@ -540,9 +534,9 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   indicator: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
+    width: 5,
+    height: 5,
+    borderRadius: 3,
   },
   indicatorPending: {
     backgroundColor: "#c2410c",
@@ -683,6 +677,14 @@ const styles = StyleSheet.create({
     fontSize: 48,
     marginBottom: 12,
     opacity: 0.5,
+  },
+  emptyText: {
+    textAlign: "center",
+    marginTop: 20,
+    color: "#737373",
+  },
+  emptyTextDark: {
+    color: "#a3a3a3",
   },
 
   // Error

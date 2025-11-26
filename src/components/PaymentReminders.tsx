@@ -6,14 +6,16 @@ import {
   ScrollView,
   ActivityIndicator,
   useColorScheme,
+  StyleProp,
+  ViewStyle,
 } from 'react-native';
 import { usePagos } from '../hooks/usePagos';
 import { useAuth } from 'providers/AuthProvider';
 import { PagoWithRelations } from 'lib/api/pagos';
+import { getDaysUntil, isToday as checkIsToday, isOverdue as checkIsOverdue } from '@/utils/dateHelpers';
 
-// Tipo para los recordatorios agrupados por día
 type DayReminder = {
-  fecha: Date;
+  fecha: string;
   totalDia: number;
   pagos: PagoWithRelations[];
 };
@@ -22,161 +24,58 @@ export function PaymentReminders() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
-  // Obtener usuario del contexto de autenticación
   const { session } = useAuth();
   const userId = session?.user?.id ?? null;
 
-  // Obtener pagos del usuario
-  const { data: pagos, isLoading, error } = usePagos(userId);
+  const { data: pagos, isLoading, error } = usePagos(userId ?? undefined, {
+    enabled: Boolean(userId),
+  });
 
-  // Calcular recordatorios de pagos pendientes (incluye vencidos y futuros)
   const calendarReminders = useMemo(() => {
-    if (!pagos) return [];
+    if (!pagos || !Array.isArray(pagos)) {
+      console.log('No hay pagos o no es array:', pagos);
+      return [];
+    }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    console.log('Total de pagos recibidos:', pagos.length);
 
-    // Filtrar solo pagos pendientes (incluye vencidos)
     const pendingPayments = pagos.filter((pago) => {
       return pago.estado === 'Pendiente';
     });
 
-    // Agrupar pagos por día
+    console.log('Pagos pendientes:', pendingPayments.length);
+
     const groupedByDay = pendingPayments.reduce((acc, pago) => {
-      const dateKey = new Date(pago.fecha_vencimiento).toDateString();
+      const dateKey = pago.fecha_vencimiento;
 
       if (!acc[dateKey]) {
         acc[dateKey] = {
-          fecha: new Date(pago.fecha_vencimiento),
+          fecha: pago.fecha_vencimiento,
           totalDia: 0,
           pagos: [],
         };
       }
-
       acc[dateKey].totalDia += Number(pago.monto) || 0;
       acc[dateKey].pagos.push(pago);
 
       return acc;
     }, {} as Record<string, DayReminder>);
 
-    // Convertir a array y ordenar por fecha
-    return Object.values(groupedByDay).sort(
-      (a, b) => a.fecha.getTime() - b.fecha.getTime()
+    const result = Object.values(groupedByDay).sort(
+      (a, b) => a.fecha.localeCompare(b.fecha)
     );
+
+    console.log('Días con pagos agrupados:', result.length);
+    console.log('Detalle de días:', result.map(r => ({ fecha: r.fecha, cantidad: r.pagos.length })));
+
+    return result;
   }, [pagos]);
 
-  // Formatear moneda colombiana
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  // Formatear fecha completa
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('es-CO', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    }).format(date);
-  };
-
-  // Verificar si es hoy
-  const isToday = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const compareDate = new Date(date);
-    compareDate.setHours(0, 0, 0, 0);
-    return compareDate.getTime() === today.getTime();
-  };
-
-  // Verificar si está vencido
-  const isPastDue = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const compareDate = new Date(date);
-    compareDate.setHours(0, 0, 0, 0);
-    return compareDate < today;
-  };
-
-  // Verificar si es esta semana (próximos 7 días)
-  const isThisWeek = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const oneWeek = new Date();
-    oneWeek.setDate(today.getDate() + 7);
-    oneWeek.setHours(0, 0, 0, 0);
-    const compareDate = new Date(date);
-    compareDate.setHours(0, 0, 0, 0);
-
-    return compareDate >= today && compareDate <= oneWeek;
-  };
-
-  // Obtener estilos de la tarjeta según la fecha
-  const getCardStyle = (date: Date) => {
-    if (isPastDue(date)) {
-      return [styles.reminderCard, styles.reminderCardOverdue, isDark && styles.reminderCardOverdueDark];
-    }
-    if (isToday(date)) {
-      return [styles.reminderCard, styles.reminderCardToday, isDark && styles.reminderCardTodayDark];
-    }
-    if (isThisWeek(date)) {
-      return [styles.reminderCard, styles.reminderCardWeek, isDark && styles.reminderCardWeekDark];
-    }
-    return [styles.reminderCard, isDark && styles.reminderCardDark];
-  };
-
-  // Obtener badge de días restantes
-  const getDaysBadge = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const compareDate = new Date(date);
-    compareDate.setHours(0, 0, 0, 0);
-    const diffTime = compareDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) {
-      return {
-        text: `Vencido hace ${Math.abs(diffDays)} día${Math.abs(diffDays) !== 1 ? 's' : ''}`,
-        style: [styles.badge, styles.badgeOverdue],
-        textStyle: styles.badgeTextWhite,
-      };
-    }
-    if (diffDays === 0) {
-      return {
-        text: 'Hoy',
-        style: [styles.badge, styles.badgeToday],
-        textStyle: styles.badgeTextWhite,
-      };
-    }
-    if (diffDays === 1) {
-      return {
-        text: 'Mañana',
-        style: [styles.badge, styles.badgeTomorrow, isDark && styles.badgeTomorrowDark],
-        textStyle: [styles.badgeText, isDark && styles.badgeTextDark],
-      };
-    }
-    if (diffDays <= 7) {
-      return {
-        text: `En ${diffDays} días`,
-        style: [styles.badge, styles.badgeWeek, isDark && styles.badgeWeekDark],
-        textStyle: [styles.badgeText, isDark && styles.badgeTextDark],
-      };
-    }
-    return {
-      text: `En ${diffDays} días`,
-      style: [styles.badge, styles.badgeDefault, isDark && styles.badgeDefaultDark],
-      textStyle: [styles.badgeText, isDark && styles.badgeTextDark],
-    };
-  };
-
-  // Agrupar recordatorios por mes
   const remindersByMonth = useMemo(() => {
     return calendarReminders.reduce((acc, reminder) => {
-      const monthKey = reminder.fecha.toLocaleString('es-CO', {
+      const [year, month] = reminder.fecha.split('-').map(Number);
+      const date = new Date(year, month - 1, 1);
+      const monthKey = date.toLocaleString('es-CO', {
         year: 'numeric',
         month: 'long',
       });
@@ -190,24 +89,132 @@ export function PaymentReminders() {
     }, {} as Record<string, DayReminder[]>);
   }, [calendarReminders]);
 
-  // Estilos dinámicos
-  const dynamicStyles = {
-    container: [styles.container, isDark && styles.containerDark],
-    card: [styles.card, isDark && styles.cardDark],
-    title: [styles.title, isDark && styles.titleDark],
-    emptyText: [styles.emptyText, isDark && styles.emptyTextDark],
-    monthTitle: [styles.monthTitle, isDark && styles.monthTitleDark],
-    dateText: [styles.dateText, isDark && styles.dateTextDark],
-    countText: [styles.countText, isDark && styles.countTextDark],
-    totalText: [styles.totalText, isDark && styles.totalTextDark],
-    pagoTitle: [styles.pagoTitle, isDark && styles.pagoTitleDark],
-    pagoCategory: [styles.pagoCategory, isDark && styles.pagoCategoryDark],
-    pagoAmount: [styles.pagoAmount, isDark && styles.pagoAmountDark],
-    summaryLabel: [styles.summaryLabel, isDark && styles.summaryLabelDark],
-    summaryValue: [styles.summaryValue, isDark && styles.summaryValueDark],
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+    }).format(amount);
   };
 
-  // Si no hay sesión
+  const formatDate = (dateStr: string) => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return new Intl.DateTimeFormat('es-CO', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(date);
+  };
+
+  const isToday = (dateStr: string) => {
+    return checkIsToday(dateStr);
+  };
+
+  const isPastDue = (dateStr: string) => {
+    return checkIsOverdue(dateStr);
+  };
+
+  const isThisWeek = (dateStr: string) => {
+    const days = getDaysUntil(dateStr);
+    return days >= 0 && days <= 7;
+  };
+
+  const getCardStyle = (dateStr: string): StyleProp<ViewStyle> => {
+    const baseStyle: StyleProp<ViewStyle>[] = [styles.reminderCard];
+
+    if (isDark) {
+      baseStyle.push(styles.reminderCardDark);
+    }
+
+    if (isPastDue(dateStr)) {
+      baseStyle.push(styles.reminderCardOverdue);
+      if (isDark) baseStyle.push(styles.reminderCardOverdueDark);
+    } else if (isToday(dateStr)) {
+      baseStyle.push(styles.reminderCardToday);
+      if (isDark) baseStyle.push(styles.reminderCardTodayDark);
+    } else if (isThisWeek(dateStr)) {
+      baseStyle.push(styles.reminderCardWeek);
+      if (isDark) baseStyle.push(styles.reminderCardWeekDark);
+    }
+
+    return baseStyle;
+  };
+
+  const getDaysBadge = (dateStr: string) => {
+    const diffDays = getDaysUntil(dateStr);
+
+    if (diffDays < 0) {
+      return {
+        text: `Vencido hace ${Math.abs(diffDays)} día${Math.abs(diffDays) !== 1 ? 's' : ''}`,
+        style: [styles.badge, styles.badgeOverdue],
+        textStyle: [styles.badgeTextWhite],
+      };
+    }
+    if (diffDays === 0) {
+      return {
+        text: 'Hoy',
+        style: [styles.badge, styles.badgeToday],
+        textStyle: [styles.badgeTextWhite],
+      };
+    }
+    if (diffDays === 1) {
+      const badgeStyles = [styles.badge, styles.badgeTomorrow];
+      const textStyles: any[] = [styles.badgeText];
+      if (isDark) {
+        badgeStyles.push(styles.badgeTomorrowDark);
+        textStyles.push(styles.badgeTextDark);
+      }
+      return {
+        text: 'Mañana',
+        style: badgeStyles,
+        textStyle: textStyles,
+      };
+    }
+    if (diffDays <= 7) {
+      const badgeStyles = [styles.badge, styles.badgeWeek];
+      const textStyles: any[] = [styles.badgeText];
+      if (isDark) {
+        badgeStyles.push(styles.badgeWeekDark);
+        textStyles.push(styles.badgeTextDark);
+      }
+      return {
+        text: `En ${diffDays} días`,
+        style: badgeStyles,
+        textStyle: textStyles,
+      };
+    }
+    
+    const badgeStyles = [styles.badge, styles.badgeDefault];
+    const textStyles: any[] = [styles.badgeText];
+    if (isDark) {
+      badgeStyles.push(styles.badgeDefaultDark);
+      textStyles.push(styles.badgeTextDark);
+    }
+    return {
+      text: `En ${diffDays} días`,
+      style: badgeStyles,
+      textStyle: textStyles,
+    };
+  };
+
+  const dynamicStyles = {
+    container: isDark ? [styles.container, styles.containerDark] : [styles.container],
+    card: isDark ? [styles.card, styles.cardDark] : [styles.card],
+    title: isDark ? [styles.title, styles.titleDark] : [styles.title],
+    emptyText: isDark ? [styles.emptyText, styles.emptyTextDark] : [styles.emptyText],
+    monthTitle: isDark ? [styles.monthTitle, styles.monthTitleDark] : [styles.monthTitle],
+    dateText: isDark ? [styles.dateText, styles.dateTextDark] : [styles.dateText],
+    countText: isDark ? [styles.countText, styles.countTextDark] : [styles.countText],
+    totalText: isDark ? [styles.totalText, styles.totalTextDark] : [styles.totalText],
+    pagoTitle: isDark ? [styles.pagoTitle, styles.pagoTitleDark] : [styles.pagoTitle],
+    pagoCategory: isDark ? [styles.pagoCategory, styles.pagoCategoryDark] : [styles.pagoCategory],
+    pagoAmount: isDark ? [styles.pagoAmount, styles.pagoAmountDark] : [styles.pagoAmount],
+    summaryLabel: isDark ? [styles.summaryLabel, styles.summaryLabelDark] : [styles.summaryLabel],
+    summaryValue: isDark ? [styles.summaryValue, styles.summaryValueDark] : [styles.summaryValue],
+  };
+
   if (!session && !isLoading) {
     return (
       <View style={dynamicStyles.container}>
@@ -224,7 +231,6 @@ export function PaymentReminders() {
     );
   }
 
-  // Manejo de errores
   if (error) {
     return (
       <View style={dynamicStyles.container}>
@@ -239,7 +245,6 @@ export function PaymentReminders() {
     );
   }
 
-  // Loading
   if (isLoading) {
     return (
       <View style={dynamicStyles.container}>
@@ -253,7 +258,6 @@ export function PaymentReminders() {
     );
   }
 
-  // Sin recordatorios
   if (calendarReminders.length === 0) {
     return (
       <View style={dynamicStyles.container}>
@@ -272,20 +276,23 @@ export function PaymentReminders() {
     );
   }
 
+  const badgeInfoStyles = isDark ? [styles.badge, styles.badgeInfo, styles.badgeInfoDark] : [styles.badge, styles.badgeInfo];
+  const badgeInfoTextStyles = isDark ? [styles.badgeText, styles.badgeTextDark] : [styles.badgeText];
+
+  const totalPagos = calendarReminders.reduce((sum, reminder) => sum + reminder.pagos.length, 0);
+
   return (
     <View style={dynamicStyles.container}>
       <View style={dynamicStyles.card}>
-        {/* Header */}
         <View style={styles.header}>
           <Text style={dynamicStyles.title}>📅 Recordatorios</Text>
-          <View style={[styles.badge, styles.badgeInfo, isDark && styles.badgeInfoDark]}>
-            <Text style={[styles.badgeText, isDark && styles.badgeTextDark]}>
-              {calendarReminders.length} días
+          <View style={badgeInfoStyles}>
+            <Text style={badgeInfoTextStyles}>
+              {totalPagos} pago{totalPagos !== 1 ? 's' : ''}
             </Text>
           </View>
         </View>
 
-        {/* Lista de recordatorios agrupados por mes */}
         <ScrollView 
           style={styles.remindersScrollContainer}
           nestedScrollEnabled={true}
@@ -301,18 +308,19 @@ export function PaymentReminders() {
 
                   return (
                     <View
-                      key={`${reminder.fecha.toISOString()}-${index}`}
+                      key={`${reminder.fecha}-${index}`}
                       style={getCardStyle(reminder.fecha)}
                     >
-                      {/* Header del día */}
                       <View style={styles.reminderHeader}>
-                        <View style={{ flex: 1 }}>
+                        <View style={styles.reminderHeaderLeft}>
                           <Text style={dynamicStyles.dateText}>
                             {formatDate(reminder.fecha)}
                           </Text>
                           <View style={styles.badgeRow}>
                             <View style={daysBadge.style}>
-                              <Text style={daysBadge.textStyle}>{daysBadge.text}</Text>
+                              <Text style={daysBadge.textStyle}>
+                                {daysBadge.text}
+                              </Text>
                             </View>
                             <Text style={dynamicStyles.countText}>
                               {reminder.pagos.length} pago
@@ -328,26 +336,29 @@ export function PaymentReminders() {
                         </View>
                       </View>
 
-                      {/* Lista de pagos del día */}
                       <View style={styles.pagosContainer}>
-                        {reminder.pagos.map((pago) => (
-                          <View
-                            key={pago.id_pago}
-                            style={[styles.pagoCard, isDark && styles.pagoCardDark]}
-                          >
-                            <View style={styles.pagoInfo}>
-                              <Text style={dynamicStyles.pagoTitle} numberOfLines={1}>
-                                {pago.categoria?.nombre || 'Sin categoría'}
-                              </Text>
-                              <Text style={dynamicStyles.pagoCategory} numberOfLines={1}>
-                                {pago.categoria?.nombre || 'Sin categoría'}
+                        {reminder.pagos.map((pago, pagoIndex) => {
+                          const pagoCardStyles = isDark ? [styles.pagoCard, styles.pagoCardDark] : [styles.pagoCard];
+                          
+                          return (
+                            <View
+                              key={`${pago.id_pago}-${pagoIndex}`}
+                              style={pagoCardStyles}
+                            >
+                              <View style={styles.pagoInfo}>
+                                <Text style={dynamicStyles.pagoTitle} numberOfLines={1}>
+                                  {pago.titulo}
+                                </Text>
+                                <Text style={dynamicStyles.pagoCategory} numberOfLines={1}>
+                                  {pago.categoria?.nombre || 'Sin categoría'}
+                                </Text>
+                              </View>
+                              <Text style={dynamicStyles.pagoAmount}>
+                                {formatCurrency(Number(pago.monto) || 0)}
                               </Text>
                             </View>
-                            <Text style={dynamicStyles.pagoAmount}>
-                              {formatCurrency(Number(pago.monto) || 0)}
-                            </Text>
-                          </View>
-                        ))}
+                          );
+                        })}
                       </View>
                     </View>
                   );
@@ -357,8 +368,7 @@ export function PaymentReminders() {
           </View>
         </ScrollView>
 
-        {/* Resumen total */}
-        <View style={[styles.summary, isDark && styles.summaryDark]}>
+        <View style={isDark ? [styles.summary, styles.summaryDark] : [styles.summary]}>
           <View style={styles.summaryRow}>
             <Text style={dynamicStyles.summaryLabel}>Total Pagos:</Text>
             <Text style={dynamicStyles.summaryValue}>
@@ -373,6 +383,12 @@ export function PaymentReminders() {
               {calendarReminders.length}
             </Text>
           </View>
+          <View style={styles.summaryRow}>
+            <Text style={dynamicStyles.summaryLabel}>Total de pagos pendientes:</Text>
+            <Text style={dynamicStyles.summaryValue}>
+              {totalPagos}
+            </Text>
+          </View>
         </View>
       </View>
     </View>
@@ -380,15 +396,12 @@ export function PaymentReminders() {
 }
 
 const styles = StyleSheet.create({
-  // Container
   container: {
     backgroundColor: '#f5f5f5',
   },
   containerDark: {
     backgroundColor: '#0a0a0a',
   },
-
-  // Card
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 12,
@@ -407,8 +420,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#171717',
     borderColor: '#262626',
   },
-
-  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -423,8 +434,6 @@ const styles = StyleSheet.create({
   titleDark: {
     color: '#fafafa',
   },
-
-  // Empty State
   emptyContainer: {
     alignItems: 'center',
     paddingVertical: 32,
@@ -442,8 +451,6 @@ const styles = StyleSheet.create({
   emptyTextDark: {
     color: '#a3a3a3',
   },
-
-  // Month Section
   monthSection: {
     marginBottom: 24,
   },
@@ -457,16 +464,12 @@ const styles = StyleSheet.create({
   monthTitleDark: {
     color: '#fafafa',
   },
-
-  // Reminders Container
   remindersScrollContainer: {
     maxHeight: 400,
   },
   remindersContainer: {
     gap: 0,
   },
-
-  // Reminder Card
   reminderCard: {
     padding: 16,
     borderRadius: 8,
@@ -503,13 +506,14 @@ const styles = StyleSheet.create({
     borderColor: '#fb923c',
     backgroundColor: 'rgba(251, 146, 60, 0.1)',
   },
-
-  // Reminder Header
   reminderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 12,
+  },
+  reminderHeaderLeft: {
+    flex: 1,
   },
   dateText: {
     fontSize: 14,
@@ -521,16 +525,12 @@ const styles = StyleSheet.create({
   dateTextDark: {
     color: '#fafafa',
   },
-
-  // Badge Row
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     marginTop: 4,
   },
-
-  // Badges
   badge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -563,6 +563,7 @@ const styles = StyleSheet.create({
   },
   badgeTomorrowDark: {
     backgroundColor: '#404040',
+    borderWidth: 1,
     borderColor: '#525252',
   },
   badgeWeek: {
@@ -578,19 +579,19 @@ const styles = StyleSheet.create({
   },
   badgeDefaultDark: {
     backgroundColor: '#404040',
+    borderWidth: 1,
     borderColor: '#525252',
   },
   badgeInfo: {
     backgroundColor: '#e5e5e5',
     borderWidth: 1,
-    borderColor: '#d4d4d4',
+    borderColor: '#525252',
   },
   badgeInfoDark: {
     backgroundColor: '#404040',
+    borderWidth: 1,
     borderColor: '#525252',
   },
-
-  // Count Text
   countText: {
     fontSize: 12,
     color: '#737373',
@@ -598,8 +599,6 @@ const styles = StyleSheet.create({
   countTextDark: {
     color: '#a3a3a3',
   },
-
-  // Total Container
   totalContainer: {
     alignItems: 'flex-end',
   },
@@ -611,8 +610,6 @@ const styles = StyleSheet.create({
   totalTextDark: {
     color: '#fafafa',
   },
-
-  // Pagos Container
   pagosContainer: {
     gap: 8,
   },
@@ -659,8 +656,6 @@ const styles = StyleSheet.create({
   pagoAmountDark: {
     color: '#fafafa',
   },
-
-  // Summary
   summary: {
     marginTop: 16,
     paddingTop: 16,
@@ -691,15 +686,11 @@ const styles = StyleSheet.create({
   summaryValueDark: {
     color: '#fafafa',
   },
-
-  // Loading
   loadingContainer: {
     paddingVertical: 40,
     alignItems: 'center',
     gap: 12,
   },
-
-  // Error
   errorContainer: {
     padding: 20,
     alignItems: 'center',

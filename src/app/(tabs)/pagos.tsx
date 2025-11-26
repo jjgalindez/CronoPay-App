@@ -4,11 +4,13 @@ import {
   RefreshControl,
   Text,
   View,
+  StyleSheet,
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { useAuth } from "../../../providers/AuthProvider"
 import { usePagos } from "../../hooks/usePagos"
+import { AddPaymentModal } from "../../components/AddPaymentModal"
 
 function PagoCard({
   monto,
@@ -58,15 +60,15 @@ export default function PagosScreen() {
         </Text>
 
         {error ? (
-          <View className="mt-10 items-center">
-            <Text className="text-center text-sm text-red-600">
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>
               {error.message}
             </Text>
           </View>
         ) : null}
 
         {isLoading && data.length === 0 ? (
-          <View className="flex-1 items-center justify-center">
+          <View style={styles.loadingContainer}>
             <ActivityIndicator color="#1B3D48" />
           </View>
         ) : (
@@ -81,8 +83,9 @@ export default function PagosScreen() {
                 estado={item.estado}
               />
             )}
-            style={{ marginTop: 20 }}
+            style={styles.list}
             showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContent}
             ListEmptyComponent={() => (
               <View className="mt-16 items-center">
                 <Text className="text-base font-medium text-neutral-700 dark:text-neutral-300">
@@ -100,6 +103,39 @@ export default function PagosScreen() {
           />
         )}
       </View>
+
+      <View style={styles.buttonContainer}>
+        <AddPaymentModal onPaymentAdded={refetch} />
+      </View>
     </SafeAreaView>
   )
 }
+
+const styles = StyleSheet.create({
+  errorContainer: {
+    marginTop: 40,
+    alignItems: 'center',
+  },
+  errorText: {
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#ef4444',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  list: {
+    marginTop: 20,
+  },
+  listContent: {
+    paddingBottom: 100,
+  },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 24,
+    right: 24,
+  },
+})
