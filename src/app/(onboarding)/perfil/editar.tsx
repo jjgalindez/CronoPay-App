@@ -134,7 +134,7 @@ export default function EditarPerfilScreen() {
             </View>
 
             {/* Formulario */}
-            <View className="rounded-lg bg-white dark:bg-neutral-900">
+            <View className="rounded-lg bg-white dark:bg-slate-900">
               <View style={{ marginBottom: isSmallScreen ? 16 : 24 }}>
                 <Text
                   className="font-medium text-gray-700"
@@ -223,7 +223,7 @@ export default function EditarPerfilScreen() {
 
             {/* Información de seguridad */}
             <View
-              className="rounded-lg border border-blue-200 bg-blue-50"
+              className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/30"
               style={{
                 marginTop: isSmallScreen ? 24 : 32,
                 padding: isSmallScreen ? 12 : 16,

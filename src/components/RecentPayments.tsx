@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, useColorScheme } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useTranslation } from "react-i18next"
+import { useTema } from "@/hooks/useTema"
 
 export type PaymentItem = {
   id?: string
@@ -45,8 +46,8 @@ function formatCurrency(value: number) {
 }
 
 export default function RecentPayments({ items = [], maxItems = 5 }: RecentPaymentsProps) {
-  const colorScheme = useColorScheme()
-  const isDark = colorScheme === 'dark'
+  const { tema } = useTema()
+  const isDark = tema === "dark"
   const { t } = useTranslation()
   // filter state: 'month' | 'trimester' | 'year'
   const [filter, setFilter] = useState<'month' | 'trimester' | 'year'>('month')
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cardDark: {
-    backgroundColor: '#171717',
+    backgroundColor: '#0B1220',
   },
   title: {
     fontSize: 16,

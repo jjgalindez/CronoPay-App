@@ -196,7 +196,8 @@ const styles = StyleSheet.create({
     },
     containerCompact: {
         paddingHorizontal: 14,
-        paddingVertical: 12,
+        paddingVertical: 22,
+        flexDirection: "row",
     },
     iconRegular: {
         width: 52,

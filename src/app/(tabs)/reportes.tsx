@@ -126,7 +126,7 @@ export default function ReportesScreen() {
       iconName: "receipt-outline" as const,
       iconBackgroundColor: "#E8F1FF",
       iconColor: "#1B3D48",
-      backgroundColor: isDark ? "#171717" : "#FFFFFF",
+      backgroundColor: isDark ? "#0B1220" : "#FFFFFF",
       showProgress: true,
       currentAmount: stats.completed,
       totalAmount: stats.total,
@@ -140,7 +140,7 @@ export default function ReportesScreen() {
       iconName: "checkmark-circle-outline" as const,
       iconBackgroundColor: "#E8F9F1",
       iconColor: "#12C48B",
-      backgroundColor: isDark ? "#171717" : "#FFFFFF",
+      backgroundColor: isDark ? "#0B1220" : "#FFFFFF",
       showProgress: true,
       currentAmount: stats.completed,
       totalAmount: stats.total,
@@ -154,7 +154,7 @@ export default function ReportesScreen() {
       iconName: "time-outline" as const,
       iconBackgroundColor: "#FFF1E3",
       iconColor: "#FF6B00",
-      backgroundColor: isDark ? "#171717" : "#FFFFFF",
+      backgroundColor: isDark ? "#0B1220" : "#FFFFFF",
       showProgress: true,
       currentAmount: stats.pending,
       totalAmount: stats.total,
@@ -167,7 +167,7 @@ export default function ReportesScreen() {
       iconName: "cash-outline" as const,
       iconBackgroundColor: "#EEE8FF",
       iconColor: "#1B3D48",
-      backgroundColor: isDark ? "#171717" : "#FFFFFF",
+      backgroundColor: isDark ? "#0B1220" : "#FFFFFF",
       showComparison: true,
       comparisonText: t("VsLastMonth"),
       comparisonPercentage: stats.comparisonPercentage,
@@ -207,8 +207,7 @@ export default function ReportesScreen() {
             iconBackgroundColor={isDark ? '#082027' : '#E8F4F8'}
             title={t("TotalPayments")}
             value={String(stats.total)}
-            backgroundColor={isDark ? "#171717" : "#FFFFFF"}
-            compact
+            backgroundColor={isDark ? "#0B1220" : "#FFFFFF"}
             showProgress
             currentAmount={stats.completed}
             totalAmount={stats.total}
@@ -221,8 +220,7 @@ export default function ReportesScreen() {
             iconBackgroundColor={isDark ? '#073024' : '#E6F9F3'}
             title={t("Completed")}
             value={String(stats.completed)}
-            backgroundColor={isDark ? "#171717" : "#FFFFFF"}
-            compact
+            backgroundColor={isDark ? "#0B1220" : "#FFFFFF"}
             showProgress
             currentAmount={stats.completed}
             totalAmount={stats.total}
@@ -235,8 +233,7 @@ export default function ReportesScreen() {
             iconBackgroundColor={isDark ? '#3A2A18' : '#FFF1E3'}
             title={t("Pendings")}
             value={String(stats.pending)}
-            backgroundColor={isDark ? "#171717" : "#FFFFFF"}
-            compact
+            backgroundColor={isDark ? "#0B1220" : "#FFFFFF"}
             showProgress
             currentAmount={stats.pending}
             totalAmount={stats.total}
@@ -249,8 +246,7 @@ export default function ReportesScreen() {
             iconBackgroundColor={isDark ? '#1C1333' : '#F3EEFF'}
             title={t("TotalAmount")}
             value={`$${formatCurrency(stats.totalAmount)}`}
-            backgroundColor={isDark ? "#171717" : "#FFFFFF"}
-            compact
+            backgroundColor={isDark ? "#0B1220" : "#FFFFFF"}
             showComparison
             comparisonText={stats.comparisonPercentage >= 0 ? t("VsLastMonth") : t("VsLastMonth")}
             comparisonPercentage={stats.comparisonPercentage}
@@ -264,7 +260,7 @@ export default function ReportesScreen() {
             {t("DistributionByCategory")} - {getMonthNames()[selectedPeriod.month]}
           </Text>
           {donutData.length > 0 ? (
-            <View className="bg-white dark:bg-neutral-900 rounded-[18px] p-4 mt-3 shadow-sm items-center">
+            <View className="bg-white dark:bg-[#0B1220] rounded-[18px] p-4 mt-3 shadow-sm items-center">
               <DonutChart
                 data={donutData}
                 filterMonth={selectedPeriod.month}

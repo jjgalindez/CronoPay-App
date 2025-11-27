@@ -86,7 +86,7 @@ export default function TabsLayout() {
             shadowOpacity: 0.05,
             shadowRadius: 8,
             elevation: 6,
-            backgroundColor: isDark ? "#171717" : "#FFFFFF",
+            backgroundColor: isDark ? "#0B1220" : "#FFFFFF",
           },
           tabBarItemStyle: {
             paddingVertical: 4,
@@ -98,8 +98,8 @@ export default function TabsLayout() {
         name="pagos"
         options={{
           title: "Pagos",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="card-outline" size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "card" : "card-outline"} size={24} color={color} />
           ),
           tabBarLabel: ({ focused }) => (
             <TabLabel focused={focused} label={t("PaymentTab")} isDark={isDark} />
@@ -110,8 +110,8 @@ export default function TabsLayout() {
         name="calendario"
         options={{
           title: "Calendario",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="calendar-outline" size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "calendar" : "calendar-outline"} size={24} color={color} />
           ),
           tabBarLabel: ({ focused }) => (
             <TabLabel focused={focused} label={t("CalendarTab")} isDark={isDark} />
@@ -122,8 +122,8 @@ export default function TabsLayout() {
         name="inicio"
         options={{
           title: "Inicio",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="home-outline" size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "home" : "home-outline"} size={24} color={color} />
           ),
           tabBarLabel: ({ focused }) => (
             <TabLabel focused={focused} label={t("HomeTab")} isDark={isDark} />
@@ -134,8 +134,8 @@ export default function TabsLayout() {
         name="estadisticas"
         options={{
           title: "Estadísticas",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="stats-chart-outline" size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "stats-chart" : "stats-chart-outline"} size={24} color={color} />
           ),
           tabBarLabel: ({ focused }) => (
             <TabLabel focused={focused} label={t("StatisticsTab")} isDark={isDark} />
@@ -146,8 +146,8 @@ export default function TabsLayout() {
         name="reportes"
         options={{
           title: "Reportes",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="document-text-outline" size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "document-text" : "document-text-outline"} size={24} color={color} />
           ),
           tabBarLabel: ({ focused }) => (
             <TabLabel focused={focused} label={t("ReportsTab")} isDark={isDark} />

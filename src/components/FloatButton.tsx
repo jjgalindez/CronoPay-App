@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { TouchableOpacity, View, StyleSheet, type ViewStyle } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons'
 
@@ -25,6 +25,7 @@ export default function FloatButton({
   position = 'bottom-right',
   accessibilityLabel = 'Acción principal',
 }: FloatButtonProps) {
+  const [disabled, setDisabled] = useState(false)
   const posStyle: ViewStyle =
     position === 'bottom-left'
       ? { left: 16, bottom: 24 }
@@ -32,12 +33,40 @@ export default function FloatButton({
       ? { left: '50%', transform: [{ translateX: -size / 2 }] as any, bottom: 24 }
       : { right: 16, bottom: 24 }
 
+  async function handlePress() {
+    if (disabled) return
+    try {
+      setDisabled(true)
+      const res = onPress()
+      // If onPress returns a promise, wait for it before re-enabling
+      if (res && typeof (res as any).then === 'function') {
+        await res
+      } else {
+        // otherwise ensure short debounce so user can't spam the button
+        await new Promise((r) => setTimeout(r, 800))
+      }
+    } catch (e) {
+      // ignore - re-enable below
+    } finally {
+      setDisabled(false)
+    }
+  }
+
   return (
     <TouchableOpacity
       accessibilityLabel={accessibilityLabel}
+      accessibilityState={{ disabled }}
       activeOpacity={0.85}
-      onPress={onPress}
-      style={[styles.button, { width: size, height: size, borderRadius: size / 2, backgroundColor: color }, posStyle as any, style]}
+      onPress={handlePress}
+      disabled={disabled}
+      pointerEvents={disabled ? 'none' : 'auto'}
+      style={[
+        styles.button,
+        { width: size, height: size, borderRadius: size / 2, backgroundColor: color },
+        posStyle as any,
+        style,
+        disabled && { opacity: 0.6 },
+      ]}
     >
       <View style={styles.iconWrap}>
         <Ionicons name={iconName} size={Math.floor(size * 0.5)} color={iconColor} />
