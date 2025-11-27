@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -18,7 +19,7 @@ import { AddPaymentModal } from '../../components/AddPaymentModal';
 import { PagoCard } from '../../components/PagoCard';
 import { usePagoActions } from '@/hooks/usePagoActions';
 import { useOptimisticPagos } from '@/hooks/useOptimisticPagos';
-
+import { useTranslation } from 'react-i18next';
 type DayReminder = {
   fecha: string;
   totalDia: number;
@@ -26,6 +27,7 @@ type DayReminder = {
 };
 
 export default function PagosScreen() {
+  const { t } = useTranslation();
   const { tema } = useTema();
   const isDark = tema === 'dark';
 
@@ -33,14 +35,14 @@ export default function PagosScreen() {
   const userId = session?.user?.id ?? null;
 
   const { data: pagos, isLoading, error, refetch } = usePagos(userId);
-  
+
   // Estado optimista para actualizaciones inmediatas - SOLO UNA DECLARACIÓN
-  const { 
-    pagos: optimisticPagos, 
-    updatePagoInState, 
-    removePagoFromState, 
+  const {
+    pagos: optimisticPagos,
+    updatePagoInState,
+    removePagoFromState,
     setPagosState,
-    addPagoToState 
+    addPagoToState
   } = useOptimisticPagos(pagos || []);
 
   // Sincronizar cuando cambien los datos de la API
@@ -61,33 +63,33 @@ export default function PagosScreen() {
   const optimisticMarkAsPaid = async (pago: PagoWithRelations) => {
     // Actualización optimista inmediata
     updatePagoInState(pago.id_pago, { estado: 'Pagado' });
-    
+
     // Llamada real a la API
     const success = await handleMarkAsPaid(pago);
-    
+
     if (!success) {
       // Revertir si falla
       updatePagoInState(pago.id_pago, { estado: 'Pendiente' });
     }
-    
+
     return success;
   };
 
   const optimisticDeletePago = async (pago: PagoWithRelations) => {
     // Guardar copia para posible reversión
     const pagoBackup = { ...pago };
-    
+
     // Eliminación optimista inmediata
     removePagoFromState(pago.id_pago);
-    
+
     // Llamada real a la API
     const success = await handleDeletePago(pago);
-    
+
     if (!success) {
       // Revertir si falla
       addPagoToState(pagoBackup);
     }
-    
+
     return success;
   };
 
@@ -102,7 +104,7 @@ export default function PagosScreen() {
     }
 
     console.log('Total pagos recibidos:', optimisticPagos.length);
-    
+
     // Filtrar solo los pagos del mes actual, igual que en el calendario
     const filtered = optimisticPagos.filter((pago) => {
       const pagoDate = new Date(pago.fecha_vencimiento);
@@ -110,7 +112,7 @@ export default function PagosScreen() {
     });
 
     console.log('Pagos del mes actual:', filtered.length);
-    
+
     return filtered;
   }, [optimisticPagos, isLoading, year, month]);
 
@@ -121,10 +123,10 @@ export default function PagosScreen() {
     }
 
     console.log('Procesando pagos filtrados:', pagosFiltrados.length);
-    
+
     const groupedByDay = pagosFiltrados.reduce((acc, pago) => {
       const dateKey = pago.fecha_vencimiento;
-      
+
       console.log('Procesando pago:', pago.titulo, 'Fecha:', dateKey, 'Monto:', pago.monto);
 
       if (!acc[dateKey]) {
@@ -134,7 +136,7 @@ export default function PagosScreen() {
           pagos: [],
         };
       }
-      
+
       const monto = Number(pago.monto) || 0;
       acc[dateKey].totalDia += monto;
       acc[dateKey].pagos.push(pago);
@@ -201,13 +203,13 @@ export default function PagosScreen() {
     const [year, month, day] = dateStr.split('-').map(Number);
     const targetDate = new Date(year, month - 1, day);
     targetDate.setHours(0, 0, 0, 0);
-    
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const diffTime = targetDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     return diffDays;
   };
 
@@ -248,35 +250,35 @@ export default function PagosScreen() {
 
     if (diffDays < 0) {
       return {
-        text: `Vencido hace ${Math.abs(diffDays)} día${Math.abs(diffDays) !== 1 ? 's' : ''}`,
+        text: `${t('DaysAgo')} ${Math.abs(diffDays)} ${Math.abs(diffDays) !== 1 ? t('Days') : t('Day')}`,
         badgeStyle: styles.badgeOverdue as ViewStyle,
         textStyle: styles.badgeTextWhite as TextStyle,
       };
     }
     if (diffDays === 0) {
       return {
-        text: 'Hoy',
+        text: t('Today'),
         badgeStyle: styles.badgeToday as ViewStyle,
         textStyle: styles.badgeTextWhite as TextStyle,
       };
     }
     if (diffDays === 1) {
       return {
-        text: 'Mañana',
+        text: t('Tomorrow'),
         badgeStyle: (isDark ? styles.badgeTomorrowDark : styles.badgeTomorrow) as ViewStyle,
         textStyle: (isDark ? styles.badgeTextDark : styles.badgeText) as TextStyle,
       };
     }
     if (diffDays <= 7) {
       return {
-        text: `En ${diffDays} días`,
+        text: `${t('InDays')} ${diffDays} ${t('InDaysPlural')}`,
         badgeStyle: (isDark ? styles.badgeWeekDark : styles.badgeWeek) as ViewStyle,
         textStyle: (isDark ? styles.badgeTextDark : styles.badgeText) as TextStyle,
       };
     }
-    
+
     return {
-      text: `En ${diffDays} días`,
+      text: `${t('InDays')} ${diffDays} ${t('InDaysPlural')}`,
       badgeStyle: (isDark ? styles.badgeDefaultDark : styles.badgeDefault) as ViewStyle,
       textStyle: (isDark ? styles.badgeTextDark : styles.badgeText) as TextStyle,
     };
@@ -290,10 +292,8 @@ export default function PagosScreen() {
           <View style={isDark ? [styles.card, styles.cardDark] : styles.card}>
             <View style={styles.errorContainer}>
               <Text style={styles.errorIcon}>🔒</Text>
-              <Text style={styles.errorText}>No autenticado</Text>
-              <Text style={styles.errorSubtext}>
-                Debes iniciar sesión para ver tus pagos
-              </Text>
+              <Text style={styles.errorText}>{t('NotAuthenticated')}</Text>
+              <Text style={styles.errorSubtext}>{t('MustLoginToSeePayments')}</Text>
             </View>
           </View>
         </View>
@@ -307,14 +307,15 @@ export default function PagosScreen() {
         <View style={styles.mainContainer}>
           <View style={styles.headerSection}>
             <Text style={isDark ? [styles.title, styles.titleDark] : styles.title}>Pagos</Text>
+            <Text style={isDark ? [styles.title, styles.titleDark] : styles.title}>{t('PaymentsTitle')}</Text>
             <Text style={isDark ? [styles.subtitle, styles.subtitleDark] : styles.subtitle}>
-              Revisa tus obligaciones próximas y mantente al día.
+              {t('ReviewUpcomingObligations')}
             </Text>
           </View>
           <View style={isDark ? [styles.card, styles.cardDark] : styles.card}>
             <View style={styles.errorContainer}>
               <Text style={styles.errorIcon}>⚠️</Text>
-              <Text style={styles.errorText}>Error al cargar pagos</Text>
+              <Text style={styles.errorText}>{t('ErrorLoadingPayments')}</Text>
               <Text style={styles.errorSubtext}>{error.message}</Text>
             </View>
           </View>
@@ -329,14 +330,15 @@ export default function PagosScreen() {
         <View style={styles.mainContainer}>
           <View style={styles.headerSection}>
             <Text style={isDark ? [styles.title, styles.titleDark] : styles.title}>Pagos</Text>
+            <Text style={isDark ? [styles.title, styles.titleDark] : styles.title}>{t('PaymentsTitle')}</Text>
             <Text style={isDark ? [styles.subtitle, styles.subtitleDark] : styles.subtitle}>
-              Revisa tus obligaciones próximas y mantente al día.
+              {t('ReviewUpcomingObligations')}
             </Text>
           </View>
           <View style={isDark ? [styles.card, styles.cardDark] : styles.card}>
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#3b82f6" />
-              <Text style={isDark ? [styles.emptyText, styles.emptyTextDark] : styles.emptyText}>Cargando pagos...</Text>
+              <Text style={isDark ? [styles.emptyText, styles.emptyTextDark] : styles.emptyText}>{t('LoadingPayments')}</Text>
             </View>
           </View>
         </View>
@@ -350,18 +352,19 @@ export default function PagosScreen() {
         <View style={styles.mainContainer}>
           <View style={styles.headerSection}>
             <Text style={isDark ? [styles.title, styles.titleDark] : styles.title}>Pagos</Text>
+            <Text style={isDark ? [styles.title, styles.titleDark] : styles.title}>{t('PaymentsTitle')}</Text>
             <Text style={isDark ? [styles.subtitle, styles.subtitleDark] : styles.subtitle}>
-              Revisa tus obligaciones próximas y mantente al día.
+              {t('ReviewUpcomingObligations')}
             </Text>
           </View>
           <View style={isDark ? [styles.card, styles.cardDark] : styles.card}>
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyIcon}>📅</Text>
               <Text style={isDark ? [styles.emptyText, styles.emptyTextDark] : styles.emptyText}>
-                No hay pagos registrados para este mes
+                {t('NoPaymentsRegisteredThisMonth')}
               </Text>
               <Text style={isDark ? [styles.emptyText, styles.emptyTextDark, styles.emptySubtext] : [styles.emptyText, styles.emptySubtext]}>
-                Puedes comenzar añadiendo uno desde el botón inferior.
+                {t('CanStartAddingOne')}
               </Text>
             </View>
           </View>
@@ -383,23 +386,25 @@ export default function PagosScreen() {
       <View style={styles.mainContainer}>
         <View style={styles.headerSection}>
           <Text style={isDark ? [styles.title, styles.titleDark] : styles.title}>Pagos</Text>
+          <Text style={isDark ? [styles.title, styles.titleDark] : styles.title}>{t('PaymentsTitle')}</Text>
           <Text style={isDark ? [styles.subtitle, styles.subtitleDark] : styles.subtitle}>
-            Revisa tus obligaciones próximas y mantente al día.
+            {t('ReviewUpcomingObligations')}
           </Text>
         </View>
 
         <View style={isDark ? [styles.card, styles.cardDark] : styles.card}>
           <View style={styles.header}>
-            <Text style={isDark ? [styles.headerTitle, styles.headerTitleDark] : styles.headerTitle}>📅 Todos los Pagos</Text>
             <View style={isDark ? styles.badgeInfoDark : styles.badgeInfo}>
+              <Text style={isDark ? [styles.headerTitle, styles.headerTitleDark] : styles.headerTitle}>{t('AllPayments')}</Text>
               <Text style={isDark ? [styles.badgeText, styles.badgeTextDark] : styles.badgeText}>
-                {totalPagos} pago{totalPagos !== 1 ? 's' : ''}
+                {totalPagos} {t('Payment')}{totalPagos !== 1 ? 's' : ''}
               </Text>
             </View>
           </View>
 
-          <ScrollView 
+          <ScrollView
             style={styles.remindersScrollContainer}
+            contentContainerStyle={{ paddingBottom: 100 }}
             nestedScrollEnabled={true}
             showsVerticalScrollIndicator={false}
             refreshControl={
@@ -468,7 +473,7 @@ export default function PagosScreen() {
 
           <View style={isDark ? [styles.summary, styles.summaryDark] : styles.summary}>
             <View style={styles.summaryRow}>
-              <Text style={isDark ? [styles.summaryLabel, styles.summaryLabelDark] : styles.summaryLabel}>Total General:</Text>
+              <Text style={isDark ? [styles.summaryLabel, styles.summaryLabelDark] : styles.summaryLabel}>{t('GeneralTotal')}</Text>
               <Text style={isDark ? [styles.summaryValue, styles.summaryValueDark] : styles.summaryValue}>
                 {formatCurrency(
                   calendarReminders.reduce((sum, reminder) => sum + reminder.totalDia, 0)
@@ -476,19 +481,19 @@ export default function PagosScreen() {
               </Text>
             </View>
             <View style={styles.summaryRow}>
-              <Text style={isDark ? [styles.summaryLabel, styles.summaryLabelDark] : styles.summaryLabel}>Pendientes:</Text>
+              <Text style={isDark ? [styles.summaryLabel, styles.summaryLabelDark] : styles.summaryLabel}>{t('PendingPayments')}</Text>
               <Text style={isDark ? [styles.summaryValuePending, styles.summaryValuePendingDark] : styles.summaryValuePending}>
                 {totalPendientes} pago{totalPendientes !== 1 ? 's' : ''}
               </Text>
             </View>
             <View style={styles.summaryRow}>
-              <Text style={isDark ? [styles.summaryLabel, styles.summaryLabelDark] : styles.summaryLabel}>Pagados:</Text>
+              <Text style={isDark ? [styles.summaryLabel, styles.summaryLabelDark] : styles.summaryLabel}>{t('PaidPayments')}</Text>
               <Text style={isDark ? [styles.summaryValuePaid, styles.summaryValuePaidDark] : styles.summaryValuePaid}>
                 {totalPagados} pago{totalPagados !== 1 ? 's' : ''}
               </Text>
             </View>
             <View style={styles.summaryRow}>
-              <Text style={isDark ? [styles.summaryLabel, styles.summaryLabelDark] : styles.summaryLabel}>Días con pagos:</Text>
+              <Text style={isDark ? [styles.summaryLabel, styles.summaryLabelDark] : styles.summaryLabel}>{t('DaysWithPayments')}</Text>
               <Text style={isDark ? [styles.summaryValue, styles.summaryValueDark] : styles.summaryValue}>
                 {calendarReminders.length}
               </Text>
@@ -502,10 +507,11 @@ export default function PagosScreen() {
       </View>
     </SafeAreaView>
   );
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
+  container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
@@ -580,7 +586,118 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 14,
     color: '#737373',
+    paddingVertical: 32,
+  },
+  emptyIcon: {
+    fontSize: 48,
+    marginBottom: 16,
+    opacity: 0.5,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#737373',
     textAlign: 'center',
+  },
+  emptyTextDark: {
+    color: '#a3a3a3',
+  },
+  emptySubtext: {
+    marginTop: 8,
+    fontSize: 12,
+  },
+  monthSection: {
+    marginBottom: 24,
+  },
+  monthTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#0a0a0a',
+    marginBottom: 12,
+    textTransform: 'capitalize',
+  },
+  monthTitleDark: {
+    color: '#fafafa',
+  },
+  remindersScrollContainer: {
+    maxHeight: 450,
+  },
+  remindersContainer: {
+    gap: 0,
+  },
+  reminderCard: {
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e5e5e5',
+    backgroundColor: '#f9fafb',
+    marginBottom: 12,
+  },
+  reminderCardDark: {
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    backgroundColor: '#262626',
+    borderColor: '#404040',
+    marginBottom: 12,
+  },
+  reminderCardOverdue: {
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ef4444',
+    backgroundColor: '#fee2e2',
+    marginBottom: 12,
+  },
+  reminderCardOverdueDark: {
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ef4444',
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    marginBottom: 12,
+  },
+  reminderCardToday: {
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#3b82f6',
+    backgroundColor: '#eff6ff',
+    marginBottom: 12,
+  },
+  reminderCardTodayDark: {
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#3b82f6',
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    marginBottom: 12,
+  },
+  reminderCardWeek: {
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#fb923c',
+    backgroundColor: '#fff7ed',
+    marginBottom: 12,
+  },
+  reminderCardWeekDark: {
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#fb923c',
+    backgroundColor: 'rgba(251, 146, 60, 0.1)',
+    marginBottom: 12,
+  },
+  reminderHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  reminderHeaderLeft: {
+    flex: 1,
+  },
+  dateText: {
   },
   emptyTextDark: {
     color: '#a3a3a3',
@@ -879,113 +996,113 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   pagoTitle: {
-fontSize: 14,
-fontWeight: '500',
-color: '#0a0a0a',
-marginBottom: 4,
-},
-pagoTitleDark: {
-color: '#fafafa',
-},
-pagoMetaRow: {
-flexDirection: 'row',
-alignItems: 'center',
-gap: 8,
-},
-pagoCategory: {
-fontSize: 12,
-color: '#737373',
-textTransform: 'capitalize',
-},
-pagoCategoryDark: {
-color: '#a3a3a3',
-},
-pagoAmount: {
-fontSize: 14,
-fontWeight: '600',
-color: '#0a0a0a',
-},
-pagoAmountDark: {
-color: '#fafafa',
-},
-summary: {
-marginTop: 16,
-paddingTop: 16,
-borderTopWidth: 1,
-borderTopColor: '#F8FAFC',
-gap: 8,
-},
-summaryDark: {
-borderTopColor: '#262626',
-},
-summaryRow: {
-flexDirection: 'row',
-justifyContent: 'space-between',
-alignItems: 'center',
-},
-summaryLabel: {
-fontSize: 14,
-color: '#737373',
-},
-summaryLabelDark: {
-color: '#a3a3a3',
-},
-summaryValue: {
-fontSize: 14,
-fontWeight: '600',
-color: '#0a0a0a',
-},
-summaryValueDark: {
-color: '#fafafa',
-},
-summaryValuePending: {
-fontSize: 14,
-fontWeight: '600',
-color: '#ea580c',
-},
-summaryValuePendingDark: {
-fontSize: 14,
-fontWeight: '600',
-color: '#fb923c',
-},
-summaryValuePaid: {
-fontSize: 14,
-fontWeight: '600',
-color: '#16a34a',
-},
-summaryValuePaidDark: {
-fontSize: 14,
-fontWeight: '600',
-color: '#4ade80',
-},
-loadingContainer: {
-paddingVertical: 40,
-alignItems: 'center',
-gap: 12,
-},
-errorContainer: {
-padding: 20,
-alignItems: 'center',
-},
-errorIcon: {
-fontSize: 48,
-marginBottom: 12,
-},
-errorText: {
-fontSize: 16,
-fontWeight: '600',
-color: '#ef4444',
-marginBottom: 8,
-},
-errorSubtext: {
-fontSize: 12,
-color: '#737373',
-textAlign: 'center',
-},
-buttonContainer: {
-position: 'absolute',
-bottom: 20,
-left: 24,
-right: 24,
-},
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#0a0a0a',
+    marginBottom: 4,
+  },
+  pagoTitleDark: {
+    color: '#fafafa',
+  },
+  pagoMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  pagoCategory: {
+    fontSize: 12,
+    color: '#737373',
+    textTransform: 'capitalize',
+  },
+  pagoCategoryDark: {
+    color: '#a3a3a3',
+  },
+  pagoAmount: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0a0a0a',
+  },
+  pagoAmountDark: {
+    color: '#fafafa',
+  },
+  summary: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F8FAFC',
+    gap: 8,
+  },
+  summaryDark: {
+    borderTopColor: '#262626',
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: '#737373',
+  },
+  summaryLabelDark: {
+    color: '#a3a3a3',
+  },
+  summaryValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0a0a0a',
+  },
+  summaryValueDark: {
+    color: '#fafafa',
+  },
+  summaryValuePending: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#ea580c',
+  },
+  summaryValuePendingDark: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fb923c',
+  },
+  summaryValuePaid: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#16a34a',
+  },
+  summaryValuePaidDark: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4ade80',
+  },
+  loadingContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
+    gap: 12,
+  },
+  errorContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  errorIcon: {
+    fontSize: 48,
+    marginBottom: 12,
+  },
+  errorText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ef4444',
+    marginBottom: 8,
+  },
+  errorSubtext: {
+    fontSize: 12,
+    color: '#737373',
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 24,
+    right: 24,
+  },
 });

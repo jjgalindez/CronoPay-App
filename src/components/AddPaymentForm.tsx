@@ -33,11 +33,7 @@ interface AddPaymentFormProps {
 }
 
 export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
-  // TEMA: Usar useColorScheme, luego puedes reemplazar con ThemeProvider
-  // Para actualizar con ThemeProvider:
-  // 1. Importa tu contexto: import { useTheme } from '@/contexts/ThemeContext'
-  // 2. Reemplaza: const { theme } = useTheme()
-  // 3. Cambia: isDark = theme === 'dark'
+  
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 

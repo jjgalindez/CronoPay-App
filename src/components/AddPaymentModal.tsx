@@ -5,6 +5,8 @@ import {
   StyleSheet,
   useColorScheme,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useTema } from '@/hooks/useTema';
 import { AddPaymentForm } from './AddPaymentForm';
 import FloatButton from './FloatButton';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

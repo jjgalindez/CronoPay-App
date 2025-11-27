@@ -1,13 +1,12 @@
-// components/PagoCard.tsx
 import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ViewStyle,
   TextStyle,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { PagoWithRelations } from 'lib/api/pagos';
 import { useTema } from '@/hooks/useTema';
 import { PagoActions } from './PagoActions';
@@ -27,24 +26,33 @@ export const PagoCard: React.FC<PagoCardProps> = ({
   loadingAction,
   isDark,
 }) => {
+  const { t } = useTranslation();
   const isPaid = pago.estado === 'Pagado';
 
   const getPaymentStatusBadge = () => {
     if (isPaid) {
       return {
-        text: 'Pagado',
+        text: t('Paid'),
         badgeStyle: (isDark ? styles.badgeStatusPaidDark : styles.badgeStatusPaid) as ViewStyle,
         textStyle: (isDark ? styles.badgeStatusTextPaidDark : styles.badgeStatusTextPaid) as TextStyle,
       };
     }
     return {
-      text: 'Pendiente',
+      text: t('Pending'),
       badgeStyle: (isDark ? styles.badgeStatusPendingDark : styles.badgeStatusPending) as ViewStyle,
       textStyle: (isDark ? styles.badgeStatusTextPendingDark : styles.badgeStatusTextPending) as TextStyle,
     };
   };
 
   const statusBadge = getPaymentStatusBadge();
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
 
   return (
     <View style={[
@@ -54,17 +62,17 @@ export const PagoCard: React.FC<PagoCardProps> = ({
     ]}>
       <View style={styles.pagoInfo}>
         <View style={styles.pagoHeader}>
-          <Text 
+          <Text
             style={[
               styles.pagoTitle,
               isDark ? styles.pagoTitleDark : styles.pagoTitleLight,
               isPaid && styles.pagoTitlePaid
-            ]} 
+            ]}
             numberOfLines={1}
           >
             {pago.titulo}
           </Text>
-          <Text 
+          <Text
             style={[
               styles.pagoAmount,
               isDark ? styles.pagoAmountDark : styles.pagoAmountLight,
@@ -74,26 +82,26 @@ export const PagoCard: React.FC<PagoCardProps> = ({
             {formatCurrency(Number(pago.monto) || 0)}
           </Text>
         </View>
-        
+
         <View style={styles.pagoMetaRow}>
-          <Text 
+          <Text
             style={[
               styles.pagoCategory,
               isDark ? styles.pagoCategoryDark : styles.pagoCategoryLight,
               isPaid && styles.pagoCategoryPaid
-            ]} 
+            ]}
             numberOfLines={1}
           >
-            {pago.categoria?.nombre || 'Sin categoría'}
+            {pago.categoria?.nombre || t('Uncategoryed')}
           </Text>
-          
+
           <View style={styles.metaRight}>
             <View style={statusBadge.badgeStyle}>
               <Text style={statusBadge.textStyle}>
                 {statusBadge.text}
               </Text>
             </View>
-            
+
             <PagoActions
               pago={pago}
               onMarkAsPaid={onMarkAsPaid}
@@ -105,14 +113,6 @@ export const PagoCard: React.FC<PagoCardProps> = ({
       </View>
     </View>
   );
-};
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    minimumFractionDigits: 0,
-  }).format(amount);
 };
 
 const styles = StyleSheet.create({

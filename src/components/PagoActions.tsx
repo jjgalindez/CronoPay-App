@@ -1,4 +1,3 @@
-// components/PagoActions.tsx
 import React from 'react';
 import {
   View,
@@ -46,10 +45,10 @@ export const PagoActions: React.FC<PagoActionsProps> = ({
           {isMarkingAsPaid ? (
             <ActivityIndicator size="small" color="#16a34a" />
           ) : (
-            <Ionicons 
-              name="checkmark-circle" 
-              size={20} 
-              color="#16a34a" 
+            <Ionicons
+              name="checkmark-circle"
+              size={20}
+              color="#16a34a"
             />
           )}
         </TouchableOpacity>
@@ -68,10 +67,10 @@ export const PagoActions: React.FC<PagoActionsProps> = ({
         {isDeleting ? (
           <ActivityIndicator size="small" color="#ef4444" />
         ) : (
-          <Ionicons 
-            name="trash" 
-            size={18} 
-            color="#ef4444" 
+          <Ionicons
+            name="trash"
+            size={18}
+            color="#ef4444"
           />
         )}
       </TouchableOpacity>

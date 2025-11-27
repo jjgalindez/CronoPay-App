@@ -13,6 +13,7 @@ import { usePagos } from '../hooks/usePagos';
 import { useAuth } from 'providers/AuthProvider';
 import { PagoWithRelations } from 'lib/api/pagos';
 import { getDaysUntil, isToday as checkIsToday, isOverdue as checkIsOverdue } from '@/utils/dateHelpers';
+import { useTranslation } from 'react-i18next';
 
 type DayReminder = {
   fecha: string;
@@ -21,6 +22,7 @@ type DayReminder = {
 };
 
 export function PaymentReminders() {
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -185,7 +187,7 @@ export function PaymentReminders() {
         textStyle: textStyles,
       };
     }
-    
+
     const badgeStyles = [styles.badge, styles.badgeDefault];
     const textStyles: any[] = [styles.badgeText];
     if (isDark) {
@@ -221,10 +223,8 @@ export function PaymentReminders() {
         <View style={dynamicStyles.card}>
           <View style={styles.errorContainer}>
             <Text style={styles.errorIcon}>🔒</Text>
-            <Text style={styles.errorText}>No autenticado</Text>
-            <Text style={styles.errorSubtext}>
-              Debes iniciar sesión para ver tus recordatorios
-            </Text>
+            <Text style={styles.errorText}>{t('NotAuthenticated')}</Text>
+            <Text style={styles.errorSubtext}>{t('MustLoginToSeeReminders')}</Text>
           </View>
         </View>
       </View>
@@ -237,7 +237,7 @@ export function PaymentReminders() {
         <View style={dynamicStyles.card}>
           <View style={styles.errorContainer}>
             <Text style={styles.errorIcon}>⚠️</Text>
-            <Text style={styles.errorText}>Error al cargar recordatorios</Text>
+            <Text style={styles.errorText}>{t('ErrorLoadingReminders')}</Text>
             <Text style={styles.errorSubtext}>{error.message}</Text>
           </View>
         </View>
@@ -251,7 +251,7 @@ export function PaymentReminders() {
         <View style={dynamicStyles.card}>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#3b82f6" />
-            <Text style={dynamicStyles.emptyText}>Cargando recordatorios...</Text>
+            <Text style={dynamicStyles.emptyText}>{t('LoadingReminders')}</Text>
           </View>
         </View>
       </View>
@@ -263,13 +263,11 @@ export function PaymentReminders() {
       <View style={dynamicStyles.container}>
         <View style={dynamicStyles.card}>
           <View style={styles.header}>
-            <Text style={dynamicStyles.title}>📅 Recordatorios</Text>
+            <Text style={dynamicStyles.title}>{t('Reminders')}</Text>
           </View>
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyIcon}>📅</Text>
-            <Text style={dynamicStyles.emptyText}>
-              No hay recordatorios de pagos pendientes
-            </Text>
+            <Text style={dynamicStyles.emptyText}>{t('NoPaymentReminders')}</Text>
           </View>
         </View>
       </View>
@@ -288,12 +286,12 @@ export function PaymentReminders() {
           <Text style={dynamicStyles.title}>📅 Recordatorios</Text>
           <View style={badgeInfoStyles}>
             <Text style={badgeInfoTextStyles}>
-              {totalPagos} pago{totalPagos !== 1 ? 's' : ''}
+              {totalPagos} {t('Payment')}{totalPagos !== 1 ? 's' : ''}
             </Text>
           </View>
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.remindersScrollContainer}
           nestedScrollEnabled={true}
           showsVerticalScrollIndicator={false}
@@ -323,8 +321,7 @@ export function PaymentReminders() {
                               </Text>
                             </View>
                             <Text style={dynamicStyles.countText}>
-                              {reminder.pagos.length} pago
-                              {reminder.pagos.length !== 1 ? 's' : ''}
+                              {reminder.pagos.length} {t('Payment')}{reminder.pagos.length !== 1 ? 's' : ''}
                             </Text>
                           </View>
                         </View>
@@ -339,7 +336,7 @@ export function PaymentReminders() {
                       <View style={styles.pagosContainer}>
                         {reminder.pagos.map((pago, pagoIndex) => {
                           const pagoCardStyles = isDark ? [styles.pagoCard, styles.pagoCardDark] : [styles.pagoCard];
-                          
+
                           return (
                             <View
                               key={`${pago.id_pago}-${pagoIndex}`}
@@ -370,7 +367,7 @@ export function PaymentReminders() {
 
         <View style={isDark ? [styles.summary, styles.summaryDark] : [styles.summary]}>
           <View style={styles.summaryRow}>
-            <Text style={dynamicStyles.summaryLabel}>Total Pagos:</Text>
+            <Text style={dynamicStyles.summaryLabel}>{t('TotalPaymentsColon')}</Text>
             <Text style={dynamicStyles.summaryValue}>
               {formatCurrency(
                 calendarReminders.reduce((sum, reminder) => sum + reminder.totalDia, 0)
@@ -378,13 +375,13 @@ export function PaymentReminders() {
             </Text>
           </View>
           <View style={styles.summaryRow}>
-            <Text style={dynamicStyles.summaryLabel}>Días con pagos:</Text>
+            <Text style={dynamicStyles.summaryLabel}>{t('DaysWithPayments')}</Text>
             <Text style={dynamicStyles.summaryValue}>
               {calendarReminders.length}
             </Text>
           </View>
           <View style={styles.summaryRow}>
-            <Text style={dynamicStyles.summaryLabel}>Total de pagos pendientes:</Text>
+            <Text style={dynamicStyles.summaryLabel}>{t('TotalPaymentsPending')}</Text>
             <Text style={dynamicStyles.summaryValue}>
               {totalPagos}
             </Text>
