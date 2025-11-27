@@ -10,6 +10,8 @@ import DonutChart from "../../components/DonutChart"
 import PaymentsList from "../../components/PaymentsList"
 import { useTranslation } from "react-i18next"
 import Button from "@/components/Button"
+import { useRouter } from 'expo-router'
+import { openAddPaymentModal } from '../../utils/addPaymentModalBus'
 
 export default function InicioScreen() {
   const { session, signOut } = useAuth()
@@ -19,6 +21,7 @@ export default function InicioScreen() {
   const { colorScheme } = useColorScheme()
   const isDark = colorScheme === 'dark'
   const { t } = useTranslation()
+  const router = useRouter()
   const displayName = useMemo(() => {
     const metadataName = session?.user?.user_metadata?.full_name
     if (metadataName) {
@@ -148,10 +151,16 @@ export default function InicioScreen() {
         <View className="mt-6">
           <PaymentsList items={recentPayments} title={t("NextDueDates")}/>
         </View>
-        <Button label={'+  ' + t("AddNewPayment")}
-        backgroundColor="#12C48B"
-        darkBackgroundColor="#0B6B4F"
-        onPress={() => Alert.alert("WIP")} />
+        <Button
+          label={'+  ' + t("AddNewPayment")}
+          backgroundColor="#12C48B"
+          darkBackgroundColor="#0B6B4F"
+          onPress={() => {
+            router.push('/pagos')
+            // open modal shortly after navigation to ensure target mounted
+            setTimeout(() => openAddPaymentModal(), 250)
+          }}
+        />
       </ScrollView>
     </SafeAreaView>
   )
