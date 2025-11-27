@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import {
   View,
   Text,
@@ -23,7 +24,7 @@ type Categoria = {
 
 type MetodoPago = {
   id_metodo: number;
-
+  tipo : string;
 };
 
 interface AddPaymentFormProps {
@@ -39,6 +40,8 @@ export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
   // 3. Cambia: isDark = theme === 'dark'
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
+
+  // const {t} = useTraslation();
 
   const { session } = useAuth();
   const userId = session?.user?.id ?? null;
@@ -377,7 +380,7 @@ export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
                   isDark && styles.chipTextDark,
                 ].filter(Boolean)}
               >
-                {metodo.id_metodo}
+                {metodo.tipo}
               </Text>
             </TouchableOpacity>
           ))}

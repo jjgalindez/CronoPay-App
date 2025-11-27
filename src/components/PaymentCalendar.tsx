@@ -1,6 +1,6 @@
 import { PagoWithRelations } from "lib/api/pagos"
 import { useAuth } from "providers/AuthProvider"
-import React, { useMemo } from "react"
+import React, { useMemo, useState } from "react"
 import {
   View,
   Text,
@@ -8,16 +8,28 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  Alert,
 } from "react-native"
+import { Ionicons } from '@expo/vector-icons'
 
 import { usePagos } from "../hooks/usePagos"
-
 import { useTema } from "@/hooks/useTema"
+import {
+  getMonthName,
+  filterByMonth,
+  isToday,
+  isOverdue,
+  getDaysUntil,
+  getMonthRange,
+  getPreviousMonth,
+  getNextMonth
+} from "../utils/dateHelpers"
 
 export function PaymentCalendar() {
   const { tema } = useTema()
   const isDark = tema === "dark"
+  const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
 
   // Obtener usuario del contexto de autenticación
   const { session } = useAuth()
@@ -26,64 +38,135 @@ export function PaymentCalendar() {
   // Obtener pagos del usuario
   const { data: pagos, isLoading, error } = usePagos(userId)
 
-  // Datos del mes actual
-  const currentDate = useMemo(() => new Date(), [])
-  const year = currentDate.getFullYear()
-  const month = currentDate.getMonth()
+  // Navegación entre meses
+  const goToPreviousMonth = () => {
+    const { month, year } = getPreviousMonth(currentMonth, currentYear)
+    setCurrentMonth(month)
+    setCurrentYear(year)
+    setSelectedDay(null) // Limpiar selección al cambiar de mes
+  }
+
+  const goToNextMonth = () => {
+    const { month, year } = getNextMonth(currentMonth, currentYear)
+    setCurrentMonth(month)
+    setCurrentYear(year)
+    setSelectedDay(null) // Limpiar selección al cambiar de mes
+  }
+
+  const goToCurrentMonth = () => {
+    const today = new Date()
+    setCurrentMonth(today.getMonth())
+    setCurrentYear(today.getFullYear())
+    setSelectedDay(null)
+  }
+
+  // Verificar si estamos en el mes actual
+  const isCurrentMonth = useMemo(() => {
+    const today = new Date()
+    return currentMonth === today.getMonth() && currentYear === today.getFullYear()
+  }, [currentMonth, currentYear])
 
   // Obtener el primer día del mes y cuántos días tiene
   const { daysInMonth, startDayOfWeek } = useMemo(() => {
-    const first = new Date(year, month, 1)
-    const last = new Date(year, month + 1, 0)
+    const first = new Date(currentYear, currentMonth, 1)
+    const last = new Date(currentYear, currentMonth + 1, 0)
     return {
       daysInMonth: last.getDate(),
       startDayOfWeek: first.getDay(),
     }
-  }, [year, month])
+  }, [currentYear, currentMonth])
 
-  // Nombres de los días y mes
-  const monthNames = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre",
-  ]
+  // Nombres de los días
   const dayNames = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 
-  // Procesar pagos del mes actual
-  const paymentsThisMonth = useMemo(() => {
-    if (!pagos || isLoading) return []
-
-    return pagos.filter((pago) => {
-      const pagoDate = new Date(pago.fecha_vencimiento)
-      return pagoDate.getFullYear() === year && pagoDate.getMonth() === month
+// Procesar pagos del mes actual - VERSIÓN MANUAL COMPLETA
+const paymentsThisMonth = useMemo(() => {
+  if (!pagos || isLoading) return []
+  
+  const filtered = pagos.filter((pago) => {
+    try {
+      // Parsear manualmente la fecha YYYY-MM-DD
+      const [yearStr, monthStr, dayStr] = pago.fecha_vencimiento.split('-')
+      const pagoYear = parseInt(yearStr)
+      const pagoMonth = parseInt(monthStr) - 1 // Restar 1 porque los meses en JS son 0-based
+      
+      console.log(`DEBUG: ${pago.titulo} - Fecha: ${pago.fecha_vencimiento} -> Mes: ${pagoMonth}, Año: ${pagoYear}`)
+      console.log(`DEBUG: Comparando con -> Mes actual: ${currentMonth}, Año actual: ${currentYear}`)
+      console.log(`DEBUG: Coincide: ${pagoMonth === currentMonth && pagoYear === currentYear}`)
+      
+      return pagoMonth === currentMonth && pagoYear === currentYear
+    } catch (error) {
+      console.error('Error procesando fecha:', pago.fecha_vencimiento, error)
+      return false
+    }
+  })
+  
+  console.log('=== DEBUG MANUAL FILTER ===')
+  console.log('Buscando mes:', currentMonth, '(0-based), año:', currentYear)
+  console.log('Total pagos disponibles:', pagos.length)
+  console.log('Pagos encontrados para este mes:', filtered.length)
+  
+  if (filtered.length === 0) {
+    console.log('NO se encontraron pagos para este mes')
+    // Mostrar todos los pagos disponibles para debug
+    pagos.forEach(p => {
+      const [y, m, d] = p.fecha_vencimiento.split('-')
+      console.log(`Pago disponible: ${p.titulo} - ${p.fecha_vencimiento} -> Mes: ${parseInt(m)-1}, Año: ${y}`)
     })
-  }, [pagos, isLoading, year, month])
+  } else {
+    filtered.forEach(p => {
+      console.log(`- ${p.titulo}: ${p.fecha_vencimiento}`)
+    })
+  }
+  console.log('=== FIN DEBUG ===')
+  
+  return filtered
+}, [pagos, isLoading, currentMonth, currentYear])
 
-  // Obtener días con pagos
-  const paymentDaysByDate = useMemo(() => {
-    return paymentsThisMonth.reduce(
-      (acc, pago) => {
-        const day = new Date(pago.fecha_vencimiento).getDate()
-        if (!acc[day]) {
-          acc[day] = []
-        }
-        acc[day].push(pago)
-        return acc
-      },
-      {} as Record<number, PagoWithRelations[]>,
-    )
-  }, [paymentsThisMonth])
+// Obtener días con pagos - VERSIÓN ROBUSTA (ESTA ES LA QUE FALTABA)
+const paymentDaysByDate = useMemo(() => {
+  const result: Record<number, PagoWithRelations[]> = {}
 
-  const today = currentDate.getDate()
+  paymentsThisMonth.forEach((pago) => {
+    // Parsear la fecha manualmente del formato YYYY-MM-DD
+    const dateParts = pago.fecha_vencimiento.split('-')
+    if (dateParts.length === 3) {
+      const day = parseInt(dateParts[2])
+
+      if (!result[day]) {
+        result[day] = []
+      }
+      result[day].push(pago)
+    }
+  })
+
+  console.log('Calendario - Días con pagos:', Object.keys(result).length)
+  Object.entries(result).forEach(([day, pagos]) => {
+    console.log(`Calendario - Día ${day}: ${pagos.length} pagos`)
+    pagos.forEach(pago => {
+      const dayFromString = parseInt(pago.fecha_vencimiento.split('-')[2])
+      console.log(`  - ${pago.titulo}: ${pago.fecha_vencimiento} -> Día del string: ${dayFromString}`)
+    })
+  })
+
+  return result
+}, [paymentsThisMonth])
+
+  // Obtener pagos del día seleccionado
+  const selectedDayPayments = useMemo(() => {
+    if (selectedDay === null) return []
+    return paymentDaysByDate[selectedDay] || []
+  }, [selectedDay, paymentDaysByDate])
+
+  // Función para verificar si un día específico es hoy
+  const isDayToday = (day: number) => {
+    const today = new Date();
+    return (
+      day === today.getDate() &&
+      currentMonth === today.getMonth() &&
+      currentYear === today.getFullYear()
+    );
+  };
 
   // Generar array de días del calendario
   const calendarDays = useMemo(() => {
@@ -116,6 +199,11 @@ export function PaymentCalendar() {
     summaryLabel: [styles.summaryLabel, isDark && styles.summaryLabelDark],
     summaryValue: [styles.summaryValue, isDark && styles.summaryValueDark],
     loadingText: [styles.loadingText, isDark && styles.loadingTextDark],
+    paymentDetailText: [styles.paymentDetailText, isDark && styles.paymentDetailTextDark],
+    paymentTitle: [styles.paymentTitle, isDark && styles.paymentTitleDark],
+    paymentAmount: [styles.paymentAmount, isDark && styles.paymentAmountDark],
+    navButton: [styles.navButton, isDark && styles.navButtonDark],
+    navButtonText: [styles.navButtonText, isDark && styles.navButtonTextDark],
   }
 
   // Si no hay sesión
@@ -150,59 +238,58 @@ export function PaymentCalendar() {
     )
   }
 
+  // Función para formatear moneda
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+    }).format(amount);
+  }
+
   // Función para renderizar cada día
   const renderDay = (day: number | null, index: number) => {
     if (day === null) {
       return <View key={`empty-${index}`} style={styles.dayCell} />
     }
 
-    const isToday = day === today
     const dayPayments = paymentDaysByDate[day] || []
     const hasPayments = dayPayments.length > 0
+    const isSelected = selectedDay === day
+    const dayIsToday = isDayToday(day)
 
     // Contar pagos por estado
     const pendingPayments = dayPayments.filter((p) => p.estado === "Pendiente")
     const paidPayments = dayPayments.filter((p) => p.estado === "Pagado")
 
-    // Determinar color basado en estado y si es vencido
-    const dayDate = new Date(year, month, day)
-    dayDate.setHours(0, 0, 0, 0)
-    const todayDate = new Date()
-    todayDate.setHours(0, 0, 0, 0)
-    const isPastDue = dayDate < todayDate && pendingPayments.length > 0
+    // Determinar si hay pagos vencidos - USANDO dateHelpers
+    const hasOverduePayments = dayPayments.some(pago =>
+      pago.estado === "Pendiente" && isOverdue(pago.fecha_vencimiento)
+    )
 
-    let dayStyle: any = styles.dayCell
+    let dayStyle: any = [styles.dayCell]
     let textStyle: any = dynamicStyles.dayText
 
-    if (isToday) {
-      dayStyle = [styles.dayCell, styles.dayToday]
+    if (isSelected) {
+      dayStyle.push(styles.daySelected)
+      textStyle = [styles.dayText, styles.daySelectedText]
+    } else if (dayIsToday) {
+      dayStyle.push(styles.dayToday)
       textStyle = [styles.dayText, styles.dayTodayText]
     } else if (hasPayments) {
-      if (isPastDue) {
-        dayStyle = [styles.dayCell, styles.dayOverdue]
+      if (hasOverduePayments) {
+        dayStyle.push(styles.dayOverdue)
         textStyle = [styles.dayText, styles.dayOverdueText]
       } else if (pendingPayments.length > 0) {
-        dayStyle = [
-          styles.dayCell,
-          styles.dayPending,
-          isDark && styles.dayPendingDark,
-        ]
-        textStyle = [
-          styles.dayText,
-          styles.dayPendingText,
-          isDark && styles.dayPendingTextDark,
-        ]
+        dayStyle.push(styles.dayPending)
+        if (isDark) dayStyle.push(styles.dayPendingDark)
+        textStyle = [styles.dayText, styles.dayPendingText]
+        if (isDark) textStyle = [styles.dayText, styles.dayPendingTextDark]
       } else {
-        dayStyle = [
-          styles.dayCell,
-          styles.dayPaid,
-          isDark && styles.dayPaidDark,
-        ]
-        textStyle = [
-          styles.dayText,
-          styles.dayPaidText,
-          isDark && styles.dayPaidTextDark,
-        ]
+        dayStyle.push(styles.dayPaid)
+        if (isDark) dayStyle.push(styles.dayPaidDark)
+        textStyle = [styles.dayText, styles.dayPaidText]
+        if (isDark) textStyle = [styles.dayText, styles.dayPaidTextDark]
       }
     }
 
@@ -210,21 +297,9 @@ export function PaymentCalendar() {
       <TouchableOpacity
         key={`day-${index}`}
         style={dayStyle}
-        disabled={!hasPayments}
         onPress={() => {
           if (hasPayments) {
-            const pagosList = dayPayments
-              .map(
-                (p) =>
-                  `• ${p.categoria?.nombre || "sin categoria"}: $${(
-                    p.monto || 0
-                  ).toLocaleString("es-CO")}`,
-              )
-              .join("\n")
-
-            Alert.alert(`Pagos del ${day} de ${monthNames[month]}`, pagosList, [
-              { text: "Cerrar", style: "cancel" },
-            ])
+            setSelectedDay(selectedDay === day ? null : day)
           }
         }}
       >
@@ -244,6 +319,54 @@ export function PaymentCalendar() {
     )
   }
 
+  // Renderizar detalles de pagos del día seleccionado
+  const renderPaymentDetails = () => {
+    if (selectedDay === null || selectedDayPayments.length === 0) {
+      return null
+    }
+
+    const totalDia = selectedDayPayments.reduce((sum, pago) => sum + Number(pago.monto || 0), 0)
+
+    return (
+      <View style={[styles.paymentDetails, isDark && styles.paymentDetailsDark]}>
+        <Text style={dynamicStyles.paymentTitle}>
+          Pagos del {selectedDay} de {getMonthName(currentMonth)}
+        </Text>
+
+        <View style={styles.paymentsList}>
+          {selectedDayPayments.map((pago, index) => (
+            <View
+              key={`${pago.id_pago}-${index}`}
+              style={[styles.paymentItem, isDark && styles.paymentItemDark]}
+            >
+              <View style={styles.paymentInfo}>
+                <Text style={dynamicStyles.paymentDetailText}>
+                  {pago.titulo}
+                </Text>
+                <Text style={styles.paymentCategory}>
+                  {pago.categoria?.nombre || "Sin categoría"} •
+                  <Text style={pago.estado === "Pagado" ? styles.statusPaid : styles.statusPending}>
+                    {pago.estado === "Pagado" ? " Pagado" : " Pendiente"}
+                  </Text>
+                </Text>
+              </View>
+              <Text style={dynamicStyles.paymentAmount}>
+                {formatCurrency(Number(pago.monto || 0))}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.paymentTotal}>
+          <Text style={dynamicStyles.paymentDetailText}>Total del día:</Text>
+          <Text style={dynamicStyles.paymentAmount}>
+            {formatCurrency(totalDia)}
+          </Text>
+        </View>
+      </View>
+    )
+  }
+
   return (
     <ScrollView style={dynamicStyles.container}>
       <View style={dynamicStyles.card}>
@@ -252,16 +375,42 @@ export function PaymentCalendar() {
           <Text style={dynamicStyles.title}>Calendario de Pagos</Text>
           {paymentsThisMonth.length > 0 && (
             <Text style={dynamicStyles.subtitle}>
-              {paymentsThisMonth.length} pago(s) este mes
+              {paymentsThisMonth.length} pago(s) en {getMonthName(currentMonth)}
             </Text>
           )}
         </View>
 
-        {/* Header del mes */}
-        <View style={styles.monthHeader}>
-          <Text style={dynamicStyles.monthText}>
-            {monthNames[month]} {year}
-          </Text>
+        {/* Navegación entre meses */}
+        <View style={styles.navigation}>
+          <TouchableOpacity 
+            style={dynamicStyles.navButton}
+            onPress={goToPreviousMonth}
+          >
+            <Ionicons name="chevron-back" size={20} color={isDark ? "#fafafa" : "#0a0a0a"} />
+            <Text style={dynamicStyles.navButtonText}>Anterior</Text>
+          </TouchableOpacity>
+
+          <View style={styles.monthHeader}>
+            <Text style={dynamicStyles.monthText}>
+              {getMonthName(currentMonth)} {currentYear}
+            </Text>
+            {!isCurrentMonth && (
+              <TouchableOpacity 
+                style={styles.currentMonthButton}
+                onPress={goToCurrentMonth}
+              >
+                <Text style={styles.currentMonthButtonText}>Hoy</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <TouchableOpacity 
+            style={dynamicStyles.navButton}
+            onPress={goToNextMonth}
+          >
+            <Text style={dynamicStyles.navButtonText}>Siguiente</Text>
+            <Ionicons name="chevron-forward" size={20} color={isDark ? "#fafafa" : "#0a0a0a"} />
+          </TouchableOpacity>
         </View>
 
         {/* Días de la semana */}
@@ -278,11 +427,18 @@ export function PaymentCalendar() {
           {calendarDays.map((day, index) => renderDay(day, index))}
         </View>
 
+        {/* Detalles de pagos del día seleccionado */}
+        {renderPaymentDetails()}
+
         {/* Leyenda */}
         <View style={styles.legend}>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, styles.legendToday]} />
             <Text style={dynamicStyles.legendText}>Hoy</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendColor, styles.legendSelected]} />
+            <Text style={dynamicStyles.legendText}>Seleccionado</Text>
           </View>
           <View style={styles.legendItem}>
             <View
@@ -313,7 +469,7 @@ export function PaymentCalendar() {
         {/* Resumen del mes */}
         {paymentsThisMonth.length > 0 && (
           <View style={[styles.summary, isDark && styles.summaryDark]}>
-            <Text style={dynamicStyles.summaryTitle}>Resumen del mes:</Text>
+            <Text style={dynamicStyles.summaryTitle}>Resumen de {getMonthName(currentMonth)}:</Text>
             <View style={styles.summaryGrid}>
               <View style={styles.summaryItem}>
                 <Text
@@ -345,10 +501,9 @@ export function PaymentCalendar() {
               </View>
               <View style={styles.summaryItem}>
                 <Text style={dynamicStyles.summaryValue}>
-                  $
-                  {paymentsThisMonth
-                    .reduce((sum, p) => sum + Number(p.monto ?? 0), 0)
-                    .toLocaleString("es-CO")}
+                  {formatCurrency(
+                    paymentsThisMonth.reduce((sum, p) => sum + Number(p.monto ?? 0), 0)
+                  )}
                 </Text>
                 <Text style={dynamicStyles.summaryLabel}>Total</Text>
               </View>
@@ -360,13 +515,17 @@ export function PaymentCalendar() {
         {isLoading && (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="small" color="#3b82f6" />
+            <Text style={dynamicStyles.loadingText}>Cargando pagos...</Text>
           </View>
         )}
 
         {!isLoading && paymentsThisMonth.length === 0 && (
-          <Text style={[styles.emptyText, isDark && styles.emptyTextDark]}>
-            No hay pagos este mes
-          </Text>
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyIcon}>📅</Text>
+            <Text style={[styles.emptyText, isDark && styles.emptyTextDark]}>
+              No hay pagos en {getMonthName(currentMonth)}
+            </Text>
+          </View>
         )}
       </View>
     </ScrollView>
@@ -424,11 +583,54 @@ const styles = StyleSheet.create({
     color: "#a3a3a3",
   },
 
-  // Month Header
-  monthHeader: {
+  // Navegación
+  navigation: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
   },
+  navButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e5e5e5",
+    backgroundColor: "#f8fafc",
+  },
+  navButtonDark: {
+    backgroundColor: "#262626",
+    borderColor: "#404040",
+  },
+  navButtonText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#0a0a0a",
+    marginHorizontal: 4,
+  },
+  navButtonTextDark: {
+    color: "#fafafa",
+  },
+  monthHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+  },
+  currentMonthButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: "#3b82f6",
+    borderRadius: 6,
+  },
+  currentMonthButtonText: {
+    fontSize: 12,
+    color: "#ffffff",
+    fontWeight: "500",
+  },
+
+  // Month Header
   monthText: {
     fontSize: 16,
     fontWeight: "600",
@@ -470,6 +672,8 @@ const styles = StyleSheet.create({
     padding: 4,
     borderRadius: 8,
     marginVertical: 2,
+    borderWidth: 1,
+    borderColor: "transparent",
   },
   dayText: {
     fontSize: 14,
@@ -477,6 +681,16 @@ const styles = StyleSheet.create({
   },
   dayTextDark: {
     color: "#fafafa",
+  },
+
+  // Day States - Selected
+  daySelected: {
+    backgroundColor: "#506266",
+    borderColor: "#10454F",
+  },
+  daySelectedText: {
+    color: "#ffffff",
+    fontWeight: "bold",
   },
 
   // Day States - Today
@@ -546,6 +760,86 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
 
+  // Payment Details
+  paymentDetails: {
+    marginTop: 16,
+    padding: 16,
+    backgroundColor: "#f8fafc",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+  },
+  paymentDetailsDark: {
+    backgroundColor: "#262626",
+    borderColor: "#404040",
+  },
+  paymentTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#0a0a0a",
+    marginBottom: 12,
+  },
+  paymentTitleDark: {
+    color: "#fafafa",
+  },
+  paymentsList: {
+    gap: 8,
+    marginBottom: 12,
+  },
+  paymentItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 12,
+    backgroundColor: "#ffffff",
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#e5e5e5",
+  },
+  paymentItemDark: {
+    backgroundColor: "#171717",
+    borderColor: "#404040",
+  },
+  paymentInfo: {
+    flex: 1,
+  },
+  paymentDetailText: {
+    fontSize: 14,
+    color: "#0a0a0a",
+  },
+  paymentDetailTextDark: {
+    color: "#fafafa",
+  },
+  paymentCategory: {
+    fontSize: 12,
+    color: "#737373",
+    marginTop: 2,
+  },
+  paymentAmount: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#0a0a0a",
+  },
+  paymentAmountDark: {
+    color: "#fafafa",
+  },
+  paymentTotal: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#e5e5e5",
+  },
+  statusPaid: {
+    color: "#16a34a",
+    fontWeight: "600",
+  },
+  statusPending: {
+    color: "#ea580c",
+    fontWeight: "600",
+  },
+
   // Legend
   legend: {
     marginTop: 16,
@@ -591,6 +885,11 @@ const styles = StyleSheet.create({
   },
   legendTextDark: {
     color: "#a3a3a3",
+  },
+  legendSelected: {
+    backgroundColor: "#506266",
+    borderWidth: 1,
+    borderColor: "#405155",
   },
 
   // Summary
@@ -680,7 +979,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     textAlign: "center",
-    marginTop: 20,
     color: "#737373",
   },
   emptyTextDark: {
