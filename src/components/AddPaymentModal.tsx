@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
   StyleSheet,
-  TouchableOpacity,
-  Text,
   useColorScheme,
 } from 'react-native';
 import { AddPaymentForm } from './AddPaymentForm';
+import FloatButton from './FloatButton';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { subscribeAddPaymentModal } from '../utils/addPaymentModalBus';
 
 interface AddPaymentModalProps {
   onPaymentAdded?: () => void;
@@ -17,8 +18,13 @@ export function AddPaymentModal({ onPaymentAdded }: AddPaymentModalProps) {
   // TEMA: Usar useColorScheme, actualizar con ThemeProvider cuando esté listo
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-
+  const insets = useSafeAreaInsets()
   const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const unsub = subscribeAddPaymentModal(() => setIsVisible(true))
+    return () => unsub()
+  }, [])
 
   const handleSuccess = async () => {
     setIsVisible(false);
@@ -31,13 +37,12 @@ export function AddPaymentModal({ onPaymentAdded }: AddPaymentModalProps) {
 
   return (
     <>
-      <TouchableOpacity
-        style={styles.openButton}
-        onPress={() => setIsVisible(true)}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.openButtonText}>➕ Agregar Pago</Text>
-      </TouchableOpacity>
+      <FloatButton
+              onPress={() => setIsVisible(true)}
+              position="bottom-right"
+              style={{ bottom: insets.bottom + 16 }}
+              color='#16a34a'
+            />
 
       <Modal
         visible={isVisible}
