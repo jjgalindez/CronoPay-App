@@ -17,6 +17,11 @@ export type DonutChartProps = {
   thickness?: number // ring thickness
   showPercent?: boolean
   filterMonth?: number // optional: filter by month (0-11)
+  // Deprecated / legacy props (still supported for backwards compatibility)
+  diameter?: number
+  strokeWidth?: number
+  showLabels?: boolean
+  legendWidth?: number
 }
 
 const DEFAULT_COLORS = ["#0F5B5C", "#12C48B", "#FFB020", "#7C4DFF", "#FF6B6B", "#3AA9FF"]
@@ -42,13 +47,30 @@ function isDarkColor(hex?: string) {
   return brightness < 150
 }
 
-export default function DonutChart({
-  data,
-  size = 160,
-  thickness = 20,
-  showPercent = true,
-  filterMonth,
-}: DonutChartProps) {
+export default function DonutChart(props: DonutChartProps) {
+  const {
+    data,
+    size,
+    thickness,
+    showPercent,
+    filterMonth,
+    // deprecated
+    diameter,
+    strokeWidth,
+    showLabels,
+    legendWidth: legendWidthProp,
+  } = props
+
+  // Backwards compatibility for deprecated props
+  let effectiveSize = size ?? diameter ?? 160
+  let effectiveThickness = thickness ?? strokeWidth ?? 20
+  let effectiveShowPercent = typeof showPercent === 'boolean' ? showPercent : (typeof showLabels === 'boolean' ? showLabels : true)
+  let legendWidth = legendWidthProp ?? 150
+
+  if (diameter !== undefined) console.warn('DonutChart: `diameter` prop is deprecated, use `size` instead')
+  if (strokeWidth !== undefined) console.warn('DonutChart: `strokeWidth` prop is deprecated, use `thickness` instead')
+  if (showLabels !== undefined) console.warn('DonutChart: `showLabels` prop is deprecated, use `showPercent` instead')
+  if (legendWidthProp !== undefined) console.warn('DonutChart: `legendWidth` prop is deprecated, use layout overrides instead')
   const { colorScheme } = useColorScheme()
   const isDark = colorScheme === 'dark'
   // filter data by month if specified
@@ -61,17 +83,17 @@ export default function DonutChart({
 
   // make size responsive to screen width so donut doesn't overflow on small devices
   const windowWidth = Dimensions.get('window').width
-  const legendWidth = 150
-  const finalSize = 180 // Fixed larger size to ensure scroll
+  const legendWidthLocal = legendWidth
+  const finalSize = Math.max(80, effectiveSize)
   const total = useMemo(() => filteredData.reduce((s, i) => s + Math.max(0, i.value), 0), [filteredData])
 
   const cx = finalSize / 2
   const cy = finalSize / 2
-  const radius = Math.max(8, finalSize / 2 - thickness / 2 - 8)
+  const radius = Math.max(8, finalSize / 2 - effectiveThickness / 2 - 8)
   const circumference = 2 * Math.PI * radius
 
   // Calculate total width needed for content
-  const contentWidth = finalSize + legendWidth + 40 // donut + legend + margins = 370px
+  const contentWidth = finalSize + legendWidthLocal + 40 // donut + legend + margins
   const containerWidth = windowWidth - 80 // TRIGGER VALUE: scroll when content exceeds screen - 80px
   const needsScroll = contentWidth > containerWidth
 
@@ -100,7 +122,7 @@ export default function DonutChart({
 
 
   return (
-    <View style={[styles.wrapper, { height: finalSize, backgroundColor: isDark ? '#171717' : undefined }]}>
+    <View style={[styles.wrapper, { height: finalSize, backgroundColor: isDark ? '#0B1220' : undefined }]}> 
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -112,7 +134,7 @@ export default function DonutChart({
           <Svg width={finalSize} height={finalSize}>
             <G rotation={0} originX={cx} originY={cy}>
               {/* background ring */}
-              <Circle cx={cx} cy={cy} r={radius} stroke={isDark ? '#111827' : '#E5E7EB'} strokeWidth={thickness} fill="none" />
+              <Circle cx={cx} cy={cy} r={radius} stroke={isDark ? '#111827' : '#E5E7EB'} strokeWidth={effectiveThickness} fill="none" />
 
               {/* slices drawn as stroked circles using strokeDasharray */}
               {slices.map((s, i) => {
@@ -126,7 +148,7 @@ export default function DonutChart({
                     cy={cy}
                     r={radius}
                     stroke={s.color}
-                    strokeWidth={thickness}
+                    strokeWidth={effectiveThickness}
                     strokeLinecap="butt"
                     fill="none"
                     strokeDasharray={dashArray}
@@ -144,6 +166,8 @@ export default function DonutChart({
                 const innerLabelPos = polarToCartesian(cx, cy, innerLabelR, midAngle)
                 const percentText = `${s.percent.toFixed(0)}%`
                 const percentFill = isDarkColor(s.color) ? '#FFFFFF' : '#12343A'
+
+                if (!effectiveShowPercent) return null
 
                 return (
                   <SvgText
@@ -169,7 +193,7 @@ export default function DonutChart({
                   <View style={[styles.swatch, { backgroundColor: s.color }]} />
                   <View style={styles.legendTextWrap}>
                     <Text style={[styles.legendLabel, isDark ? { color: '#E5E7EB' } : undefined]}>{s.label}</Text>
-                    <Text style={[styles.legendPercent, isDark ? { color: '#E5E7EB' } : undefined]}>{s.percent.toFixed(1)}%</Text>
+                      <Text style={[styles.legendPercent, isDark ? { color: '#E5E7EB' } : undefined]}>{s.percent.toFixed(1)}%</Text>
                   </View>
                 </View>
               ))}

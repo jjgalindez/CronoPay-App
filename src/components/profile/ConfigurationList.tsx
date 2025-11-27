@@ -112,7 +112,7 @@ export function ConfigurationList() {
 
   return (
     <View className="bg-white dark:bg-gray-900">
-      <Text className="bg-gray-50 px-6  py-4 text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-gray-100">
+      <Text className="bg-gray-50 px-6  py-4 text-2xl font-semibold text-gray-900 dark:bg-gray-800 dark:text-gray-100">
         {t("settings")}
       </Text>
 

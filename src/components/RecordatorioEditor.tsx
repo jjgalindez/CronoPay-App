@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { View, Text, Pressable, StyleSheet, Modal, TextInput, Platform, Alert } from 'react-native'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import showToast from '../utils/toast'
 import { useColorScheme } from 'nativewind'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { RecordatorioItem } from './RecordatoriosList'
@@ -52,7 +54,18 @@ export default function RecordatorioEditor({ visible, recordatorio, onClose, onU
   async function handleSave() {
     if (!recordatorio) return
     const v = validate()
-    if (v) return Alert.alert('Error', v)
+    if (v) return showToast(v)
+    // Validar que la fecha+hora sea futura antes de intentar guardar o programar
+    try {
+      const dateCheck = buildDateFromFechaHora(fecha, hora)
+      if (dateCheck.getTime() <= Date.now()) {
+        showToast('El recordatorio debe programarse en una fecha y hora futuras.')
+        return
+      }
+    } catch (e) {
+      showToast('El recordatorio debe programarse en una fecha y hora futuras.')
+      return
+    }
 
     setSubmitting(true)
     try {
@@ -89,7 +102,7 @@ export default function RecordatorioEditor({ visible, recordatorio, onClose, onU
       onClose()
     } catch (err: any) {
       console.error('Error updating reminder', err)
-      Alert.alert('Error', err?.message ?? 'Error actualizando recordatorio')
+      showToast(err?.message ?? 'Error actualizando recordatorio')
     } finally {
       setSubmitting(false)
     }
@@ -111,7 +124,7 @@ export default function RecordatorioEditor({ visible, recordatorio, onClose, onU
           onClose()
         } catch (e) {
           console.error('Error deleting', e)
-          Alert.alert('Error', 'No se pudo eliminar el recordatorio')
+          showToast('No se pudo eliminar el recordatorio')
         } finally { setSubmitting(false) }
       }}
     ])
@@ -122,10 +135,15 @@ export default function RecordatorioEditor({ visible, recordatorio, onClose, onU
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <View style={[styles.container, isDark ? { backgroundColor: '#0B1220' } : {}]}>
-        <Text style={[styles.title, isDark ? { color: '#E5E7EB' } : {}]}>Editar recordatorio</Text>
+        <View style={styles.headerRow}>
+          <Text style={[styles.title, isDark ? { color: '#E5E7EB' } : {}]}>Editar recordatorio</Text>
+          <Pressable onPress={onClose} style={styles.headerClose} hitSlop={8}>
+            <Ionicons name="close" size={20} color={isDark ? '#E5E7EB' : '#0B2E35'} />
+          </Pressable>
+        </View>
 
         <Text style={[styles.label, isDark ? { color: '#E5E7EB' } : {}]}>Fecha</Text>
-        <Pressable style={[styles.input, isDark ? { backgroundColor: '#0B1220', borderColor: '#1F2933' } : {}]} onPress={() => setShowDatePicker(true)}>
+        <Pressable style={[styles.input, isDark ? styles.inputDark : {}]} onPress={() => setShowDatePicker(true)}>
           <Text style={isDark ? { color: '#E5E7EB' } : undefined}>{(() => {
             if (!fecha) return ''
             const [y, m, d] = fecha.split('-').map(Number)
@@ -134,7 +152,7 @@ export default function RecordatorioEditor({ visible, recordatorio, onClose, onU
         </Pressable>
 
         <Text style={[styles.label, isDark ? { color: '#E5E7EB' } : {}]}>Hora</Text>
-        <Pressable style={[styles.input, isDark ? { backgroundColor: '#0B1220', borderColor: '#1F2933' } : {}]} onPress={() => setShowTimePicker(true)}>
+        <Pressable style={[styles.input, isDark ? styles.inputDark : {}]} onPress={() => setShowTimePicker(true)}>
           <Text style={isDark ? { color: '#E5E7EB' } : undefined}>{(() => {
             const [hh, mm] = hora.split(':').map((s) => Number(s))
             return new Date(1970, 0, 1, hh || 0, mm || 0).toLocaleTimeString('es-ES', { hour: 'numeric', minute: '2-digit', hour12: true })
@@ -142,20 +160,23 @@ export default function RecordatorioEditor({ visible, recordatorio, onClose, onU
         </Pressable>
 
         <Text style={[styles.label, isDark ? { color: '#E5E7EB' } : {}]}>Mensaje</Text>
-        <TextInput value={mensaje} onChangeText={setMensaje} style={[styles.input, { height: 100 }, isDark ? { backgroundColor: '#071018', borderColor: '#1F2933', color: '#E5E7EB' } : {}]} multiline />
+        <TextInput value={mensaje} onChangeText={setMensaje} style={[styles.input, { height: 100 }, isDark ? styles.inputDarkText : {}]} multiline />
 
         <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }}>
           <Text style={isDark ? { color: '#E5E7EB', marginRight: 8 } : { marginRight: 8 }}>Programar notificación</Text>
-          <Pressable onPress={() => setProgramar(!programar)} style={[styles.toggle, programar && styles.toggleActive, isDark && programar ? { backgroundColor: '#0B3B3B' } : {}]}>
-            <Text style={{ color: programar ? '#fff' : isDark ? '#E5E7EB' : '#0B2E35' }}>{programar ? 'ON' : 'OFF'}</Text>
+          <Pressable onPress={() => setProgramar(!programar)} style={[styles.iconToggle, programar && styles.iconToggleActive, isDark && programar ? { backgroundColor: '#0B3B3B' } : {}]}>
+            <Ionicons name={programar ? 'notifications' : 'notifications-off-outline'} size={18} color={programar ? '#fff' : (isDark ? '#E5E7EB' : '#0B2E35')} />
           </Pressable>
+          <Text style={{ fontSize: 12, color: isDark ? '#9CA3AF' : '#6B7280', marginBottom: 8, marginLeft: 2 }}>
+            Al activar, recibirás una notificación local en la fecha y hora seleccionadas. Asegúrate de conceder permisos de alarma si tu dispositivo lo requiere.
+          </Text>
         </View>
 
-        <View style={{ flexDirection: 'row', gap: 8 }}>
-          <Pressable onPress={handleSave} style={[styles.button, { flex: 1 }]} disabled={submitting}>
+        <View style={styles.actionsRow}>
+          <Pressable onPress={handleSave} style={[styles.buttonPrimary, submitting && styles.buttonDisabled, { flex: 1 }]} disabled={submitting}>
             <Text style={styles.buttonText}>{submitting ? 'Guardando...' : 'Guardar'}</Text>
           </Pressable>
-          <Pressable onPress={handleDelete} style={[styles.button, styles.deleteButton]} disabled={submitting}>
+          <Pressable onPress={handleDelete} style={[styles.buttonDanger, submitting && styles.buttonDisabled, { marginLeft: 8 }]} disabled={submitting}>
             <Text style={styles.buttonText}>Eliminar</Text>
           </Pressable>
         </View>
@@ -198,7 +219,7 @@ export default function RecordatorioEditor({ visible, recordatorio, onClose, onU
           />
         )}
 
-        <Pressable onPress={onClose} style={styles.close}><Text style={{ color: isDark ? '#E5E7EB' : '#0B2E35' }}>Cerrar</Text></Pressable>
+        {/* footer left intentionally empty; close handled in header */}
       </View>
     </Modal>
   )
@@ -206,13 +227,21 @@ export default function RecordatorioEditor({ visible, recordatorio, onClose, onU
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: '#F8FAFC' },
-  title: { fontSize: 18, fontWeight: '800', marginBottom: 12 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
+  headerClose: { padding: 6 },
+  title: { fontSize: 18, fontWeight: '800', marginBottom: 4 },
   label: { fontSize: 14, fontWeight: '700', color: '#0B2E35', marginBottom: 6 },
   input: { backgroundColor: '#fff', borderRadius: 8, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: '#E5E7EB' },
+  inputDark: { backgroundColor: '#071018', borderColor: '#1F2933' },
+  inputDarkText: { backgroundColor: '#071018', borderColor: '#1F2933', color: '#E5E7EB' },
   button: { backgroundColor: '#06B6D4', padding: 14, borderRadius: 10, alignItems: 'center' },
   deleteButton: { backgroundColor: '#EF4444', marginLeft: 8 },
   buttonText: { color: '#fff', fontWeight: '700' },
-  toggle: { padding: 8, borderRadius: 6, borderWidth: 1, borderColor: '#E5E7EB' },
-  toggleActive: { backgroundColor: '#0B2E35' },
+  iconToggle: { padding: 8, borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB', alignItems: 'center', justifyContent: 'center' },
+  iconToggleActive: { backgroundColor: '#0B2E35', borderColor: '#0B2E35' },
+  actionsRow: { flexDirection: 'row', marginTop: 10 },
+  buttonPrimary: { backgroundColor: '#12C48B', padding: 14, borderRadius: 10, alignItems: 'center' },
+  buttonDanger: { backgroundColor: '#EF4444', padding: 14, borderRadius: 10, alignItems: 'center' },
+  buttonDisabled: { opacity: 0.6 },
   close: { marginTop: 12, alignItems: 'center' },
 })

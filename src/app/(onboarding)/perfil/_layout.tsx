@@ -19,7 +19,7 @@ export default function PerfilLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: t("profilAndSettings"),
+          title: "   " + t("profilAndSettings"),
           headerShadowVisible: false,
           headerStyle,
           headerTintColor,
@@ -36,7 +36,7 @@ export default function PerfilLayout() {
       <Stack.Screen
         name="editar"
         options={{
-          title: "Editar Perfil",
+          title: "   Editar Perfil",
           headerShadowVisible: false,
           headerStyle,
           headerTintColor,

@@ -13,6 +13,8 @@ import {
 } from "react-native"
 
 import { updateRecordatorio } from "../../lib/api/recordatorios"
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { useColorScheme } from 'nativewind'
 import { useAuth } from "../../providers/AuthProvider"
 import useNotifee from "../hooks/useNotifee"
 import { usePagos } from "../hooks/usePagos"
@@ -44,6 +46,9 @@ export default function RecordatorioForm({ onSaved }: Props) {
   const [showPagoModal, setShowPagoModal] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [programar, setProgramar] = useState<boolean>(true)
+  const { colorScheme } = useColorScheme()
+  const isDark = colorScheme === 'dark'
 
   // keep selectedPagoId in sync when pagos load
   React.useEffect(() => {
@@ -69,6 +74,26 @@ export default function RecordatorioForm({ onSaved }: Props) {
       setError(v)
       return
     }
+    // Validar que la fecha+hora sea futura antes de crear el recordatorio
+    function buildDateFromFechaHoraLocal(fechaStr: string, horaStr: string) {
+      const [y, m, d] = fechaStr.split("-").map(Number)
+      const [hh, mm] = horaStr.split(":").map((s) => Number(s))
+      return new Date(y, (m || 1) - 1, d || 1, hh || 0, mm || 0, 0)
+    }
+
+    const date = buildDateFromFechaHoraLocal(fecha, hora)
+    if (isNaN(date.getTime())) {
+      setError('Fecha u hora inválida')
+      return
+    }
+
+    // Requerir que la fecha/hora esté al menos 1 minuto en el futuro
+    const MIN_ADVANCE_MS = 60 * 1000 // 1 minuto
+    const now = Date.now()
+    if (date.getTime() <= now + MIN_ADVANCE_MS) {
+      setError('La fecha del recordatorio debe ser al menos 1 minuto en el futuro')
+      return
+    }
 
     try {
       setSubmitting(true)
@@ -81,32 +106,29 @@ export default function RecordatorioForm({ onSaved }: Props) {
       // created may be the new record or nothing; try to extract id
       const recId =
         (created as any)?.id_recordatorio ?? (created as any)?.id ?? null
-      if (recId) {
-        function buildDateFromFechaHora(fechaStr: string, horaStr: string) {
-          const [y, m, d] = fechaStr.split("-").map(Number)
-          const [hh, mm] = horaStr.split(":").map((s) => Number(s))
-          return new Date(y, (m || 1) - 1, d || 1, hh || 0, mm || 0, 0)
-        }
-        const date = buildDateFromFechaHora(fecha, hora)
-        try {
-          const nid = await nf.scheduleTrigger({
-            title: selectedPagoTitle ?? "Recordatorio",
-            body: mensaje || undefined,
-            date,
-            smallIcon: "ic_launcher",
-          })
-          if (nid) {
-            await updateRecordatorio(recId, { notification_id: nid })
+        if (recId && programar) {
+          try {
+            const nid = await nf.scheduleTrigger({
+              title: selectedPagoTitle ?? "Recordatorio",
+              body: mensaje || undefined,
+              date,
+              smallIcon: "ic_launcher",
+            })
+            if (nid) {
+              await updateRecordatorio(recId, { notification_id: nid })
+            }
+          } catch (e) {
+            console.warn(
+              "No se pudo programar trigger tras crear recordatorio",
+              e,
+            )
           }
-        } catch (e) {
-          console.warn(
-            "No se pudo programar trigger tras crear recordatorio",
-            e,
-          )
         }
+      if (onSaved) {
+        onSaved()
+      } else {
+        router.back()
       }
-      onSaved?.()
-      router.back()
     } catch (err: any) {
       console.error("Error creando recordatorio", err)
       setError(err?.message ?? "Error creando recordatorio")
@@ -157,6 +179,16 @@ export default function RecordatorioForm({ onSaved }: Props) {
         placeholder="Recordar pagar suscripción"
         multiline
       />
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }}>
+        <Text style={{ marginRight: 8, color: isDark ? '#E5E7EB' : '#0B2E35' }}>Programar notificación</Text>
+        <Pressable onPress={() => setProgramar(!programar)} style={[styles.iconToggle, programar && styles.iconToggleActive, isDark && programar ? { backgroundColor: '#0B3B3B' } : {}]}>
+          <Ionicons name={programar ? 'notifications' : 'notifications-off-outline'} size={18} color={programar ? '#fff' : (isDark ? '#E5E7EB' : '#0B2E35')} />
+        </Pressable>
+      </View>
+      <Text style={{ fontSize: 12, color: isDark ? '#9CA3AF' : '#6B7280', marginBottom: 8, marginLeft: 2 }}>
+        Al activar, recibirás una notificación local en la fecha y hora seleccionadas. Asegúrate de conceder permisos de alarma si tu dispositivo lo requiere.
+      </Text>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -267,6 +299,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E5E7EB",
   },
+  iconToggle: { padding: 8, borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB', alignItems: 'center', justifyContent: 'center' },
+  iconToggleActive: { backgroundColor: '#0B2E35', borderColor: '#0B2E35' },
   select: {
     backgroundColor: "#fff",
     borderRadius: 8,

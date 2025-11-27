@@ -1,5 +1,4 @@
 import Ionicons from "@expo/vector-icons/Ionicons"
-import { useColorScheme } from "nativewind"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import {
@@ -10,9 +9,7 @@ import {
   Text,
   View,
 } from "react-native"
-
 import { getMonthNames } from "../utils/dateHelpers"
-
 import { useTema } from "@/hooks/useTema"
 
 // month names are provided by i18n via getMonthNames()
@@ -249,7 +246,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   selectorDark: {
-    backgroundColor: "#171717",
+    backgroundColor: "#0B1220",
     borderColor: "#262626",
   },
   valueText: {
@@ -290,7 +287,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   modalContentDark: {
-    backgroundColor: "#171717",
+    backgroundColor: "#0B1220",
   },
   modalHandle: {
     width: 48,
@@ -356,7 +353,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   yearChipDark: {
-    backgroundColor: "#171717",
+    backgroundColor: "#0B1220",
     borderColor: "#262626",
   },
   yearChipActive: {
@@ -396,7 +393,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   monthChipDark: {
-    backgroundColor: "#171717",
+    backgroundColor: "#0B1220",
     borderColor: "#262626",
   },
   monthChipActive: {

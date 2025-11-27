@@ -6,17 +6,16 @@ import {
   ScrollView,
   Pressable,
   Alert,
-  useColorScheme,
   type StyleProp,
   type ViewStyle,
+  ActivityIndicator,
 } from "react-native"
-import { Switch, ActivityIndicator } from "react-native"
-
+import Ionicons from "@expo/vector-icons/Ionicons"
+import { formatCurrency } from "../utils/formatters"
 import RecordatorioEditor from "./RecordatorioEditor"
 import { updateRecordatorio } from "../../lib/api/recordatorios"
 import useNotifee, { supportsTrigger } from "../hooks/useNotifee"
 import { isOverdue, getDaysUntil } from "../utils/dateHelpers"
-
 import { useTema } from "@/hooks/useTema"
 
 export type RecordatorioItem = {
@@ -256,6 +255,17 @@ export default function RecordatoriosList({
 
             const scheduled = schedulingMap[it.id_recordatorio] ?? false
 
+            const amountColorStyle =
+              status === "Vencido"
+                ? isDark
+                  ? styles.amountOverdueDark
+                  : styles.amountOverdue
+                : status === "Pagado"
+                ? isDark
+                  ? styles.amountPaidDark
+                  : styles.amountPaid
+                : styles.amountNeutral
+
             return (
               <Pressable
                 key={it.id_recordatorio}
@@ -280,17 +290,18 @@ export default function RecordatoriosList({
                   <Text style={dynamicStyles.statusLabel(status)}>
                     {status}
                   </Text>
-                  <Text style={dynamicStyles.timeText}>
-                    {formatTime(it.hora)}
-                  </Text>
+                  <View style={styles.timeBlock}>
+                    <Text style={dynamicStyles.timeText}>{formatTime(it.hora)}</Text>
+                  </View>
                   <View style={{ marginLeft: 12 }}>
                     {loadingMap[it.id_recordatorio] ? (
                       <ActivityIndicator size="small" />
                     ) : (
-                      <Switch
-                        value={scheduled}
-                        onValueChange={async (value) => {
-                          // toggle schedule
+                      <Pressable
+                        accessibilityRole="switch"
+                        accessibilityState={{ checked: scheduled }}
+                        onPress={async () => {
+                          const value = !scheduled
 
                           setLoadingMap((m) => ({
                             ...m,
@@ -298,7 +309,6 @@ export default function RecordatoriosList({
                           }))
                           try {
                             if (value) {
-                              // schedule notification
                               const currentNotifId =
                                 notificationIdMap[it.id_recordatorio] ??
                                 (it as any).notification_id
@@ -314,11 +324,9 @@ export default function RecordatoriosList({
                                 date,
                                 smallIcon: "ic_launcher",
                               })
-                              // persist to DB
                               await updateRecordatorio(it.id_recordatorio, {
                                 notification_id: notifId,
                               })
-                              // update local maps so cancel uses the known id
                               setSchedulingMap((m) => ({
                                 ...m,
                                 [it.id_recordatorio]: true,
@@ -327,7 +335,6 @@ export default function RecordatoriosList({
                                 ...m,
                                 [it.id_recordatorio]: String(notifId),
                               }))
-                              // update localItems so UI reloads immediately
                               setLocalItems((prev) =>
                                 prev.map((p) =>
                                   p.id_recordatorio === it.id_recordatorio
@@ -336,8 +343,6 @@ export default function RecordatoriosList({
                                 ),
                               )
                             } else {
-                              // cancel: obtain notification id from item
-                              // prefer the in-memory map (reflects latest scheduled id)
                               const notifId =
                                 notificationIdMap[it.id_recordatorio] ??
                                 (it as any).notification_id
@@ -346,12 +351,10 @@ export default function RecordatoriosList({
                                 await updateRecordatorio(it.id_recordatorio, {
                                   notification_id: null,
                                 })
-                                // clear local map
                                 setNotificationIdMap((m) => ({
                                   ...m,
                                   [it.id_recordatorio]: null,
                                 }))
-                                // update localItems so UI reloads immediately
                                 setLocalItems((prev) =>
                                   prev.map((p) =>
                                     p.id_recordatorio === it.id_recordatorio
@@ -370,7 +373,6 @@ export default function RecordatoriosList({
                               "Error scheduling/canceling notification",
                               err,
                             )
-                            // Special handling when Android exact-alarm permission is required
                             if (
                               err &&
                               (err.code === "ALARM_PERMISSION_REQUIRED" ||
@@ -403,14 +405,31 @@ export default function RecordatoriosList({
                             }))
                           }
                         }}
-                      />
+                        style={({ pressed }) => [
+                          { padding: 6, borderRadius: 20 },
+                          pressed && { opacity: 0.7 },
+                        ]}
+                      >
+                        <Ionicons
+                          name={scheduled ? "notifications" : "notifications-off-outline"}
+                          size={22}
+                          color={scheduled ? "#0B7886" : "#6B7280"}
+                        />
+                      </Pressable>
                     )}
                   </View>
                 </View>
 
-                <Text style={dynamicStyles.title}>
-                  {it.pago?.titulo ?? it.mensaje ?? "Recordatorio"}
-                </Text>
+                <View style={styles.titleRow}>
+                  <Text style={dynamicStyles.title} numberOfLines={1} ellipsizeMode="tail">
+                    {it.pago?.titulo ?? it.mensaje ?? "Recordatorio"}
+                  </Text>
+                  {it.pago?.monto ? (
+                    <Text style={[dynamicStyles.amount, amountColorStyle]}>
+                      {'$' + formatCurrency(Number(it.pago.monto))}
+                    </Text>
+                  ) : null}
+                </View>
                 {it.mensaje ? (
                   <Text style={dynamicStyles.message}>{it.mensaje}</Text>
                 ) : null}
@@ -421,11 +440,7 @@ export default function RecordatoriosList({
                       ? `Pagado el ${formatDateLabel(it.fecha_aviso, it.hora)}`
                       : `Vence el ${formatDateLabel(it.fecha_aviso, it.hora)}`}
                   </Text>
-                  {it.pago?.monto ? (
-                    <Text style={dynamicStyles.amount}>
-                      ${Number(it.pago.monto).toLocaleString("es-CL")}
-                    </Text>
-                  ) : null}
+                  {/* monto ahora se muestra junto a la hora en el header para mayor visibilidad */}
                 </View>
               </Pressable>
             )
@@ -611,20 +626,46 @@ const styles = StyleSheet.create({
     color: "#a3a3a3",
   },
   timeText: {
-    marginLeft: "auto",
     fontSize: 16,
     fontWeight: "800",
     color: "#0B2E35",
+  },
+  timeBlock: {
+    marginLeft: "auto",
+    alignItems: "flex-end",
+    marginRight: 12,
   },
   timeTextDark: {
     color: "#fafafa",
   },
   amount: {
-    fontWeight: "700",
+    fontWeight: "800",
     color: "#0B2E35",
-    fontSize: 14,
+    fontSize: 16,
+    fontStyle: "italic",
   },
   amountDark: {
     color: "#fafafa",
+  },
+  amountPaid: {
+    color: "#12C48B",
+  },
+  amountPaidDark: {
+    color: "#86efac",
+  },
+  amountOverdue: {
+    color: "#FF6B6B",
+  },
+  amountOverdueDark: {
+    color: "#FCA5A5",
+  },
+  amountNeutral: {
+    color: "#0B7886",
+  },
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
   },
 })

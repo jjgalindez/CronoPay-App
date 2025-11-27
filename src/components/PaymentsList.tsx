@@ -56,14 +56,14 @@ export default function PaymentsList({
   const isDark = colorScheme === 'dark'
 
   // dark-mode fallbacks (only applied when there is no explicit color prop)
-  const DARK_CARD_BG = '#171717'
+  const DARK_CARD_BG = '#0B1220'
   const DARK_TITLE = '#FFFFFF'
   const DARK_MUTED = '#9CA3AF'
   // subtle dark border to sit gently on dark backgrounds (e.g. slate-900)
   const DARK_BORDER = '#111827'
   const DARK_AVATAR_BG = '#1F2933'
   const DARK_AMOUNT = '#FFFFFF'
-  const BADGE_TEXT_COLOR = '#0B2B28'
+  const BADGE_TEXT_COLOR = '#FFFFFF'
   // parse and sort by date desc
   const sorted = useMemo(() => {
     return [...items]
@@ -93,7 +93,7 @@ export default function PaymentsList({
   }, [sorted, filterMonth, filterCategory])
 
   return (
-    <View className="rounded-[18px] p-4 mb-4 bg-white dark:bg-slate-900 shadow-md"> 
+    <View className={`rounded-[18px] p-4 mb-4 bg-white dark:bg-[${DARK_CARD_BG}] shadow-md`}> 
       <Text className="text-primary-700 dark:text-neutral-100 text-lg font-bold mb-3">{title}</Text>
 
       {filtered.length === 0 ? (

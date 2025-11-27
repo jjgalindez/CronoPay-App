@@ -76,7 +76,7 @@ export const ConfigurationItem = React.memo(
     if (hasSwitch) {
       return (
         <View
-          className={`px-6 py-4 ${!isLast ? "border-b border-gray-200 dark:border-gray-800" : ""}`}
+          className={`px-6 py-4 ${!isLast ? "border-b border-gray-200 dark:border-gray-700" : "border-none"}`}
         >
           {content}
         </View>
@@ -85,7 +85,7 @@ export const ConfigurationItem = React.memo(
 
     return (
       <Pressable
-        className={`px-6 py-4 ${!isLast ? "border-b border-gray-200 dark:border-gray-800" : ""}`}
+        className={`px-6 py-4 ${!isLast ? "border-b border-gray-200 dark:border-gray-700" : "border-none"}`}
         onPress={onPress}
         style={({ pressed }) => [
           {
@@ -96,7 +96,7 @@ export const ConfigurationItem = React.memo(
               : "transparent",
           },
         ]}
-        android_ripple={{ color: "#F3F4F6" }}
+        android_ripple={{ color: "#FFFFFF" }}
       >
         {content}
       </Pressable>

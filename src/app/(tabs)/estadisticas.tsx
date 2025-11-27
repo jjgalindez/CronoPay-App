@@ -136,7 +136,7 @@ export default function EstadisticasScreen() {
       iconName: "card-outline" as const,
       iconBackgroundColor: isDark ? '#082027' : '#E8F1FF',
       iconColor: isDark ? '#E5E7EB' : '#1B3D48',
-      backgroundColor: isDark ? "#171717" : "#F4F8FF",
+      backgroundColor: isDark ? "#0B1220" : "#F4F8FF",
     },
     {
       id: "pendientes",
@@ -146,7 +146,7 @@ export default function EstadisticasScreen() {
       iconName: "time-outline" as const,
       iconBackgroundColor: isDark ? '#3A2A18' : '#FFF1E3',
       iconColor: isDark ? '#FFD59A' : '#FF6B00',
-      backgroundColor: isDark ? "#171717" : "#FFF7EE",
+      backgroundColor: isDark ? "#0B1220" : "#FFF7EE",
     },
     {
       id: "completados",
@@ -156,7 +156,7 @@ export default function EstadisticasScreen() {
       iconName: "checkmark-circle-outline" as const,
       iconBackgroundColor: isDark ? '#073024' : '#E8F9F1',
       iconColor: isDark ? '#9EE6C6' : '#1AAE6F',
-      backgroundColor: isDark ? "#171717" : "#F5FCF8",
+      backgroundColor: isDark ? "#0B1220" : "#F5FCF8",
     },
     {
       id: "total",
@@ -165,7 +165,7 @@ export default function EstadisticasScreen() {
       iconName: "wallet-outline" as const,
       iconBackgroundColor: isDark ? '#1C1333' : '#EEE8FF',
       iconColor: isDark ? '#CDBAFF' : '#6C3CF0',
-      backgroundColor: isDark ? "#171717" : "#F6F2FF",
+      backgroundColor: isDark ? "#0B1220" : "#F6F2FF",
     },
   ], [estadisticasMes, isDark])
 
