@@ -12,12 +12,10 @@ import { ThemeProvider } from "@/hooks/useTema"
 import { initI18n } from "@/i18n"
 
 export default function Layout() {
-
   const [ready, setReady] = useState(false)
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId:
-        "260786178265-k3im15pear08ktgbbp42mu96jv5hlb8j.apps.googleusercontent.com",
+      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
       offlineAccess: true,
     })
     initI18n().then(() => setReady(true))
