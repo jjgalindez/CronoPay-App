@@ -39,7 +39,7 @@ export default function FloatButton({
       setDisabled(true)
       const res = onPress()
       // If onPress returns a promise, wait for it before re-enabling
-      if (res && typeof (res as any).then === 'function') {
+      if (typeof res !== 'undefined' && typeof (res as any)?.then === 'function') {
         await res
       } else {
         // otherwise ensure short debounce so user can't spam the button
@@ -59,7 +59,6 @@ export default function FloatButton({
       activeOpacity={0.85}
       onPress={handlePress}
       disabled={disabled}
-      pointerEvents={disabled ? 'none' : 'auto'}
       style={[
         styles.button,
         { width: size, height: size, borderRadius: size / 2, backgroundColor: color },

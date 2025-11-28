@@ -9,10 +9,10 @@ export const usePagoActions = (onActionSuccess?: () => void) => {
 
   const handleMarkAsPaid = async (pago: PagoWithRelations) => {
     setLoadingAction(`paid-${pago.id_pago}`);
-    
+
     try {
       console.log('Marcando como pagado:', pago.id_pago);
-      
+
       // Llamada real a Supabase
       await setPagoEstado(pago.id_pago, 'Pagado');
       
@@ -25,12 +25,12 @@ export const usePagoActions = (onActionSuccess?: () => void) => {
       if (onActionSuccess) {
         onActionSuccess();
       }
-      
+
       return true;
     } catch (error: any) {
       console.error('Error marcando como pagado:', error);
       Alert.alert(
-        t('Error'), 
+        t('Error'),
         error.message || t('CouldNotMarkAsPaid')
       );
       return false;
@@ -41,7 +41,7 @@ export const usePagoActions = (onActionSuccess?: () => void) => {
 
   const handleDeletePago = async (pago: PagoWithRelations) => {
     setLoadingAction(`delete-${pago.id_pago}`);
-    
+
     try {
       // Mostrar confirmación antes de eliminar
       return new Promise<boolean>((resolve) => {
@@ -63,12 +63,12 @@ export const usePagoActions = (onActionSuccess?: () => void) => {
               onPress: async () => {
                 try {
                   console.log('Eliminando pago:', pago.id_pago);
-                  
+
                   // Llamada real a Supabase
                   await deletePago(pago.id_pago);
                   
                   Alert.alert(
-                    t('Success'), 
+                    t('Success'),
                     `${t('PaymentColon')} "${pago.titulo}" ${t('Deleted')}`
                   );
                   
@@ -76,12 +76,12 @@ export const usePagoActions = (onActionSuccess?: () => void) => {
                   if (onActionSuccess) {
                     onActionSuccess();
                   }
-                  
+
                   resolve(true);
                 } catch (error: any) {
                   console.error('Error eliminando pago:', error);
                   Alert.alert(
-                    t('Error'), 
+                    t('Error'),
                     error.message || t('CouldNotDeletePayment')
                   );
                   resolve(false);
