@@ -8,7 +8,7 @@
 <p align="center">
     Aplicación para llevar tus gastos e ingresos construida con React Native, Expo y Supabase. 
     <br />
-    Desarrollada por <a href="https://github.com/jjgalindez">Jhon Galindez</a>, <a href="https://github.com/LenKid">Kedin Valencia</a>, Jhonatan Tobar, Manuel Ruge, Jair Hoyos
+    Desarrollada por <a href="https://github.com/jjgalindez">Jhon Galindez</a>, <a href="https://github.com/LenKid">Kedin Valencia</a>, <a href="https://github.com/Jtobar2809">Jonathan Tobar</a>, Manuel Ruge, Jair Hoyos
     <br />
     Demo app created by <a href="#">CronoTeam</a>
     <br />
