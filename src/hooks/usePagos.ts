@@ -49,7 +49,9 @@ export function usePagos(
     try {
       setIsLoading(true)
       setError(null)
+      console.log('[usePagos] fetching pagos for userId:', userId)
       const result = await fetchPagos(userId)
+      console.log('[usePagos] fetched pagos count:', result?.length ?? 0)
       setData(result)
     } catch (err) {
       setError(err as Error)

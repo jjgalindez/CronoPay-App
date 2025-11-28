@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -25,6 +25,14 @@ export const PagoActions: React.FC<PagoActionsProps> = ({
   const { tema } = useTema();
   const isDark = tema === 'dark';
 
+  useEffect(() => {
+    try {
+      console.log('[PagoActions] props', { id: pago?.id_pago, estado: pago?.estado, loadingAction });
+    } catch (e) {
+      console.warn('[PagoActions] logging error', e);
+    }
+  }, [pago, loadingAction]);
+
   const isPaid = pago.estado === 'Pagado';
   const isMarkingAsPaid = loadingAction === `paid-${pago.id_pago}`;
   const isDeleting = loadingAction === `delete-${pago.id_pago}`;
@@ -39,7 +47,10 @@ export const PagoActions: React.FC<PagoActionsProps> = ({
             isDark ? styles.actionButtonDark : styles.actionButtonLight,
             styles.paidButton,
           ]}
-          onPress={() => onMarkAsPaid(pago)}
+          onPress={() => {
+            console.log('[PagoActions] markAsPaid pressed for', pago?.id_pago);
+            onMarkAsPaid(pago);
+          }}
           disabled={isMarkingAsPaid || isDeleting}
         >
           {isMarkingAsPaid ? (
@@ -61,7 +72,10 @@ export const PagoActions: React.FC<PagoActionsProps> = ({
           isDark ? styles.actionButtonDark : styles.actionButtonLight,
           styles.deleteButton,
         ]}
-        onPress={() => onDelete(pago)}
+        onPress={() => {
+          console.log('[PagoActions] delete pressed for', pago?.id_pago);
+          onDelete(pago);
+        }}
         disabled={isMarkingAsPaid || isDeleting}
       >
         {isDeleting ? (
