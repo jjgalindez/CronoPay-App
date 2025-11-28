@@ -16,7 +16,7 @@ interface AddPaymentModalProps {
 }
 
 export function AddPaymentModal({ onPaymentAdded }: AddPaymentModalProps) {
-  // TEMA: Usar useColorScheme, actualizar con ThemeProvider cuando esté listo
+  
   const { tema } = useTema();
   const isDark = tema === 'dark';
 
@@ -41,7 +41,7 @@ export function AddPaymentModal({ onPaymentAdded }: AddPaymentModalProps) {
     <>
       <FloatButton
               onPress={() => setIsVisible(true)}
-              position="bottom-right"
+              position="center"
               style={{ bottom: insets.bottom + 16 }}
               color='#16a34a'
             />
