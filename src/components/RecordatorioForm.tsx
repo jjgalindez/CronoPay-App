@@ -19,12 +19,14 @@ import { useAuth } from "../../providers/AuthProvider"
 import useNotifee from "../hooks/useNotifee"
 import { usePagos } from "../hooks/usePagos"
 import useRecordatorios from "../hooks/useRecordatorios"
+import { useTranslation } from 'react-i18next'
 
 type Props = {
   onSaved?: () => void
 }
 
 export default function RecordatorioForm({ onSaved }: Props) {
+  const { t } = useTranslation()
   const { session } = useAuth()
   const userId = session?.user?.id ?? null
   const { data: pagos = [] } = usePagos(userId, { enabled: !!userId })
@@ -61,9 +63,9 @@ export default function RecordatorioForm({ onSaved }: Props) {
   )
 
   function validate() {
-    if (!selectedPagoId) return "Selecciona un pago"
-    if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(fecha)) return "Fecha inválida"
-    if (!/^[0-9]{1,2}:[0-9]{2}$/.test(hora)) return "Hora inválida"
+    if (!selectedPagoId) return t('SelectPayment')
+    if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(fecha)) return t('InvalidDate')
+    if (!/^[0-9]{1,2}:[0-9]{2}$/.test(hora)) return t('InvalidTime')
     return null
   }
 
@@ -83,7 +85,7 @@ export default function RecordatorioForm({ onSaved }: Props) {
 
     const date = buildDateFromFechaHoraLocal(fecha, hora)
     if (isNaN(date.getTime())) {
-      setError('Fecha u hora inválida')
+      setError(t('InvalidDate'))
       return
     }
 
@@ -91,7 +93,7 @@ export default function RecordatorioForm({ onSaved }: Props) {
     const MIN_ADVANCE_MS = 60 * 1000 // 1 minuto
     const now = Date.now()
     if (date.getTime() <= now + MIN_ADVANCE_MS) {
-      setError('La fecha del recordatorio debe ser al menos 1 minuto en el futuro')
+      setError(t('ReminderTooSoon'))
       return
     }
 
@@ -131,7 +133,7 @@ export default function RecordatorioForm({ onSaved }: Props) {
       }
     } catch (err: any) {
       console.error("Error creando recordatorio", err)
-      setError(err?.message ?? "Error creando recordatorio")
+      setError(err?.message ?? t('ErrorCreatingReminder'))
     } finally {
       setSubmitting(false)
     }
@@ -139,14 +141,14 @@ export default function RecordatorioForm({ onSaved }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Pago</Text>
+      <Text style={styles.label}>{t('Payment')}</Text>
       <Pressable style={styles.select} onPress={() => setShowPagoModal(true)}>
         <Text style={styles.selectText}>
-          {selectedPagoTitle ?? "Selecciona un pago"}
+          {selectedPagoTitle ?? t('SelectPayment')}
         </Text>
       </Pressable>
 
-      <Text style={styles.label}>Fecha</Text>
+      <Text style={styles.label}>{t('Date')}</Text>
       <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
         <Text>
           {(() => {
@@ -160,7 +162,7 @@ export default function RecordatorioForm({ onSaved }: Props) {
         </Text>
       </Pressable>
 
-      <Text style={styles.label}>Hora</Text>
+      <Text style={styles.label}>{t('Time')}</Text>
       <Pressable style={styles.input} onPress={() => setShowTimePicker(true)}>
         <Text>
           {new Date(`1970-01-01T${hora}`).toLocaleTimeString("es-ES", {
@@ -171,23 +173,23 @@ export default function RecordatorioForm({ onSaved }: Props) {
         </Text>
       </Pressable>
 
-      <Text style={styles.label}>Mensaje (opcional)</Text>
+      <Text style={styles.label}>{t('MessageOptional')}</Text>
       <TextInput
         value={mensaje}
         onChangeText={setMensaje}
         style={[styles.input, { height: 100 }]}
-        placeholder="Recordar pagar suscripción"
+        placeholder={t('MessagePlaceholder')}
         multiline
       />
 
       <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }}>
-        <Text style={{ marginRight: 8, color: isDark ? '#E5E7EB' : '#0B2E35' }}>Programar notificación</Text>
+        <Text style={{ marginRight: 8, color: isDark ? '#E5E7EB' : '#0B2E35' }}>{t('ScheduleNotification')}</Text>
         <Pressable onPress={() => setProgramar(!programar)} style={[styles.iconToggle, programar && styles.iconToggleActive, isDark && programar ? { backgroundColor: '#0B3B3B' } : {}]}>
           <Ionicons name={programar ? 'notifications' : 'notifications-off-outline'} size={18} color={programar ? '#fff' : (isDark ? '#E5E7EB' : '#0B2E35')} />
         </Pressable>
       </View>
       <Text style={{ fontSize: 12, color: isDark ? '#9CA3AF' : '#6B7280', marginBottom: 8, marginLeft: 2 }}>
-        Al activar, recibirás una notificación local en la fecha y hora seleccionadas. Asegúrate de conceder permisos de alarma si tu dispositivo lo requiere.
+        {t('ScheduleNotificationHint')}
       </Text>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -198,7 +200,7 @@ export default function RecordatorioForm({ onSaved }: Props) {
         disabled={submitting}
       >
         <Text style={styles.buttonText}>
-          {submitting ? "Guardando..." : "Guardar recordatorio"}
+          {submitting ? t('saving') : t('SaveReminder')}
         </Text>
       </Pressable>
 
@@ -208,7 +210,7 @@ export default function RecordatorioForm({ onSaved }: Props) {
         onRequestClose={() => setShowPagoModal(false)}
       >
         <View style={styles.modalWrap}>
-          <Text style={styles.modalTitle}>Selecciona un pago</Text>
+          <Text style={styles.modalTitle}>{t('SelectPaymentTitle')}</Text>
           <FlatList
             data={pagos}
             keyExtractor={(p: any) => String(p.id_pago)}
@@ -234,7 +236,7 @@ export default function RecordatorioForm({ onSaved }: Props) {
             onPress={() => setShowPagoModal(false)}
             style={styles.modalClose}
           >
-            <Text style={styles.modalCloseText}>Cerrar</Text>
+            <Text style={styles.modalCloseText}>{t('Close')}</Text>
           </Pressable>
         </View>
       </Modal>

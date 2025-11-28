@@ -36,7 +36,7 @@ export default function PerfilLayout() {
       <Stack.Screen
         name="editar"
         options={{
-          title: "   Editar Perfil",
+          title: "   " + t('editProfile'),
           headerShadowVisible: false,
           headerStyle,
           headerTintColor,

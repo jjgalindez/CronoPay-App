@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal, View } from 'react-native'
 import { Slot } from 'expo-router'
@@ -14,6 +15,7 @@ import RecordatorioForm from '../../../components/RecordatorioForm'
 
 export default function RootLayout() {
   const insets = useSafeAreaInsets()
+  const { t } = useTranslation()
   const { session } = useAuth()
   const userId = session?.user?.id ?? null
   const { data: perfil } = useUsuarioPerfil(userId, { enabled: !!userId })
@@ -23,7 +25,7 @@ export default function RootLayout() {
     <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
       <AppHeader
         icon="alarm-outline"
-        title="Recordatorios"
+        title={t('PaymentReminders')}
         profileUri={perfil?.avatar_url}
         userName={perfil?.nombre ?? null}
       />

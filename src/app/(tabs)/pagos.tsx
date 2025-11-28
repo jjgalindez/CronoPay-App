@@ -261,10 +261,10 @@ export default function PagosScreen() {
     return {
       container: {
         flex: 1,
-        backgroundColor: isDark ? "#0a0a0a" : "#f5f5f5",
+        backgroundColor: isDark ? "#0f172b" : "#f5f5f5",
       },
       card: {
-        backgroundColor: isDark ? "#171717" : "#ffffff",
+        backgroundColor: isDark ? "#0B1220" : "#ffffff",
         borderRadius: 12,
         padding: 16,
         margin: 16,
@@ -274,7 +274,7 @@ export default function PagosScreen() {
         shadowRadius: 4,
         elevation: 3,
         borderWidth: 1,
-        borderColor: isDark ? "#262626" : "#e5e5e5",
+        borderColor: isDark ? "#101828" : "#e5e5e5",
       },
       title: {
         fontSize: 24,
@@ -626,7 +626,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     borderWidth: 1,
-    backgroundColor: '#262626',
+    backgroundColor: '#1e293b',
     borderColor: '#404040',
     marginBottom: 12,
   },
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ef4444',
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    backgroundColor: "#2b1212",
     marginBottom: 12,
   },
   reminderCardToday: {
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#3b82f6',
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    backgroundColor: "#0B1220",
     marginBottom: 12,
   },
   reminderCardWeek: {
@@ -675,7 +675,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#fb923c',
-    backgroundColor: 'rgba(251, 146, 60, 0.1)',
+    backgroundColor: "#0B1220",
     marginBottom: 12,
   },
   reminderHeader: {
@@ -730,7 +730,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   badgeTomorrowDark: {
-    backgroundColor: '#404040',
+    backgroundColor: '#0f172b',
     borderWidth: 1,
     borderColor: '#525252',
     paddingHorizontal: 8,
@@ -753,11 +753,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   badgeDefault: {
-    backgroundColor: '#e5e5e5',
-    borderWidth: 1,
-    borderColor: '#d4d4d4',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: "#0B1220",
     borderRadius: 4,
     alignSelf: 'flex-start',
   },
@@ -780,13 +776,14 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   badgeInfoDark: {
-    backgroundColor: '#404040',
+    backgroundColor: '#053345',
     borderWidth: 1,
-    borderColor: '#525252',
+    borderColor: '#032e15',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-end',
+    margin: 'auto',
   },
   totalContainer: {
     alignItems: 'flex-end',

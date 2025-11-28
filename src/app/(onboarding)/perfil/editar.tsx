@@ -1,6 +1,7 @@
 // app/(onboarding)/perfil/editar.tsx
 import Ionicons from "@expo/vector-icons/Ionicons"
 import React from "react"
+import { useTranslation } from 'react-i18next'
 import {
   TouchableOpacity,
   View,
@@ -18,6 +19,7 @@ import { useEditarPerfil } from "../../../hooks/useEditarPerfil"
 
 export default function EditarPerfilScreen() {
   const { width } = useWindowDimensions()
+  const { t } = useTranslation()
   const {
     nombre,
     email,
@@ -56,7 +58,7 @@ export default function EditarPerfilScreen() {
                 marginBottom: isSmallScreen ? 16 : 24,
               }}
             >
-              Editar Perfil
+              {t('editProfile')}
             </Text>
 
             {/* Foto de Perfil */}
@@ -113,23 +115,21 @@ export default function EditarPerfilScreen() {
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity
-                onPress={seleccionarFoto}
-                disabled={subiendoImagen}
-                className="mt-4"
-              >
-                <Text
-                  className={`font-medium ${subiendoImagen ? "text-gray-400" : "text-blue-500 dark:text-blue-400"
-                    }`}
+                <TouchableOpacity
+                  onPress={seleccionarFoto}
+                  disabled={subiendoImagen}
+                  className="mt-4"
                 >
-                  {subiendoImagen
-                    ? "Subiendo imagen..."
-                    : "Cambiar foto de perfil"}
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    className={`font-medium ${subiendoImagen ? "text-gray-400" : "text-blue-500 dark:text-blue-400"
+                      }`}
+                  >
+                    {subiendoImagen ? t('uploadingImage') : t('changeProfilePhoto')}
+                  </Text>
+                </TouchableOpacity>
 
               <Text className="mt-2 text-center text-xs text-gray-500 dark:text-gray-400">
-                Haz clic para cambiar tu foto. Máximo 5MB.
+                {t('clickToChangePhoto')}
               </Text>
             </View>
 
@@ -140,7 +140,7 @@ export default function EditarPerfilScreen() {
                   className="font-medium text-gray-700"
                   style={{ marginBottom: 8, fontSize: isSmallScreen ? 14 : 16 }}
                 >
-                  Nombre completo
+                  {t('fullName')}
                 </Text>
                 <TextInput
                   className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 text-gray-900 dark:text-gray-100"
@@ -152,7 +152,7 @@ export default function EditarPerfilScreen() {
                   }}
                   value={nombre}
                   onChangeText={setNombre}
-                  placeholder="Ingresa tu nombre completo"
+                  placeholder={t('enterFullName')}
                   placeholderTextColor="#9CA3AF"
                 />
               </View>
@@ -162,7 +162,7 @@ export default function EditarPerfilScreen() {
                   className="font-medium text-gray-700"
                   style={{ marginBottom: 8, fontSize: isSmallScreen ? 14 : 16 }}
                 >
-                  Correo electrónico
+                  {t('emailAddress')}
                 </Text>
                 <TextInput
                   className="rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400"
@@ -179,7 +179,7 @@ export default function EditarPerfilScreen() {
                   className="text-gray-500 dark:text-gray-400"
                   style={{ marginTop: 8, fontSize: isSmallScreen ? 12 : 14 }}
                 >
-                  El correo electrónico no se puede modificar por seguridad
+                  {t('emailCannotModify')}
                 </Text>
               </View>
 
@@ -198,7 +198,7 @@ export default function EditarPerfilScreen() {
                   className="text-center font-semibold text-white"
                   style={{ fontSize: isSmallScreen ? 14 : 16 }}
                 >
-                  {cargando ? "Guardando..." : "Guardar cambios"}
+                  {cargando ? t('saving') : t('saveChanges')}
                 </Text>
               </TouchableOpacity>
 
@@ -216,7 +216,7 @@ export default function EditarPerfilScreen() {
                   className="text-center font-medium text-gray-700 dark:text-gray-300"
                   style={{ fontSize: isSmallScreen ? 14 : 16 }}
                 >
-                  Cancelar
+                  {t('Cancel')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -243,7 +243,7 @@ export default function EditarPerfilScreen() {
                       marginBottom: 4,
                     }}
                   >
-                    Sobre tu información personal
+                    {t('aboutPersonalInfoTitle')}
                   </Text>
                   <Text
                     className="text-blue-700"
@@ -252,9 +252,7 @@ export default function EditarPerfilScreen() {
                       lineHeight: isSmallScreen ? 16 : 18,
                     }}
                   >
-                    Tu información personal está protegida y solo tú puedes
-                    verla y modificarla. Nunca compartiremos tus datos con
-                    terceros sin tu consentimiento explícito.
+                    {t('aboutPersonalInfoBody')}
                   </Text>
                 </View>
               </View>

@@ -109,7 +109,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="calendario"
         options={{
-          title: "Calendario",
+          title: t('CalendarTitle'),
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? "calendar" : "calendar-outline"} size={24} color={color} />
           ),
@@ -121,7 +121,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="inicio"
         options={{
-          title: "Inicio",
+          title: t('HomeTitle'),
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? "home" : "home-outline"} size={24} color={color} />
           ),
@@ -133,7 +133,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="estadisticas"
         options={{
-          title: "Estadísticas",
+          title: t('StatisticsTitle'),
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? "stats-chart" : "stats-chart-outline"} size={24} color={color} />
           ),
@@ -145,7 +145,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="reportes"
         options={{
-          title: "Reportes",
+          title: t('ReportsTitle'),
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? "document-text" : "document-text-outline"} size={24} color={color} />
           ),

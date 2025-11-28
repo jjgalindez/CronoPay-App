@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
   containerDark: {
-    backgroundColor: "#0a0a0a",
+    backgroundColor: "#0f172b",
   },
   contentContainer: {
     padding: 20,
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
     color: "#0a0a0a",
   },
   inputDark: {
-    backgroundColor: "#171717",
+    backgroundColor: "#1d293d",
     borderColor: "#404040",
     color: "#fafafa",
   },
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   dateButtonDark: {
-    backgroundColor: "#171717",
+    backgroundColor: "#1d293d",
     borderColor: "#404040",
   },
   dateText: {
@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   chipDark: {
-    backgroundColor: "#171717",
+    backgroundColor: "#1d293d",
     borderColor: "#404040",
   },
   chipSelected: {
@@ -582,8 +582,8 @@ const styles = StyleSheet.create({
     borderColor: "#3b82f6",
   },
   chipSelectedDark: {
-    backgroundColor: "#2563eb",
-    borderColor: "#2563eb",
+    backgroundColor: "#016630",
+    borderColor: "#016630",
   },
   chipText: {
     fontSize: 14,

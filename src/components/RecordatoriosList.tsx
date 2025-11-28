@@ -17,6 +17,7 @@ import { updateRecordatorio } from "../../lib/api/recordatorios"
 import useNotifee, { supportsTrigger } from "../hooks/useNotifee"
 import { isOverdue, getDaysUntil } from "../utils/dateHelpers"
 import { useTema } from "@/hooks/useTema"
+import { useTranslation } from "react-i18next"
 
 export type RecordatorioItem = {
   id_recordatorio: number
@@ -33,7 +34,14 @@ export type RecordatorioItem = {
   }
 }
 
-type FilterKey = "Todos" | "Pendientes" | "Vencidos" | "Pagado"
+// dark fallback colors
+const DARK_CARD_BG = "#0B1220"
+const DARK_MUTED = "#016630"
+const DARK_SURFACE = "#111827"
+const DARK_FILTER_ACTIVE = "#0B3B3B"
+const DARK_TEXT = "#E5E7EB"
+
+type FilterKey = 'all' | 'pending' | 'overdue' | 'paid'
 
 type RecordatoriosListProps = {
   items?: RecordatorioItem[]
@@ -43,7 +51,7 @@ type RecordatoriosListProps = {
   onItemPress?: (item: RecordatorioItem) => void
 }
 
-const FILTERS: FilterKey[] = ["Todos", "Pendientes", "Vencidos", "Pagado"]
+const FILTERS: FilterKey[] = ["all", "pending", "overdue", "paid"]
 
 function formatDateLabel(dateStr: string, timeStr?: string | null) {
   try {
@@ -99,18 +107,12 @@ export default function RecordatoriosList({
   items = [],
   style,
   showFilters = true,
-  initialFilter = "Todos",
+  initialFilter = "all",
   onItemPress,
 }: RecordatoriosListProps) {
   const { tema } = useTema()
   const isDark = tema === "dark"
-
-  // dark fallback colors
-  const DARK_CARD_BG = "#0B0F13"
-  const DARK_MUTED = "#9CA3AF"
-  const DARK_SURFACE = "#111827"
-  const DARK_FILTER_ACTIVE = "#0B3B3B"
-  const DARK_TEXT = "#E5E7EB"
+  const { t } = useTranslation()
   const [filter, setFilter] = useState<FilterKey>(initialFilter)
   const [schedulingMap, setSchedulingMap] = useState<Record<number, boolean>>(
     {},
@@ -168,10 +170,10 @@ export default function RecordatoriosList({
       const overdue = isOverdue(datetime)
       const pagoEstado = it.pago?.estado ?? ""
 
-      if (filter === "Todos") return true
-      if (filter === "Vencidos") return overdue && pagoEstado !== "Pagado"
-      if (filter === "Pendientes") return !overdue && pagoEstado !== "Pagado"
-      if (filter === "Pagado") return pagoEstado === "Pagado"
+      if (filter === "all") return true
+      if (filter === "overdue") return overdue && pagoEstado !== "Pagado"
+      if (filter === "pending") return !overdue && pagoEstado !== "Pagado"
+      if (filter === "paid") return pagoEstado === "Pagado"
       return true
     })
   }, [localItems, filter])
@@ -210,11 +212,7 @@ export default function RecordatoriosList({
     <View style={dynamicStyles.container}>
       {schedulingSupported === false ? (
         <View style={dynamicStyles.warningBox}>
-          <Text style={dynamicStyles.warningText}>
-            La programación de recordatorios está limitada en este entorno (no
-            hay soporte de triggers). Algunas funciones pueden no estar
-            disponibles.
-          </Text>
+          <Text style={dynamicStyles.warningText}>{t('schedulingLimitedWarning')}</Text>
         </View>
       ) : null}
       {showFilters && (
@@ -228,7 +226,15 @@ export default function RecordatoriosList({
                 pressed && styles.filterPressed,
               ]}
             >
-              <Text style={dynamicStyles.filterText(filter === f)}>{f}</Text>
+              <Text style={dynamicStyles.filterText(filter === f)}>
+                {f === 'all'
+                  ? t('FilterAll')
+                  : f === 'pending'
+                  ? t('FilterPending')
+                  : f === 'overdue'
+                  ? t('FilterOverdue')
+                  : t('FilterPaid')}
+              </Text>
             </Pressable>
           ))}
         </View>
@@ -236,31 +242,30 @@ export default function RecordatoriosList({
 
       <ScrollView nestedScrollEnabled style={styles.list}>
         {filtered.length === 0 ? (
-          <Text style={dynamicStyles.emptyText}>
-            No hay recordatorios para este filtro.
-          </Text>
+          <Text style={dynamicStyles.emptyText}>{t('noRemindersForFilter')}</Text>
         ) : (
           filtered.map((it) => {
             const datetime = `${it.fecha_aviso}T${it.hora}`
             const overdue = isOverdue(datetime)
             const days = getDaysUntil(datetime)
-            const status =
+            const statusKey =
               it.pago?.estado === "Pagado"
-                ? "Pagado"
+                ? 'status.paid'
                 : overdue
-                  ? "Vencido"
-                  : days === 0
-                    ? "Hoy"
-                    : "Próximo"
+                ? 'status.overdue'
+                : days === 0
+                ? 'status.today'
+                : 'status.upcoming'
+            const status = t(statusKey)
 
             const scheduled = schedulingMap[it.id_recordatorio] ?? false
 
             const amountColorStyle =
-              status === "Vencido"
+              statusKey === 'status.overdue'
                 ? isDark
                   ? styles.amountOverdueDark
                   : styles.amountOverdue
-                : status === "Pagado"
+                : statusKey === 'status.paid'
                 ? isDark
                   ? styles.amountPaidDark
                   : styles.amountPaid
@@ -316,10 +321,7 @@ export default function RecordatoriosList({
                                 `${it.fecha_aviso}T${it.hora}`,
                               )
                               const notifId = await nf.scheduleTrigger({
-                                title:
-                                  it.pago?.titulo ??
-                                  it.mensaje ??
-                                  "Recordatorio",
+                                title: it.pago?.titulo ?? it.mensaje ?? t('Reminder'),
                                 body: it.mensaje ?? undefined,
                                 date,
                                 smallIcon: "ic_launcher",
@@ -380,23 +382,19 @@ export default function RecordatoriosList({
                                   "ALARM_PERMISSION_REQUIRED",
                                 ))
                             ) {
-                              Alert.alert(
-                                "Permiso requerido",
-                                'Android requiere el permiso de "alarma exacta" para programar recordatorios en segundo plano. ¿Quieres abrir la configuración de permisos para habilitarlo?',
-                                [
-                                  { text: "Cancelar", style: "cancel" },
-                                  {
-                                    text: "Abrir ajustes",
-                                    onPress: async () => {
-                                      try {
-                                        await nf.openAlarmPermissionSettings()
-                                      } catch (e) {
-                                        console.warn(e)
-                                      }
-                                    },
+                              Alert.alert(t('alarmPermissionRequiredTitle'), t('alarmPermissionRequiredBody'), [
+                                { text: t('Cancel'), style: 'cancel' },
+                                {
+                                  text: t('openSettings'),
+                                  onPress: async () => {
+                                    try {
+                                      await nf.openAlarmPermissionSettings()
+                                    } catch (e) {
+                                      console.warn(e)
+                                    }
                                   },
-                                ],
-                              )
+                                },
+                              ])
                             }
                           } finally {
                             setLoadingMap((m) => ({
@@ -422,7 +420,7 @@ export default function RecordatoriosList({
 
                 <View style={styles.titleRow}>
                   <Text style={dynamicStyles.title} numberOfLines={1} ellipsizeMode="tail">
-                    {it.pago?.titulo ?? it.mensaje ?? "Recordatorio"}
+                    {it.pago?.titulo ?? it.mensaje ?? t('Reminder')}
                   </Text>
                   {it.pago?.monto ? (
                     <Text style={[dynamicStyles.amount, amountColorStyle]}>
@@ -436,9 +434,9 @@ export default function RecordatoriosList({
 
                 <View style={styles.row}>
                   <Text style={dynamicStyles.dateLabel}>
-                    {status === "Pagado"
-                      ? `Pagado el ${formatDateLabel(it.fecha_aviso, it.hora)}`
-                      : `Vence el ${formatDateLabel(it.fecha_aviso, it.hora)}`}
+                    {statusKey === 'status.paid'
+                      ? `${t('PaidOn')} ${formatDateLabel(it.fecha_aviso, it.hora)}`
+                      : `${t('DueOn')} ${formatDateLabel(it.fecha_aviso, it.hora)}`}
                   </Text>
                   {/* monto ahora se muestra junto a la hora en el header para mayor visibilidad */}
                 </View>
@@ -572,7 +570,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   cardDark: {
-    backgroundColor: "#171717",
+    backgroundColor: DARK_CARD_BG,
     shadowColor: "#000",
   },
   cardHeader: {

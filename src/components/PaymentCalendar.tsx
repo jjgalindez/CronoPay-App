@@ -168,10 +168,10 @@ export function PaymentCalendar() {
     return {
       container: {
         flex: 1,
-        backgroundColor: isDark ? "#0a0a0a" : "#f5f5f5",
+        backgroundColor: isDark ? "#0f172a" : "#f5f5f5",
       },
       card: {
-        backgroundColor: isDark ? "#171717" : "#ffffff",
+        backgroundColor: isDark ? "#0B1220" : "#ffffff",
         borderRadius: 12,
         padding: 16,
         margin: 16,
@@ -200,7 +200,7 @@ export function PaymentCalendar() {
         borderRadius: 8,
         borderWidth: 1,
         borderColor: isDark ? "#404040" : "#e5e5e5",
-        backgroundColor: isDark ? "#262626" : "#f8fafc",
+        backgroundColor: isDark ? "#0F1220" : "#f8fafc",
       },
       navButtonText: {
         fontSize: 14,
@@ -689,8 +689,8 @@ const styles = StyleSheet.create({
     borderColor: "#e2e8f0",
   },
   paymentDetailsDark: {
-    backgroundColor: "#262626",
-    borderColor: "#404040",
+    backgroundColor: "#054f35",
+    borderColor: "#22543d",
   },
   paymentsList: {
     gap: 8,
@@ -707,8 +707,8 @@ const styles = StyleSheet.create({
     borderColor: "#e5e5e5",
   },
   paymentItemDark: {
-    backgroundColor: "#171717",
-    borderColor: "#404040",
+    backgroundColor: "#192e03",
+    borderColor: "#053345",
   },
   paymentInfo: {
     flex: 1,

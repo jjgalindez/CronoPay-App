@@ -3,7 +3,6 @@ import {
   Modal,
   View,
   StyleSheet,
-  useColorScheme,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTema } from '@/hooks/useTema';
@@ -18,8 +17,9 @@ interface AddPaymentModalProps {
 
 export function AddPaymentModal({ onPaymentAdded }: AddPaymentModalProps) {
   // TEMA: Usar useColorScheme, actualizar con ThemeProvider cuando esté listo
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const { tema } = useTema();
+  const isDark = tema === 'dark';
+
   const insets = useSafeAreaInsets()
   const [isVisible, setIsVisible] = useState(false);
 
@@ -89,6 +89,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   modalContainerDark: {
-    backgroundColor: '#0a0a0a',
+    backgroundColor: '#0f172b',
   },
 });

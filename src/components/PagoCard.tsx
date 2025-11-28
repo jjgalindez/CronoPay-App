@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { PagoWithRelations } from 'lib/api/pagos';
-import { useTema } from '@/hooks/useTema';
 import { PagoActions } from './PagoActions';
 
 interface PagoCardProps {
@@ -130,7 +129,7 @@ const styles = StyleSheet.create({
     borderColor: '#e5e5e5',
   },
   pagoCardDark: {
-    backgroundColor: '#171717',
+    backgroundColor: '#0B1220',
     borderColor: '#404040',
   },
   pagoCardPaid: {

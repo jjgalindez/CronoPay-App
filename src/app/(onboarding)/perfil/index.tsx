@@ -48,7 +48,7 @@ export default function PerfilScreen() {
     return (
       <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
         <View className="flex-1 items-center justify-center">
-          <Text>Cargando perfil...</Text>
+          <Text>{t('LoadingProfile')}</Text>
         </View>
       </SafeAreaView>
     )
@@ -66,7 +66,7 @@ export default function PerfilScreen() {
       >
         <ProfileHeader
           name={getDisplayName()}
-          email={session?.user?.email || "jose@correo.com"}
+          email={session?.user?.email || t('UnknownEmail')}
           avatarUrl={perfil?.avatar_url}
           onEditProfile={handleEditProfile}
         />
