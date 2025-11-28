@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
-
+import DateTimePicker from "@react-native-community/datetimepicker"
+import { supabase } from "lib/supabase"
+import { useAuth } from "providers/AuthProvider"
+import React, { useState, useEffect } from "react"
 import {
   View,
   Text,
@@ -10,110 +12,107 @@ import {
   useColorScheme,
   Platform,
   ScrollView,
-} from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { PagoInsert, usePagos } from "../hooks/usePagos";
-import { useAuth } from "providers/AuthProvider";
-import { supabase } from "lib/supabase"
+} from "react-native"
+
+import { PagoInsert, usePagos } from "../hooks/usePagos"
 
 // Tipos para los catálogos
 type Categoria = {
-  id_categoria: number;
-  nombre: string;
-};
+  id_categoria: number
+  nombre: string
+}
 
 type MetodoPago = {
-  id_metodo: number;
-  tipo : string;
-};
+  id_metodo: number
+  tipo: string
+}
 
 interface AddPaymentFormProps {
-  onSuccess?: () => void;
-  onCancel?: () => void;
+  onSuccess?: () => void
+  onCancel?: () => void
 }
 
 export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
-  
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const colorScheme = useColorScheme()
+  const isDark = colorScheme === "dark"
 
   // const {t} = useTraslation();
 
-  const { session } = useAuth();
-  const userId = session?.user?.id ?? null;
+  const { session } = useAuth()
+  const userId = session?.user?.id ?? null
 
-  const { create, isLoading } = usePagos(userId ?? undefined);
+  const { create, isLoading } = usePagos(userId ?? undefined)
 
   // Estados del formulario
-  const [titulo, setTitulo] = useState("");
-  const [monto, setMonto] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [fechaVencimiento, setFechaVencimiento] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [idCategoria, setIdCategoria] = useState<number | null>(null);
-  const [idMetodo, setIdMetodo] = useState<number | null>(null);
+  const [titulo, setTitulo] = useState("")
+  const [monto, setMonto] = useState("")
+  const [descripcion, setDescripcion] = useState("")
+  const [fechaVencimiento, setFechaVencimiento] = useState(new Date())
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [idCategoria, setIdCategoria] = useState<number | null>(null)
+  const [idMetodo, setIdMetodo] = useState<number | null>(null)
 
   // Catálogos
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
-  const [metodosPago, setMetodosPago] = useState<MetodoPago[]>([]);
-  const [loadingCatalogos, setLoadingCatalogos] = useState(true);
+  const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [metodosPago, setMetodosPago] = useState<MetodoPago[]>([])
+  const [loadingCatalogos, setLoadingCatalogos] = useState(true)
 
   // Cargar catálogos al montar
   useEffect(() => {
-    loadCatalogos();
-  }, []);
+    loadCatalogos()
+  }, [])
 
   const loadCatalogos = async () => {
     try {
-      setLoadingCatalogos(true);
+      setLoadingCatalogos(true)
 
       // Cargar categorías
       const { data: categoriasData, error: categoriasError } = await supabase
         .from("categoria")
         .select("*")
-        .order("nombre");
+        .order("nombre")
 
-      if (categoriasError) throw categoriasError;
+      if (categoriasError) throw categoriasError
 
       // Cargar métodos de pago
       const { data: metodosData, error: metodosError } = await supabase
         .from("metodo_pago")
         .select("*")
-        .order("id_metodo");
+        .order("id_metodo")
 
-      if (metodosError) throw metodosError;
+      if (metodosError) throw metodosError
 
-      setCategorias(categoriasData || []);
-      setMetodosPago(metodosData || []);
+      setCategorias(categoriasData || [])
+      setMetodosPago(metodosData || [])
     } catch (error) {
-      console.error("Error cargando catálogos:", error);
+      console.error("Error cargando catálogos:", error)
       Alert.alert(
         "Error",
-        "No se pudieron cargar las categorías y métodos de pago"
-      );
+        "No se pudieron cargar las categorías y métodos de pago",
+      )
     } finally {
-      setLoadingCatalogos(false);
+      setLoadingCatalogos(false)
     }
-  };
+  }
 
   // Formatear monto mientras se escribe
   const handleMontoChange = (text: string) => {
     // Permitir solo números y un punto decimal
-    const cleaned = text.replace(/[^0-9.]/g, "");
+    const cleaned = text.replace(/[^0-9.]/g, "")
 
     // Evitar múltiples puntos decimales
-    const parts = cleaned.split(".");
+    const parts = cleaned.split(".")
     if (parts.length > 2) {
-      return;
+      return
     }
 
     // Limitar a 2 decimales
     if (parts[1] && parts[1].length > 2) {
-      return;
+      return
     }
 
-    setMonto(cleaned);
-  };
+    setMonto(cleaned)
+  }
 
   // Formatear fecha para mostrar
   const formatDateDisplay = (date: Date): string => {
@@ -122,78 +121,77 @@ export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
       year: "numeric",
       month: "long",
       day: "numeric",
-    });
-  };
+    })
+  }
 
   // Manejar cambio de fecha
   const onDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(Platform.OS === "ios");
+    setShowDatePicker(Platform.OS === "ios")
     if (selectedDate) {
-      setFechaVencimiento(selectedDate);
+      setFechaVencimiento(selectedDate)
     }
-  };
+  }
 
   // Validar formulario
   const validateForm = (): boolean => {
     if (!titulo.trim()) {
-      Alert.alert("Campo requerido", "El título es obligatorio");
-      return false;
+      Alert.alert("Campo requerido", "El título es obligatorio")
+      return false
     }
 
     if (!monto || parseFloat(monto) <= 0) {
-      Alert.alert("Monto inválido", "Ingresa un monto válido mayor a 0");
-      return false;
+      Alert.alert("Monto inválido", "Ingresa un monto válido mayor a 0")
+      return false
     }
 
     if (!userId) {
-      Alert.alert("Error", "Usuario no autenticado");
-      return false;
+      Alert.alert("Error", "Usuario no autenticado")
+      return false
     }
 
-    return true;
-  };
+    return true
+  }
 
   // Enviar formulario
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) return
 
     try {
-    
       // Formatear fecha manteniendo la fecha local (YYYY-MM-DD)
-      const year = fechaVencimiento.getFullYear();
-      const month = String(fechaVencimiento.getMonth() + 1).padStart(2, '0');
-      const day = String(fechaVencimiento.getDate()).padStart(2, '0');
-      const fechaISO = `${year}-${month}-${day}`;
+      const year = fechaVencimiento.getFullYear()
+      const month = String(fechaVencimiento.getMonth() + 1).padStart(2, "0")
+      const day = String(fechaVencimiento.getDate()).padStart(2, "0")
+      const fechaISO = `${year}-${month}-${day}`
 
       const payload: PagoInsert = {
         titulo: titulo.trim(),
-        monto: monto,
+        monto,
         fecha_vencimiento: fechaISO,
         estado: "Pendiente",
         id_usuario: userId!,
         id_categoria: idCategoria,
         id_metodo: idMetodo,
-      };
+      }
 
-      await create(payload);
+      await create(payload)
 
-      Alert.alert("¡Éxito!", "Pago guardado correctamente");
+      Alert.alert("¡Éxito!", "Pago guardado correctamente")
 
       // Limpiar formulario
-      setTitulo("");
-      setMonto("");
-      setDescripcion("");
-      setFechaVencimiento(new Date());
-      setIdCategoria(null);
-      setIdMetodo(null);
+      setTitulo("")
+      setMonto("")
+      setDescripcion("")
+      setFechaVencimiento(new Date())
+      setIdCategoria(null)
+      setIdMetodo(null)
 
       // Notificar éxito
-      onSuccess?.();
+      onSuccess?.()
     } catch (err) {
-      console.error("Error guardando pago:", err);
-      Alert.alert("Error", "Hubo un problema al guardar el pago");
+      console.error("Error guardando pago:", err)
+      Alert.alert("Error", "Hubo un problema al guardar el pago")
     }
-  };
+  }
 
   return (
     <ScrollView
@@ -201,13 +199,17 @@ export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
       contentContainerStyle={styles.contentContainer}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={[styles.header, isDark && styles.headerDark].filter(Boolean)}>
+      <Text
+        style={[styles.header, isDark && styles.headerDark].filter(Boolean)}
+      >
         Nuevo Pago
       </Text>
 
       {/* Título */}
       <View style={styles.fieldContainer}>
-        <Text style={[styles.label, isDark && styles.labelDark].filter(Boolean)}>
+        <Text
+          style={[styles.label, isDark && styles.labelDark].filter(Boolean)}
+        >
           Título <Text style={styles.required}>*</Text>
         </Text>
         <TextInput
@@ -222,15 +224,26 @@ export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
 
       {/* Monto */}
       <View style={styles.fieldContainer}>
-        <Text style={[styles.label, isDark && styles.labelDark].filter(Boolean)}>
+        <Text
+          style={[styles.label, isDark && styles.labelDark].filter(Boolean)}
+        >
           Monto (COP) <Text style={styles.required}>*</Text>
         </Text>
         <View style={styles.montoContainer}>
-          <Text style={[styles.montoSymbol, isDark && styles.montoSymbolDark].filter(Boolean)}>
+          <Text
+            style={[
+              styles.montoSymbol,
+              isDark && styles.montoSymbolDark,
+            ].filter(Boolean)}
+          >
             $
           </Text>
           <TextInput
-            style={[styles.input, styles.montoInput, isDark && styles.inputDark].filter(Boolean)}
+            style={[
+              styles.input,
+              styles.montoInput,
+              isDark && styles.inputDark,
+            ].filter(Boolean)}
             keyboardType="decimal-pad"
             value={monto}
             onChangeText={handleMontoChange}
@@ -239,7 +252,12 @@ export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
           />
         </View>
         {monto && parseFloat(monto) > 0 && (
-          <Text style={[styles.montoPreview, isDark && styles.montoPreviewDark].filter(Boolean)}>
+          <Text
+            style={[
+              styles.montoPreview,
+              isDark && styles.montoPreviewDark,
+            ].filter(Boolean)}
+          >
             {new Intl.NumberFormat("es-CO", {
               style: "currency",
               currency: "COP",
@@ -251,14 +269,22 @@ export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
 
       {/* Fecha de vencimiento */}
       <View style={styles.fieldContainer}>
-        <Text style={[styles.label, isDark && styles.labelDark].filter(Boolean)}>
+        <Text
+          style={[styles.label, isDark && styles.labelDark].filter(Boolean)}
+        >
           Fecha de vencimiento <Text style={styles.required}>*</Text>
         </Text>
         <TouchableOpacity
-          style={[styles.dateButton, isDark && styles.dateButtonDark].filter(Boolean)}
+          style={[styles.dateButton, isDark && styles.dateButtonDark].filter(
+            Boolean,
+          )}
           onPress={() => setShowDatePicker(true)}
         >
-          <Text style={[styles.dateText, isDark && styles.dateTextDark].filter(Boolean)}>
+          <Text
+            style={[styles.dateText, isDark && styles.dateTextDark].filter(
+              Boolean,
+            )}
+          >
             📅 {formatDateDisplay(fechaVencimiento)}
           </Text>
         </TouchableOpacity>
@@ -277,7 +303,9 @@ export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
 
       {/* Categoría */}
       <View style={styles.fieldContainer}>
-        <Text style={[styles.label, isDark && styles.labelDark].filter(Boolean)}>
+        <Text
+          style={[styles.label, isDark && styles.labelDark].filter(Boolean)}
+        >
           Categoría (opcional)
         </Text>
         <ScrollView
@@ -311,7 +339,9 @@ export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
                 styles.chip,
                 idCategoria === cat.id_categoria && styles.chipSelected,
                 isDark && styles.chipDark,
-                idCategoria === cat.id_categoria && isDark && styles.chipSelectedDark,
+                idCategoria === cat.id_categoria &&
+                isDark &&
+                styles.chipSelectedDark,
               ].filter(Boolean)}
               onPress={() => setIdCategoria(cat.id_categoria)}
             >
@@ -331,7 +361,9 @@ export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
 
       {/* Método de pago */}
       <View style={styles.fieldContainer}>
-        <Text style={[styles.label, isDark && styles.labelDark].filter(Boolean)}>
+        <Text
+          style={[styles.label, isDark && styles.labelDark].filter(Boolean)}
+        >
           Método de pago (opcional)
         </Text>
         <ScrollView
@@ -365,7 +397,9 @@ export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
                 styles.chip,
                 idMetodo === metodo.id_metodo && styles.chipSelected,
                 isDark && styles.chipDark,
-                idMetodo === metodo.id_metodo && isDark && styles.chipSelectedDark,
+                idMetodo === metodo.id_metodo &&
+                isDark &&
+                styles.chipSelectedDark,
               ].filter(Boolean)}
               onPress={() => setIdMetodo(metodo.id_metodo)}
             >
@@ -385,7 +419,9 @@ export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
 
       {/* Descripción adicional */}
       <View style={styles.fieldContainer}>
-        <Text style={[styles.label, isDark && styles.labelDark].filter(Boolean)}>
+        <Text
+          style={[styles.label, isDark && styles.labelDark].filter(Boolean)}
+        >
           Descripción adicional (opcional)
         </Text>
         <TextInput
@@ -429,7 +465,7 @@ export function AddPaymentForm({ onSuccess, onCancel }: AddPaymentFormProps) {
         </TouchableOpacity>
       </View>
     </ScrollView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -598,4 +634,4 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     opacity: 0.5,
   },
-});
+})

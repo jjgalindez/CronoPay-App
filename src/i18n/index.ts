@@ -6,7 +6,44 @@ import { initReactI18next } from "react-i18next"
 const resources = {
   es: {
     translation: {
-      
+      home: {
+        title: "Organiza tus pagos fácilmente",
+        subtitle:
+          "Controla todas tus suscripciones y pagos recurrentes desde una sola app",
+
+        signUpButton: "Crear cuenta gratuita",
+        loginButton: "Iniciar sesión",
+
+        reminders:
+          "Recordatorios automáticos: Nunca olvides un pago importante",
+        categories:
+          "Visualiza por categoría: Organiza tus gastos de forma inteligente",
+        reports: "Reportes mensuales: Analiza tus patrones de gasto",
+
+        terms: "Términos",
+        privacy: "Privacidad",
+        support: "Soporte",
+        rights: "© 2024 CronoPay. Todos los derechos reservados.",
+      },
+      login: {
+        title: "Iniciar sesión",
+        subtitle: "Ingresa con tu correo y contraseña para continuar.",
+        continueWith: "o continúa con",
+        noAccount: "¿No tienes cuenta?",
+        signUp: "Regístrate",
+
+        emailPlaceholder: "Correo electrónico",
+        passwordPlaceholder: "Contraseña",
+        defaultError: "Ocurrió un error",
+      },
+      signup: {
+        title: "Crear cuenta",
+        subtitle: "Regístrate con tu correo para comenzar.",
+        namePlaceholder: "Nombre completo",
+        repeatPasswordPlaceholder: "Repite tu contraseña",
+        alreadyHaveAccount: "¿Ya tienes cuenta?",
+        button: "Registrarse",
+      },
       monthNames: [
         "Enero",
         "Febrero",
@@ -35,7 +72,7 @@ const resources = {
         "Nov",
         "Dic",
       ],
-     
+
       profilAndSettings: "Perfil y Configuración",
       editProfile: "Editar perfil",
       uploadingImage: "Subiendo imagen...",
@@ -69,7 +106,8 @@ const resources = {
       backupManual: "Respaldo manual",
       passwordAndAuth: "Contraseña y autenticación",
       ChangePassword: "Cambiar contraseña",
-      ConfigurePasswordAndAuthentication: "Configurar contraseña y autenticación",
+      ConfigurePasswordAndAuthentication:
+        "Configurar contraseña y autenticación",
       TwoFactorAuth: "Autenticación de dos factores",
       signOut: "Cerrar sesión",
       AreYouSureYouWantToLogOut: "¿Estás seguro de que quieres cerrar sesión?",
@@ -105,12 +143,16 @@ const resources = {
       ExportExcel: "Exportar Excel",
       SendMail: "Enviar por Correo",
       WIP: "Funcionalidad en desarrollo",
-      WIPExcel: "La funcionalidad de exportar a Excel estará disponible próximamente",
-      WIPEmail: "La funcionalidad de exportar por correo electrónico estará disponible próximamente",
-      WIPPdf: "La funcionalidad de exportar a PDF estará disponible próximamente",
+      WIPExcel:
+        "La funcionalidad de exportar a Excel estará disponible próximamente",
+      WIPEmail:
+        "La funcionalidad de exportar por correo electrónico estará disponible próximamente",
+      WIPPdf:
+        "La funcionalidad de exportar a PDF estará disponible próximamente",
       PaymentsDetails: "Detalles de Pagos",
       Found: "encontrados",
-      MonthSelectorMessage: "Selecciona el año y luego el mes para filtrar tus reportes.",
+      MonthSelectorMessage:
+        "Selecciona el año y luego el mes para filtrar tus reportes.",
       SelectPeriod: "Elige un Periodo",
       PaymentsTitle: "Pagos",
       CalendarTitle: "Calendario",
@@ -129,8 +171,6 @@ const resources = {
       NextDueDates: "Próximos Vencimientos",
       AddNewPayment: "Agregar Nuevo Pago",
 
-      
-      
       // Calendario
       PaymentCalendar: "Calendario de Pagos",
       PaymentsInMonth: "pago(s) en",
@@ -149,15 +189,17 @@ const resources = {
       PaymentsOf: "Pagos del",
       Of: "de",
       TotalOfDay: "Total del día:",
-      
+
       // Pantalla de Pagos
       AllPayments: "📅 Todos los Pagos",
-      ReviewUpcomingObligations: "Revisa tus obligaciones próximas y mantente al día.",
+      ReviewUpcomingObligations:
+        "Revisa tus obligaciones próximas y mantente al día.",
       NotAuthenticated: "No autenticado",
       MustLoginToSeePayments: "Debes iniciar sesión para ver tus pagos",
       ErrorLoadingPayments: "Error al cargar pagos",
       NoPaymentsRegisteredThisMonth: "No hay pagos registrados para este mes",
-      CanStartAddingOne: "Puedes comenzar añadiendo uno desde el botón inferior.",
+      CanStartAddingOne:
+        "Puedes comenzar añadiendo uno desde el botón inferior.",
       DaysAgo: "Vencido hace",
       Day: "día",
       Days: "días",
@@ -167,11 +209,12 @@ const resources = {
       GeneralTotal: "Total General:",
       PendingPayments: "Pendientes:",
       PaidPayments: "Pagados:",
-      
+
       // Recordatorios de Pago
       Reminders: "📅 Reminders",
       NoPaymentReminders: "No hay recordatorios de pagos pendientes",
-      MustLoginToSeeReminders: "Debes iniciar sesión para ver tus recordatorios",
+      MustLoginToSeeReminders:
+        "Debes iniciar sesión para ver tus recordatorios",
       ErrorLoadingReminders: "Error al cargar recordatorios",
       LoadingReminders: "Cargando recordatorios...",
       TotalPaymentsPending: "Total de pagos pendientes:",
@@ -217,6 +260,7 @@ const resources = {
       PaidOn: "Pagado el",
       DueOn: "Vence el",
       
+
       // Acciones de Pago
       Success: "Éxito",
       MarkedAsPaid: "marcado como pagado",
@@ -226,14 +270,49 @@ const resources = {
       SureToDeletePayment: "¿Estás seguro de que quieres eliminar el pago",
       Deleted: "eliminado",
       CouldNotDeletePayment: "No se pudo eliminar el pago",
-      
+
       // Tarjeta de Pago
       PaymentColon: "Pago:",
     },
   },
   en: {
     translation: {
-      
+      home: {
+        title: "Organize your payments easily",
+        subtitle:
+          "Manage all your subscriptions and recurring payments from a single app",
+
+        signUpButton: "Create free account",
+        loginButton: "Log in",
+
+        reminders: "Automatic reminders: Never forget an important payment",
+        categories: "View by category: Organize your expenses intelligently",
+        reports: "Monthly reports: Analyze your spending patterns",
+
+        terms: "Terms",
+        privacy: "Privacy",
+        support: "Support",
+        rights: "© 2024 CronoPay. All rights reserved.",
+      },
+      login: {
+        title: "Log in",
+        subtitle: "Enter your email and password to continue.",
+        continueWith: "or continue with",
+        noAccount: "Don't have an account?",
+        signUp: "Sign up",
+
+        emailPlaceholder: "Email address",
+        passwordPlaceholder: "Password",
+        defaultError: "An error occurred",
+      },
+      signup: {
+        title: "Create account",
+        subtitle: "Sign up with your email to get started.",
+        namePlaceholder: "Full name",
+        repeatPasswordPlaceholder: "Repeat your password",
+        alreadyHaveAccount: "Already have an account?",
+        button: "Sign up",
+      },
       monthNames: [
         "January",
         "February",
@@ -262,7 +341,7 @@ const resources = {
         "Nov",
         "Dec",
       ],
-     
+
       profilAndSettings: "Profile and Settings",
       editProfile: "Edit Profile",
       uploadingImage: "Uploading image...",
@@ -296,7 +375,8 @@ const resources = {
       backupManual: "Manual backup",
       passwordAndAuth: "Password and authentication",
       ChangePassword: "Change Password",
-      ConfigurePasswordAndAuthentication: "Configure Password and Authentication",
+      ConfigurePasswordAndAuthentication:
+        "Configure Password and Authentication",
       TwoFactorAuth: "Two-factor authentication",
       signOut: "Sign Out",
       AreYouSureYouWantToLogOut: "Are you sure you want to log out?",
@@ -337,7 +417,8 @@ const resources = {
       WIPPdf: "PDF export functionality will be available soon",
       PaymentsDetails: "Payments Details",
       Found: "found",
-      MonthSelectorMessage: "Select a year and then month to view your payment summary",
+      MonthSelectorMessage:
+        "Select a year and then month to view your payment summary",
       SelectPeriod: "Select Period",
       PaymentsTitle: "Payments",
       CalendarTitle: "Calendar",
@@ -356,8 +437,6 @@ const resources = {
       NextDueDates: "Next Due Dates",
       AddNewPayment: "Add New Payment",
 
-     
-      
       // Calendar
       PaymentCalendar: "Payment Calendar",
       PaymentsInMonth: "payment(s) in",
@@ -376,10 +455,11 @@ const resources = {
       PaymentsOf: "Payments of",
       Of: "of",
       TotalOfDay: "Total of the day:",
-      
+
       // Payments Screen
       AllPayments: "📅 All Payments",
-      ReviewUpcomingObligations: "Review your upcoming obligations and stay on track.",
+      ReviewUpcomingObligations:
+        "Review your upcoming obligations and stay on track.",
       NotAuthenticated: "Not authenticated",
       MustLoginToSeePayments: "You must log in to see your payments",
       ErrorLoadingPayments: "Error loading payments",
@@ -394,7 +474,7 @@ const resources = {
       GeneralTotal: "General Total:",
       PendingPayments: "Pending:",
       PaidPayments: "Paid:",
-      
+
       // Payment Reminders
       Reminders: "📅 Reminders",
       NoPaymentReminders: "No pending payment reminders",
@@ -444,6 +524,7 @@ const resources = {
       PaidOn: "Paid on",
       DueOn: "Due on",
       
+
       // Payment Actions
       Success: "Success",
       MarkedAsPaid: "marked as paid",
@@ -453,7 +534,7 @@ const resources = {
       SureToDeletePayment: "Are you sure you want to delete the payment",
       Deleted: "deleted",
       CouldNotDeletePayment: "Could not delete the payment",
-      
+
       // Payment Card
       PaymentColon: "Payment:",
     },

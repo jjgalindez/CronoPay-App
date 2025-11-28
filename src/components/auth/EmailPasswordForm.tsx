@@ -1,7 +1,8 @@
 // src/components/auth/EmailPasswordForm.tsx
 import { router } from "expo-router"
 import { supabase } from "lib/supabase"
-import { useState } from "react"
+import { use, useState } from "react"
+import { useTranslation } from "react-i18next"
 import {
   View,
   Text,
@@ -11,6 +12,8 @@ import {
 } from "react-native"
 
 export function EmailPasswordForm() {
+  const { t } = useTranslation()
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -27,7 +30,7 @@ export function EmailPasswordForm() {
       if (error) throw error
       router.replace("/(tabs)/inicio")
     } catch (err: any) {
-      setError(err.message ?? "Ocurrió un error")
+      setError(err.message ?? t("login.defaultError"))
     } finally {
       setIsLoading(false)
     }
@@ -36,31 +39,32 @@ export function EmailPasswordForm() {
   return (
     <View>
       <TextInput
-        placeholder="Correo electrónico"
+        placeholder={t("login.emailPlaceholder")}
         placeholderTextColor="#9ca3af"
         keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
-        className="border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-gray-100 p-3 mb-3 rounded-lg"
+        className="mb-3 rounded-lg border border-neutral-300 bg-white p-3 text-neutral-900 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-100"
       />
       <TextInput
-        placeholder="Contraseña"
+        placeholder={t("login.passwordPlaceholder")}
         placeholderTextColor="#9ca3af"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
-        className="border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-gray-100 p-3 mb-3 rounded-lg"
+        className="mb-3 rounded-lg border border-neutral-300 bg-white p-3 text-neutral-900 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-100"
       />
-      {error && <Text className="text-red-500 mb-3">{error}</Text>}
+      {error && <Text className="mb-3 text-red-500">{error}</Text>}
       <Pressable
         onPress={handleLogin}
         disabled={isLoading}
-        className={`p-4 rounded-lg items-center ${isLoading ? 'bg-neutral-400' : 'bg-[#2791B5]'}`}
+        className={`items-center rounded-lg p-4 ${isLoading ? "bg-neutral-400" : "bg-[#2791B5]"
+          }`}
       >
         {isLoading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text className="text-white font-bold">Entrar</Text>
+          <Text className="font-bold text-white">{t("home.loginButton")}</Text>
         )}
       </Pressable>
     </View>
