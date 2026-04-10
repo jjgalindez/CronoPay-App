@@ -15,6 +15,8 @@ import { formatCurrency } from "../utils/formatters"
 import RecordatorioEditor from "./RecordatorioEditor"
 import { updateRecordatorio } from "../../lib/api/recordatorios"
 import useNotifee, { supportsTrigger } from "../hooks/useNotifee"
+import { fetchRecordatoriosByUser } from "../../lib/api/recordatorios"
+import { useAuth } from "../../providers/AuthProvider"
 import { isOverdue, getDaysUntil } from "../utils/dateHelpers"
 import { useTema } from "@/hooks/useTema"
 import { useTranslation } from "react-i18next"
@@ -128,9 +130,58 @@ export default function RecordatoriosList({
   >(null)
   const nf = useNotifee()
   const [localItems, setLocalItems] = useState<RecordatorioItem[]>(items)
+  const [isFetching, setIsFetching] = useState(false)
+  const { session } = useAuth()
 
   // keep a local copy of items so UI can refresh immediately after edits
-  useEffect(() => setLocalItems(items), [items])
+  // If there is a logged user, we will fetch recordatorios for that user
+  useEffect(() => {
+    if (!session?.user?.id) {
+      setLocalItems(items)
+    }
+  }, [items, session?.user?.id])
+
+  // When user is logged-in, fetch recordatorios belonging to their pagos
+  useEffect(() => {
+    let mounted = true
+    const userId = session?.user?.id
+    if (!userId) return
+
+    ;(async () => {
+      setIsFetching(true)
+      try {
+        const rows = await fetchRecordatoriosByUser(userId)
+        if (!mounted) return
+
+        // map supabase rows to RecordatorioItem shape
+        const mapped: RecordatorioItem[] = (rows as any[]).map((r) => ({
+          id_recordatorio: r.id_recordatorio,
+          fecha_aviso: r.fecha_aviso,
+          hora: r.hora,
+          mensaje: r.mensaje,
+          id_pago: r.id_pago,
+          pago: r.pago
+            ? {
+                titulo: r.pago.titulo,
+                monto: r.pago.monto,
+                estado: r.pago.estado,
+                metodo: (r.pago.metodo_pago && r.pago.metodo_pago.nombre) || r.pago.metodo,
+              }
+            : undefined,
+        }))
+
+        setLocalItems(mapped)
+      } catch (e) {
+        console.error('[RecordatoriosList] fetchRecordatoriosByUser error', e)
+      } finally {
+        if (mounted) setIsFetching(false)
+      }
+    })()
+
+    return () => {
+      mounted = false
+    }
+  }, [session?.user?.id])
 
   useEffect(() => {
     // initialize scheduling map from localItems' notification_id
@@ -213,6 +264,11 @@ export default function RecordatoriosList({
       {schedulingSupported === false ? (
         <View style={dynamicStyles.warningBox}>
           <Text style={dynamicStyles.warningText}>{t('schedulingLimitedWarning')}</Text>
+        </View>
+      ) : null}
+      {isFetching ? (
+        <View style={{ paddingVertical: 16 }}>
+          <ActivityIndicator size="small" />
         </View>
       ) : null}
       {showFilters && (

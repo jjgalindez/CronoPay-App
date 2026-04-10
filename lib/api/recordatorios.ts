@@ -25,6 +25,23 @@ export async function fetchRecordatoriosByPago(
 }
 
 /**
+ * Obtener todos los recordatorios de los pagos de un usuario
+ */
+export async function fetchRecordatoriosByUser(
+  userId: string,
+): Promise<RecordatorioRow[]> {
+  const { data, error } = await supabase
+    .from('recordatorio')
+    .select('*, pago(*)')
+    .eq('pago.id_usuario', userId)
+    .order('fecha_aviso', { ascending: true })
+    .order('hora', { ascending: true })
+
+  if (error) throw error
+  return (data as RecordatorioRow[] | null) ?? []
+}
+
+/**
  * Obtener un recordatorio por su ID
  */
 export async function fetchRecordatorioById(
